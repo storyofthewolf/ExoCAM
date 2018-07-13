@@ -1,0 +1,40 @@
+#! /bin/csh -f
+
+#===============================================================================
+# Janus machine specific settings
+# #===============================================================================
+ source /etc/profile.d/modules.csh
+
+
+ if ( $COMPILER == "intel" ) then
+#  module load icc_15.0-ompi_1.6.5
+#  module load hdf5_1.8.14-icc_15.0.2
+#  module load netcdf_fortran+c_4.4.2-icc_15.0.2
+#  setenv NETCDF_PATH /sw/netcdf-fortran+c-4.4.2_icc-15.0.2
+#  setenv MPI_PATH /sw/openmpi-1.6.5_icc-15.0.2  
+
+  #  setenv INC_NETCDF /sw/netcdf-fortran+c-4.4.2_icc-15.0.2/inc
+  #  setenv LIB_NETCDF /sw/netcdf-fortran+c-4.4.2_icc-15.0.2/lib
+
+  module load icc_15.0-ompi_1.8.3
+  module load netcdf_fortran+c_4.4.1-icc_15.0
+  module load hdf5_1.8.13-icc_15.0
+  setenv NETCDF_PATH /sw/netcdf-fortran+c-4.4.1_icc-15.0
+  setenv NETCDF /sw/netcdf-fortran+c-4.4.1_icc-15.0
+  setenv MPI_PATH /sw/openmpi-1.8.3_icc-15.0/bin/mpirun
+  setenv INC_NETCDF /sw/netcdf-fortran+c-4.4.1_icc-15.0/include
+  setenv LIB_NETCDF /sw/netcdf-fortran+c-4.4.1_icc-15.0/lib
+
+  setenv MPI_PATH $MPI_PATH
+  setenv NETCDF_PATH $NETCDF_PATH
+  setenv OMP_STACKSIZE 64M
+  setenv P4_GLOBMEMSIZE 500000000
+
+
+
+endif
+
+if ( $COMPILER == "pgi" ) then
+
+endif
+
