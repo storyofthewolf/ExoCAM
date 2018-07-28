@@ -24,8 +24,6 @@ MODULE shr_const_mod
    real(R8),parameter :: SHR_CONST_REARTH = exo_planet_radius  ! planet radius
    real(R8),parameter :: SHR_CONST_G = exo_surface_gravity     ! surface gravity
 
-   ! LENGTH OF DAY
-
    real(R8),parameter :: SHR_CONST_PI      = 3.14159265358979323846_R8  ! pi
    real(R8),parameter :: SHR_CONST_CDAY    = 86400.0_R8      ! sec in calendar day ~ sec, [DO NOT CHANGE]
    real(R8),parameter :: SHR_CONST_OMEGA   = 2.0_R8*SHR_CONST_PI/SHR_CONST_SDAY ! earth rot ~ rad/sec

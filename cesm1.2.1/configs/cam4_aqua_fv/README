@@ -1,2 +1,12 @@
+QuickStart Guide
+
+create_newcase -case $my_aquaplanet_case -res f45_f45 -mach hyak -compset E2000C4AQI
+xmlchange CAM_CONFIG_OPTS="-nlev 40 -phys cam4 -usr_src /projects/wolfet/models/ExoRT/3dmodels/src.cam.n******"
 copy SourceMods folder directly into your $Case directory
-copy namelist files into yourr $Case directory
+copy namelist files into your $Case directory
+build and run
+
+
+
+---------------------------------------------------------------------------------
+NOTES:

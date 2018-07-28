@@ -1,3 +1,16 @@
+ExoCAM
+https://github.com/storyofthewolf/ExoCAM
+Eric T. Wolf
+eric.wold@colorado.edu
+
+DESCRIPTION:  This code contains system files, source code, initial conditions files, and namelists needed to adapt the NCAR Community Earth System Model for planetary/exoplanetary applications.  The files provided do not run standalone.  This is a patch to be used with standard distributions of CESM.  CESM is freely available at http://www.cesm.ucar.edu/models/current.html
+
+PRE-REQUISITE:  Familiarity with checking out, building, and running CESM is assumed.  Please refer to the publicly available CESM user’s guide for details.  
+http://www.cesm.ucar.edu/models/cesm1.2/cesm/doc/usersguide/ug.pdf
+
+NOTE: ExoCAM is mean to be run with ExoRT, a correlated-k radiative transfer package available at https://github.com/storyofthewolf/ExoRT.
+
+
 folders
 cesm1.2.1  -- model versions for CESM1.2.1
 

@@ -443,6 +443,19 @@ for mct, etc.
   <ADD_SLIBS>-L$(NETCDF_DIR)/lib -lnetcdff -lnetcdf</ADD_SLIBS>
 </compiler>
 
+<compiler MACH="summit" COMPILER="intel">
+  <ADD_SLIBS>$(shell $(NETCDF_PATH)/bin/nc-config --flibs) -mkl=cluster</ADD_SLIBS>
+  <MPICC>mpiicc</MPICC>
+  <MPICXX>mpiicpc </MPICXX>
+  <MPIFC>mpiifort </MPIFC>
+  <SFC>ifort </SFC>
+  <SCXX>icpc </SCXX>
+  <SCC>icc </SCC>
+  <PIO_FILESYSYEM_HINTS>gpfs</PIO_FILESYSYEM_HINTS>
+  <ADD_FFLAGS>-xHost -march=core-avx2</ADD_FFLAGS>
+  <ADD_CFLAGS>-xHost -march=core-avx2</ADD_CFLAGS>
+  <ADD_SLIBS></ADD_SLIBS>
+</compiler>
 
 <compiler MACH="janus">
   <NETCDF_PATH> $(NETCDF)</NETCDF_PATH>

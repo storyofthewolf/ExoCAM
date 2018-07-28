@@ -1,0 +1,30 @@
+#! /bin/csh -f
+
+#===============================================================================
+# Summit machine specific settings
+# #===============================================================================
+source /etc/profile.d/lmod.csh
+
+if ( $COMPILER == "intel" ) then
+  source /home/wolfet/.my.cshrc.compilenode
+endif
+
+if ( $COMPILER == "pgi" ) then
+
+endif
+
+module load cmake
+
+setenv MKL "-mkl=cluster"
+setenv NETCDF_DIR $CURC_NETCDF_ROOT
+setenv PNETCDF_PATH $CURC_PNETCDF_ROOT
+setenv CPATH $CURC_NETCDF_INC
+setenv NETCDF_FORTRAN_LIB_DIR $CURC_NETCDF_LIB
+setenv NETCDF_PATH $CURC_NETCDF_ROOT
+
+
+
+
+# Run time variables
+
+setenv OMP_STACKSIZE 64M

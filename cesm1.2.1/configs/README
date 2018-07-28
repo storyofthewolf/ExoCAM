@@ -2,3 +2,10 @@ supported configurations
 
 cam4_aqua_fv 
   cam4, aquaplanet slab ocean, finite volume dynamical core
+
+planned
+  cam4_aqua_se
+  cam4_land_fv
+  cam4_land_se
+
+

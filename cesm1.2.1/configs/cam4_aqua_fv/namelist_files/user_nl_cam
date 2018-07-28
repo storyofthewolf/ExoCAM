@@ -15,8 +15,8 @@ kv_top_pressure=0.0   !Pa (mb)  ! set to zero to turn off
 kv_top_scale=0.5
 trop_cloud_top_press = 1.
 
-ncdata = '/projects/wolfet/models/ExoCAM/cesm1.2.1/initial_files/cam4_fv_4x5_aquaplanet/ic_P1.1bar_L40_ic.nc'
-bnd_topo = '/projects/wolfet/models/ExoCAM/cesm1.2.1/initial_files/cam4_fv_4x5_aquaplanet/USGS-gtopo_aquaplanet_4x5.nc'
+ncdata = '/projects/wolfet/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/ic_P1.1bar_L40_ic.nc'
+bnd_topo = '/projects/wolfet/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/USGS-gtopo_aquaplanet_4x5.nc'
 
 gw_drag_file = '/projects/wolfet/models/ExoCAM/cesm1.2.1/initial_files/other/newmfspectra40_dc25.nc'
 

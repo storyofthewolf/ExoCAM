@@ -5,12 +5,12 @@
 !----------------------------------------------------------------------------------
 
  
-grid_file = '/projects/wolfet/models/ExoCAM/cesm1.2.1/initial_files/cam4_fv_4x5_aquaplanet/domain.ocn.4x5_100120_aquaplanet.nc'
+grid_file = '/projects/wolfet/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/domain.ocn.4x5_100120_aquaplanet.nc'
 grid_format = 'nc'
 grid_type = 'latlon'
 gridcpl_file = 'unknown_gridcpl_file'
 kcatbound =  0
-kmt_file = '/projects/wolfet/models/ExoCAM/cesm1.2.1/initial_files/cam4_fv_4x5_aquaplanet/domain.ocn.4x5_100120_aquaplanet.nc'
+kmt_file = '/projects/wolfet/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/domain.ocn.4x5_100120_aquaplanet.nc'
 
 shortwave = 'default'
 albedo_type = 'default'
