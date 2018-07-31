@@ -355,12 +355,18 @@ contains
         write(iulog,*) '***     New physical constants; exoplanet_mod      ***'
         write(iulog,*) 'SOLAR CONSTANT: ', SHR_CONST_SCON
         write(iulog,*) 'SOLAR SPECTRUM FILE: ', exo_solar_file
-        write(iulog,*) 'PLANET RADIUS (km): ', SHR_CONST_REARTH
+        write(iulog,*) 'PLANET RADIUS (m): ', SHR_CONST_REARTH
         write(iulog,*) 'SURFACE GRAVITY (m/s2): ', SHR_CONST_G
         write(iulog,*) 'SURFACE PRESSURE: ', SHR_CONST_PSTD
+        write(iulog,*) 'LENGTH OF DAY: ', EXO_NDAYS
         write(iulog,*) 'N2 BAR: ', exo_n2bar
+        write(iulog,*) 'H2 BAR: ', exo_h2bar
         write(iulog,*) 'CO2 BAR: ', exo_co2bar
         write(iulog,*) 'CH4 BAR: ', exo_ch4bar
+        write(iulog,*) 'N2 VMR, MMR: ', exo_n2vmr, exo_n2mmr
+        write(iulog,*) 'H2 VMR, MMR: ', exo_h2vmr, exo_h2mmr
+        write(iulog,*) 'CO2 VMR, MMR: ', exo_co2vmr, exo_co2mmr
+        write(iulog,*) 'CH4 VMR, MMR: ', exo_ch4vmr, exo_ch4mmr
         write(iulog,*) 'CPDAIR: ', SHR_CONST_CPDAIR
         write(iulog,*) 'MWDRY: ', SHR_CONST_MWDAIR
         write(iulog,*) 'RAIR: ', SHR_CONST_RDAIR

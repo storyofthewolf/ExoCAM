@@ -2,7 +2,7 @@
 ! namelist_var = new_namelist_value 
 
 
-nhtfrq = 1
+nhtfrq = 0
 mfilt = 1
 nspltvrm = 2
 nspltrac = 2

@@ -5,9 +5,9 @@
 
 nhtfrq = 0
 mfilt = 1
-nspltvrm = 4
-nspltrac = 4
-nsplit = 32
+nspltvrm = 2
+nspltrac = 2
+nsplit = 16
 avgflag_pertape = 'A'
 rad_data_output = .false.
 div24del2flag=2
