@@ -35,17 +35,21 @@ set queue=batch
 
 cat >! $file << EOF1
 #!/bin/csh -f
-# See https://www.rc.colorado.edu/crcdocs/queues for alternative queues
-#PBS -N ${jobname}
-#PBS -q ${queue}
-#PBS -l walltime=${time_limit} 
-#PBS -l nodes=${mppnodes}:ppn=${MAX_TASKS_PER_NODE},mem=22gb,feature=12core
-#PBS -j oe
-#PBS -S /bin/csh
+#SBATCH --job-name=${jobname}
+#SBATCH --account=vsm 
+#SBATCH --partition=vsm
+#SBATCH --time=${time_limit}
+#SBATCH --nodes=4   
+#SBATCH --ntasks=64 
+#SBATCH --mem=59gb  
+#SBATCH --ntasks-per-node=16 
 
 setenv MX_RCACHE 0
 limit coredumpsize 1000000
 limit stacksize unlimited
+module load icc_14.0.3-ompi_1.8.3 
+module load hdf5_1.8.13-icc_14.0.3 
+module load netcdf_fortran+c_4.4-icc_14.0.3 
 
 EOF1
 
@@ -80,9 +84,9 @@ if ( "\$MPILIB" == "mpi-serial" ) then
     \$EXEROOT/cesm.exe >&! cesm.log.\$LID
 else
     if( $taskpernode > $maxtasks ) then
-      mpiexec -np ${maxtasks}  \$EXEROOT/cesm.exe >&! cesm.log.\$LID
+      mpirun -np ${maxtasks} --mca mtl mx --mca pml cm --bind-to core --mca mpi_paffinity_alone 1 \$EXEROOT/cesm.exe >&! cesm.log.\$LID 
     else
-      mpiexec -np ${maxtasks} -npernode ${taskpernode}  \$EXEROOT/cesm.exe >&! cesm.log.\$LID
+      mpirun -np ${maxtasks} --mca mtl mx --mca pml cm --bind-to core --mca mpi_paffinity_alone 1 \$EXEROOT/cesm.exe >&! cesm.log.\$LID 
     endif
 endif
 wait

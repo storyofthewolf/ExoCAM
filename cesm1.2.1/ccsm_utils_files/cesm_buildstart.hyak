@@ -1,0 +1,16 @@
+#! /bin/csh -f
+#SBATCH -p build
+#SBATCH --job-name=build
+#SBATCH --time=00:20:00
+#SBATCH --mem=40gb
+
+
+./Tools/ccsm_check_lockedfiles || exit -1
+source ./Tools/ccsm_getenv     || exit -2
+
+setenv LID "`date +%y%m%d-%H%M%S`"
+
+if (! -f $CASE.run) then
+  echo "ERROR: must invoke cesm_setup script before calling build script "; exit -1
+endif
+

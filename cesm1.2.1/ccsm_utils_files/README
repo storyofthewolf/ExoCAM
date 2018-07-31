@@ -1,0 +1,21 @@
+ccsm_utils_files
+
+place the following files in directory 
+../cesm1_2_1/scripts/ccsm_utils/Machines
+
+  config_compilers.xml
+  config_machines.xml 
+  env_mach_specific.hyak 
+  env_mach_specific.summit  
+  mkbatch.hyak  
+  mkbatch.summit
+
+
+place the following file in directory
+../cesm1_2_1/scripts/ccsm_utils/Case.template
+
+  config_compilers.xml
+
+
+for hyak only! replace the following file
+  cesm_buildstart.hyak -> ../cesm1_2_1/scripts/ccsm_utils/Tools/cesm_buildstart    
