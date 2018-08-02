@@ -30,27 +30,30 @@ module exoplanet_mod
                                                                 !! or hours (negative).
 
   !! planet parameters
-  real(r8), public, parameter :: exo_planet_radius   = 1.5*6.37122e6_R8  ! radius ~ m                                                      
+  real(r8), public, parameter :: exo_planet_radius   = 1.5*6.37122e6_R8  ! radius ~ m
   real(r8), public, parameter :: exo_surface_gravity = 12.0_R8         ! gravity ~ m/s^2            
   real(r8), public, parameter :: exo_ndays  = 1.0_R8                    !! length of day scaled to number of Earth days.
   !! Earth
   !!real(r8), public, parameter :: exo_planet_radius   = 6.37122e6_R8     ! radius ~ m
   !!real(r8), public, parameter :: exo_surface_gravity = 9.80616_R8       ! gravity ~ m/s^2
-  !! Trappist-1e
+  !! Trappist-1e  (Gillon et al. 2017)
   !!real(r8), public, parameter :: exo_planet_radius    = 5.84878e6_R8    ! radius ~ m
   !!real(r8), public, parameter :: exo_surface_gravity  = 7.22925_R8      ! gravity ~ m/s^2
-  !! Trappist-1f
+  !!real(r8), public, parameter :: exo_ndays  = 6.099615_r8               !! length of day scaled to number of Earth days.   
+  !! Trappist-1f  (Gillon et al. 2017)
   !!real(r8), public, parameter :: exo_planet_radius    = 6.65792e6_R8    ! radius ~ m
   !!real(r8), public, parameter :: exo_surface_gravity  = 6.11876_R8      ! gravity ~ m/s^2
-  !! LHS 1140b  ;Kane DR2 values
-  !!real(r8), public, parameter :: exo_planet_radius   = 1.72*6.37122e6_R8  ! radius ~ m                                                      
+  !!real(r8), public, parameter :: exo_ndays  = 9.206690_r8               !! length of day scaled to number of Earth days.
+  !! LHS 1140b  (Kane 2018, with DR2 values)
+  !!real(r8), public, parameter :: exo_planet_radius   = 1.72*6.37122e6_R8  ! radius ~ m   
   !!real(r8), public, parameter :: exo_surface_gravity = 21.9734_R8         ! gravity ~ m/s^2            
   !!real(r8), public, parameter :: exo_ndays  = 24.737_r8          !! length of day scaled to number of Earth days.
 
   ! ORBITAL OPTIONS
+  !! Note: exo_sdays becomes orbital-rotational period if (do_exo_sycnhronous)
   !!real(r8), public, parameter :: exo_sday = 86400.0_r8 * exo_ndays   !! sidereal period [sec], uncomment for scaling
-  real(r8), public, parameter :: exo_sday = 86164.0_r8                 !! uncomment for Earth value = 86164.0
-                                                                       !! becomes orbital-rotational period if (do_exo_sycnhronous)
+  real(r8), public, parameter :: exo_sday = 86164.0_r8                 !! sidereal period [sec], uncomment for Earth value = 86164.0
+
 
   !! if (do_exo_synchronous) and user_nl_cpl::orb_iyear = -1
   real(r8), public, parameter :: exo_eccen = 0.0_r8   ! eccentricity
@@ -61,7 +64,7 @@ module exoplanet_mod
   real(r8), public, parameter :: exo_scon = 1360._r8         ! Solar constant (W m-2)
 
   ! SOLAR SPECTRAL FILE
-  !! Make sure solar file matches RT configuration !!
+  !! Make sure solar file matches spectral intervals for selected RT configuration !!
   character(len=256), public, parameter :: exo_solar_file = '/projects/wolfet/models/ExoRT/data/solar/G2V_SUN_n28.nc '
 
 

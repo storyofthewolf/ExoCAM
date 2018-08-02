@@ -36,15 +36,15 @@ module exoplanet_mod
   !! Earth
   !!real(r8), public, parameter :: exo_planet_radius   = 6.37122e6_R8     ! radius ~ m
   !!real(r8), public, parameter :: exo_surface_gravity = 9.80616_R8       ! gravity ~ m/s^2
-  !! Trappist-1e
+  !! Trappist-1e  (Gillon et al. 2017)
   !!real(r8), public, parameter :: exo_planet_radius    = 5.84878e6_R8    ! radius ~ m
   !!real(r8), public, parameter :: exo_surface_gravity  = 7.22925_R8      ! gravity ~ m/s^2
   !!real(r8), public, parameter :: exo_ndays  = 6.099615_r8               !! length of day scaled to number of Earth days.   
-  !! Trappist-1f
+  !! Trappist-1f  (Gillon et al. 2017)
   !!real(r8), public, parameter :: exo_planet_radius    = 6.65792e6_R8    ! radius ~ m
   !!real(r8), public, parameter :: exo_surface_gravity  = 6.11876_R8      ! gravity ~ m/s^2
   !!real(r8), public, parameter :: exo_ndays  = 9.206690_r8               !! length of day scaled to number of Earth days.
-  !! LHS 1140b  ;Kane DR2 values
+  !! LHS 1140b  (Kane 2018, with DR2 values)
   !!real(r8), public, parameter :: exo_planet_radius   = 1.72*6.37122e6_R8  ! radius ~ m   
   !!real(r8), public, parameter :: exo_surface_gravity = 21.9734_R8         ! gravity ~ m/s^2            
   !!real(r8), public, parameter :: exo_ndays  = 24.737_r8          !! length of day scaled to number of Earth days.

@@ -1500,6 +1500,7 @@ subroutine tphysac (ztodt,   cam_in,  &
     !===================================================
     call t_startf('gw_intr')
 
+!!  Wolf :: comment out to turn off gravity waves
     call gw_intr(state, sgh, pbuf, ztodt, ptend, cam_in%landfrac)
 
     call physics_update(state, ptend, ztodt, tend)
