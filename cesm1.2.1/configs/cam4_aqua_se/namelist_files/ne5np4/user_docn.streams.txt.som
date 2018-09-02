@@ -1,0 +1,39 @@
+      <dataSource>
+         GENERIC
+      </dataSource>
+      <domainInfo>
+         <variableNames>
+            time    time
+            xc      lon
+            yc      lat
+            area    area
+            mask    mask
+         </variableNames>
+         <filePath>
+            /projects/wolfet/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_se
+         </filePath>
+         <fileNames>
+            domain.ocn.ne5np4_gx3v7.140810_aquaplanet.nc
+         </fileNames>
+      </domainInfo>
+      <fieldInfo>
+         <variableNames>
+            T     t
+            S     s
+            U     u
+            V     v
+            dhdx  dhdx
+            dhdy  dhdy
+            hblt  h
+            qdp   qbot
+         </variableNames>
+         <filePath>
+            /projects/wolfet/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_se
+         </filePath>
+         <fileNames>
+            ocean_ne5np4.nc
+         </fileNames>
+         <offset>
+            0
+         </offset>
+      </fieldInfo>

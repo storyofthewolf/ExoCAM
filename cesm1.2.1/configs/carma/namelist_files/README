@@ -1,0 +1,7 @@
+# add the following to user_nl_cam 
+
+carma_emis_file = "/projects/wolfet/models/ExoRT/data/aerosol/early_earth_haze.nc"
+carma_emis_total = 50000.0
+ncdata = '/projects/btoon/wolfet/exofiles/atm/ic_1barN2_0.1barCO2_0.02barCH4_L50_ic.nc'  ! 50 levels !
+
+fincl1 = 'HAZE01EM'
