@@ -3,15 +3,21 @@ https://github.com/storyofthewolf/ExoCAM
 Eric T. Wolf
 eric.wold@colorado.edu
 
-DESCRIPTION:  This code contains system files, source code, initial conditions files, and namelists needed to adapt the NCAR Community Earth System Model for planetary/exoplanetary applications.  The files provided do not run standalone.  This is a patch to be used with standard distributions of CESM.  CESM is freely available at http://www.cesm.ucar.edu/models/current.html
+DESCRIPTION:  This code contains system files, source code, initial conditions files, and namelists needed to adapt the NCAR Community Earth System Model for planetary/exoplanetary applications.  The files provided do not run standalone.  This is a patch to be used with standard distributions of CESM version 1.2.1.  CESM is freely available at http://www.cesm.ucar.edu/models/current.html
 
-PRE-REQUISITE:  Familiarity with checking out, building, and running CESM is assumed.  Please refer to the publicly available CESM user’s guide for details.  
+PRE-REQUISITE:  Familiarity with checking out, building, and running CESM 1.2.1 is assumed.  Please refer to the publicly available CESM user’s guide for details.  
 http://www.cesm.ucar.edu/models/cesm1.2/cesm/doc/usersguide/ug.pdf
 
-NOTE: ExoCAM is mean to be run with ExoRT, a correlated-k radiative transfer package available at https://github.com/storyofthewolf/ExoRT.
+ExoCAM is intended to be run with ExoRT, a correlated-k radiative transfer package available at https://github.com/storyofthewolf/ExoRT.  
 
 
-folders
+!! Disclaimer.
+The code is constantly evolving.  Not all functionalties are supported. While support for ExoCAM and ExoRT is limited, if you intend to use ExoCAM and ExoRT, please contact eric.wolf@colorado.edu to ensure that your particular application is reasonable, and importantly, I may help you avoid potential pit falls, traps, and other idiosyncracies in the model that could result in lost productivity.
+
+
+
+/folders
 cesm1.2.1  -- model versions for CESM1.2.1
+idl_progs  -- a colletion of idl utilities
 
-in the future cesm2 branches can be added here
+(in the future cesm2 branches can be added here)

@@ -9,6 +9,7 @@ xmlchange CAM_CONFIG_OPTS="-nlev 40 -phys cam4 -usr_src /projects/wolfet/models/
 == set domain file from xml command
 xmlchange LND_DOMAIN_PATH=/gscratch/vsm/wolfet/exofiles/cam4_fv_4x5_landplanet
 xmlchange LND_DOMAIN_FILE=domain.lnd.fv4x5_landplanet.nc
+xmlchange RTM_MODE=NULL  ; turns off river routing
 
 copy SourceMods folder directly into your $Case directory
 copy namelist files into your $Case directory
