@@ -4,10 +4,10 @@ QuickStart Guide
 create_newcase -case $my_landplanet_case -res f45_f45 -mach hyak -compset L2000
 
 == set the ExoRT radiative transfer package
-xmlchange CAM_CONFIG_OPTS="-nlev 40 -phys cam4 -usr_src /projects/wolfet/models/ExoRT/3dmodels/src.cam.n******"
+xmlchange CAM_CONFIG_OPTS="-nlev 40 -phys cam4 -usr_src $EXORT_PATH/ExoRT/3dmodels/src.cam.n******"
 
 == set domain file from xml command
-xmlchange LND_DOMAIN_PATH=/gscratch/vsm/wolfet/exofiles/cam4_fv_4x5_landplanet
+xmlchange LND_DOMAIN_PATH=$EXOC_PATH/ExoCAM/cesm1.2.1/initial_files/cam4_land_fv
 xmlchange LND_DOMAIN_FILE=domain.lnd.fv4x5_landplanet.nc
 xmlchange RTM_MODE=NULL  ; turns off river routing
 
@@ -19,3 +19,9 @@ build and run
 
 ---------------------------------------------------------------------------------
 NOTES:
+$EXOC_PATH is the path where ExoCAM is located
+$EXORT_PATH is the path where ExoRT is located
+
+for instance...
+on Summit; $EXOC_PATH = $EXORT_PATH = /projects/wolfet/models
+on Hyak;   $EXOC_PATH = $EXORT_PATH = /suppscr/vsm/gscratch/wolfet
