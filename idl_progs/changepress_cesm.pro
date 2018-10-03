@@ -36,7 +36,7 @@ cpch4 = 2.226e3
 
 co2bar = 0.0 ;bar
 ch4bar = 0.0 ;bar
-n2bar = 10.0  ; - co2bar - ch4bar      ;bar
+n2bar = 4.1  ; - co2bar - ch4bar      ;bar
 
 psbar = co2bar + ch4bar  + n2bar
 
@@ -69,15 +69,16 @@ print, "------------------------------"
 ;==============================================================
 ;  file_out =  '/projects/btoon/wolfet/exofiles/atm/CO2_0.00000976562bar_L45_ic.nc'
 ;  file_out =   '/projects/btoon/wolfet/exofiles/atm/ic_1barN2_0.2barCO2_L40_ic.nc'
-  file_out =  '/projects/btoon/wolfet/exofiles/atm/ic_10bar_L51_ic.nc'
+  file_out =  '/projects/btoon/wolfet/exofiles/atm/ic_4.1bar_L40_ic.nc'
 ;  file_out = '/projects/btoon/wolfet/exofiles/atm/ohz_t2700K_temp_ic.nc'
 ;  file_out = '/projects/btoon/wolfet/exofiles/atm/archean_360ppmCO2_1bN2_L40_ic.nc'
 ;  ncdata_in = '/projects/btoon/wolfet/exofiles/atm/cami_0001-01-01_4x5_L26_c060608.nc'
 
 ; standard present day initial conditions
 
+ncdata_in = '/projects/wolfet/EXO_RESTART/trappist1e_1barN2_0.1barCO2_aqua_0061-01-01/trappist1e_1barN2_0.1barCO2_aqua.cam.i.0061-01-01-00000.nc'
 ;ncdata_in = '/gpfs/summit/scratch/wolfet/archive/t3300_s1400_p22.1392_0.25bar/rest/0017-01-01-00000/t3300_s1400_p22.1392_0.25bar.cam.i.0017-01-01-00000.nc'
-   ncdata_in = '/projects/btoon/wolfet/exofiles/atm/ic_1bar_L51_ic.nc'
+  ;ncdata_in = '/projects/btoon/wolfet/exofiles/atm/ic_1bar_L51_ic.nc'
 ;  ncdata_in = '/projects/btoon/wolfet/exofiles/atm/control_L48.cam.i.0048-01-01-00000.nc'
 
    ;standard ohz start

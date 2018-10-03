@@ -10,9 +10,9 @@ pro changevert_cesm
 
 do_write_file=1
 ;fname_out = '/projects/btoon/wolfet/exofiles/atm/control_L60.cam.i.0048-01-01-00000.nc'
-fname_out = '/projects/btoon/wolfet/exofiles/atm/ic_1bar_L51_ic.nc'
-nlev_out = 51
-nilev_out = 52
+fname_out = '/projects/btoon/wolfet/exofiles/atm/ic_1bar_L40_0.47x0.63d.nc'
+nlev_out = 40
+nilev_out = 41
 
 
 ;read in appropriate lev, hyai for N>26
@@ -23,8 +23,8 @@ lev_fname_new = '/projects/wolfet/ANALYSIS/oxygen_CE.cam2.avg.nc'
 ncid=ncdf_open(lev_fname_new, /nowrite)
 ncdf_varget,ncid,'lev',lev_new
 ncdf_varget,ncid,'ilev',ilev_new
-ncdf_varget,ncid,'lat',lat_new
-ncdf_varget,ncid,'lon',lon_new
+;ncdf_varget,ncid,'lat',lat_new
+;ncdf_varget,ncid,'lon',lon_new
 ncdf_varget,ncid,'hyai',hyai_new   ;ilev
 ncdf_varget,ncid,'hybi',hybi_new   ;ilev
 ncdf_varget,ncid,'hyam',hyam_new   ;lev
@@ -33,19 +33,21 @@ ncdf_close,ncid
 
 nlev_new = n_elements(lev_new)
 nilev_new = n_elements(ilev_new)
-nlat_new = n_elements(lat_new)
-nlon_new = n_elements(lon_new)
+;nlat_new = n_elements(lat_new)
+;nlon_new = n_elements(lon_new)
 
 
 
 ;read in data file
-clim_fname_in ='/projects/btoon/wolfet/exofiles/atm/ic_1barN2_0.1barCO2_0.02barCH4_L48_ic.nc'
+;ic file with desired 
+;clim_fname_in ='/projects/btoon/wolfet/exofiles/atm/ic_1barN2_0.1barCO2_0.02barCH4_L48_ic.nc'
+clim_fname_in ="/gpfs/summit/datasets/CESM/inputdata/atm/cam/inic/fv/cami_0000-09-01_0.47x0.63_L26_c061106.nc"
 
 ncid=ncdf_open(clim_fname_in, /nowrite)
 ncdf_varget,ncid,'lev',lev_old
 ncdf_varget,ncid,'ilev',ilev_old
-ncdf_varget,ncid,'lat',lat_old
-ncdf_varget,ncid,'lon',lon_old
+ncdf_varget,ncid,'lat',lat
+ncdf_varget,ncid,'lon',lon
 ncdf_varget,ncid,'hyai',hyai_old
 ncdf_varget,ncid,'hybi',hybi_old
 ncdf_varget,ncid,'hyam',hyam_old
@@ -53,20 +55,19 @@ ncdf_varget,ncid,'hybm',hybm_old
 
 nlev_old = n_elements(lev_old)
 nilev_old = n_elements(ilev_old)
-nlat_old = n_elements(lat_old)
-nlon_old = n_elements(lon_old)
+nlat = n_elements(lat)
+nlon = n_elements(lon)
 ;kludge, I am keeping with a 4x5 grid
-nslat=45
-nslon=72
+nslat=nlat-1
+nslon=nlon
 
 ncdf_varget,ncid,'CLDICE',CLDICE_old
 ncdf_varget,ncid,'CLDLIQ',CLDLIQ_old
+ncdf_varget,ncid,'CLOUD',CLOUD_old
 ncdf_varget,ncid,'Q',Q_old
 ncdf_varget,ncid,'T',T_old
 ncdf_varget,ncid,'US',US_old
 ncdf_varget,ncid,'VS',VS_old
-
-help, T_old
 
 ;stuff that doesn't need to be changed
 ncdf_varget,ncid,'P0',P0
@@ -74,7 +75,7 @@ ncdf_varget,ncid,'slat',slat
 ncdf_varget,ncid,'slon',slon
 ncdf_varget,ncid,'w_stag',w_stag
 ncdf_varget,ncid,'time',time
-ncdf_varget,ncid,'time_bnds',time_bnds
+;ncdf_varget,ncid,'time_bnds',time_bnds
 ncdf_varget,ncid,'date_written',date_written
 ncdf_varget,ncid,'time_written',time_written
 ncdf_varget,ncid,'ntrm',ntrm
@@ -103,15 +104,13 @@ ncdf_varget,ncid,'TSICE',TSICE
 ncdf_close,ncid
 
 ; create pressure grids from hybrid sigma coordinates
+lev_P_new=fltarr(nlon, nlat, nlev_new)    ;[Pa] pressure coordinate matrix, layer midpoints    
+ilev_P_new=fltarr(nlon, nlat, nilev_new)   ;[Pa] pressure coordinate matrix, layer interfaces  
+hybrid2pressure,nlon,nlat,nlev_new,PS,P0,hyam_new,hybm_new,hyai_new,hybi_new,lev_P_new,ilev_P_new
 
-lev_P_new=fltarr(nlon_new, nlat_new, nlev_new)    ;[Pa] pressure coordinate matrix, layer midpoints    
-ilev_P_new=fltarr(nlon_new, nlat_new, nilev_new)   ;[Pa] pressure coordinate matrix, layer interfaces  
-hybrid2pressure,nlon_new,nlat_new,nlev_new,PS,P0,hyam_new,hybm_new,hyai_new,hybi_new,lev_P_new,ilev_P_new
-
-
-lev_P_old=fltarr(nlon_old, nlat_old, nlev_old)    ;[Pa] pressure coordinate matrix, layer midpoints     
-ilev_P_old=fltarr(nlon_old, nlat_old, nilev_old)   ;[Pa] pressure coordinate matrix, layer interfaces 
-hybrid2pressure,nlon_old,nlat_old,nlev_old,PS,P0,hyam_old,hybm_old,hyai_old,hybi_old,lev_P_old,ilev_P_old
+lev_P_old=fltarr(nlon, nlat, nlev_old)    ;[Pa] pressure coordinate matrix, layer midpoints     
+ilev_P_old=fltarr(nlon, nlat, nilev_old)   ;[Pa] pressure coordinate matrix, layer interfaces 
+hybrid2pressure,nlon,nlat,nlev_old,PS,P0,hyam_old,hybm_old,hyai_old,hybi_old,lev_P_old,ilev_P_old
 
 
 ;-----
@@ -119,12 +118,13 @@ hybrid2pressure,nlon_old,nlat_old,nlev_old,PS,P0,hyam_old,hybm_old,hyai_old,hybi
 
 
 ;out variables
-CLDICE_out=fltarr(nlon_new,nlat_new,nlev_out)
-CLDLIQ_out=fltarr(nlon_new,nlat_new,nlev_out)
-Q_out=fltarr(nlon_new,nlat_new,nlev_out)
-T_out=fltarr(nlon_new,nlat_new,nlev_out)
-US_out=fltarr(nlon_new,nslat,nlev_out)
-VS_out=fltarr(nslon,nlat_new,nlev_out)
+CLDICE_out=fltarr(nlon,nlat,nlev_out)
+CLDLIQ_out=fltarr(nlon,nlat,nlev_out)
+CLOUD_out=fltarr(nlon,nlat,nlev_out)
+Q_out=fltarr(nlon,nlat,nlev_out)
+T_out=fltarr(nlon,nlat,nlev_out)
+US_out=fltarr(nlon,nslat,nlev_out)
+VS_out=fltarr(nslon,nlat,nlev_out)
 
 
 lev_out=fltarr(nlev_out)
@@ -135,19 +135,21 @@ hyam_out=fltarr(nlev_out)
 hybm_out=fltarr(nlev_out)
 
 
+
 n=66-nlev_out
-for x=0,nlon_new-1 do begin
-  for y=0,nlat_new-1 do begin
+for x=0,nlon-1 do begin
+  for y=0,nlat-1 do begin
     T_out(x,y,*) = interpol(T_old(x,y,*), lev_P_old(x,y,*), lev_P_new(x,y,n:65))  
     CLDICE_out(x,y,*) = interpol(CLDICE_old(x,y,*), lev_P_old(x,y,*), lev_P_new(x,y,n:65))  
     CLDLIQ_out(x,y,*) = interpol(CLDLIQ_old(x,y,*), lev_P_old(x,y,*), lev_P_new(x,y,n:65))  
+    CLOUD_out(x,y,*)  = interpol(CLOUD_old(x,y,*), lev_P_old(x,y,*), lev_P_new(x,y,n:65))  
     Q_out(x,y,*) = interpol(Q_old(x,y,*), lev_P_old(x,y,*), lev_P_new(x,y,n:65))  
     VS_out(x,y,*) = interpol(VS_old(x,y,*), lev_P_old(x,y,*), lev_P_new(x,y,n:65))  
   endfor
 endfor
 
-for x=0,nlon_new-1 do begin
-  for y=0,nlat_new-2 do begin
+for x=0,nlon-1 do begin
+  for y=0,nlat-2 do begin
     US_out(x,y,*) = interpol(US_old(x,y,*), lev_P_old(x,y,*), lev_P_new(x,y,n:65))  
   endfor
 endfor
@@ -176,14 +178,14 @@ endfor
 ;write
 
 if (do_write_file eq 1) then begin
-
+spawn, "rm -r -f fname_out"
 print, "creating file ...." 
 print, fname_out
   id = ncdf_create(fname_out,/clobber)
-  dim1 = NCDF_DIMDEF(id, 'lat', 46)
-  dim2 = NCDF_DIMDEF(id, 'lon', 72)  
-  dim3 = NCDF_DIMDEF(id, 'slat', 45)  
-  dim4 = NCDF_DIMDEF(id, 'slon', 72)  
+  dim1 = NCDF_DIMDEF(id, 'lat', nlat)
+  dim2 = NCDF_DIMDEF(id, 'lon', nlon)  
+  dim3 = NCDF_DIMDEF(id, 'slat', nslat)  
+  dim4 = NCDF_DIMDEF(id, 'slon', nlon)  
   dim5 = NCDF_DIMDEF(id, 'lev', nlev_out)  
   dim6 = NCDF_DIMDEF(id, 'ilev', nilev_out)  
   dim10 = NCDF_DIMDEF(id, 'time', 1)
@@ -223,6 +225,7 @@ print, fname_out
   varid34 = NCDF_VARDEF(id,'nsteph',dim10)
   varid57 = NCDF_VARDEF(id,'CLDICE',[dim2,dim1,dim5,dim10],/double)
   varid58 = NCDF_VARDEF(id,'CLDLIQ',[dim2,dim1,dim5,dim10],/double)
+  varid58 = NCDF_VARDEF(id,'CLOUD',[dim2,dim1,dim5,dim10],/double)
   varid76 = NCDF_VARDEF(id,'ICEFRAC',[dim2,dim1,dim10],/double)
   varid99 = NCDF_VARDEF(id,'PS',[dim2,dim1,dim10],/double)
   varid100 = NCDF_VARDEF(id,'Q',[dim2,dim1,dim5,dim10],/double)
@@ -318,8 +321,8 @@ print, fname_out
 
   
   NCDF_VARPUT, id, varid1, P0
-  NCDF_VARPUT, id, varid2, lat_new
-  NCDF_VARPUT, id, varid3, lon_new
+  NCDF_VARPUT, id, varid2, lat
+  NCDF_VARPUT, id, varid3, lon
   NCDF_VARPUT, id, varid4, slat
   NCDF_VARPUT, id, varid5, slon
   NCDF_VARPUT, id, varid6, w_stag

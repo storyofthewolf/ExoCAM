@@ -1,2 +1,6 @@
 idl_progs
 useful idl scripts for use with ExoCAM
+
+changepress_cesm.pro  -- change the surface pressure in CAM .i. files
+changevert_cesm.pro   -- change the numnber of vertical levels in CAM .i. files
+mod_cesm_files.pro    -- modify/customize a smorgasboard 
