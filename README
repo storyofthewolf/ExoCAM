@@ -1,7 +1,7 @@
 ExoCAM
 https://github.com/storyofthewolf/ExoCAM
 Eric T. Wolf
-eric.wold@colorado.edu
+eric.wolf@colorado.edu
 
 DESCRIPTION:  This code contains system files, source code, initial conditions files, and namelists needed to adapt the NCAR Community Earth System Model for planetary/exoplanetary applications.  The files provided do not run standalone.  This is a patch to be used with standard distributions of CESM version 1.2.1.  CESM is freely available at http://www.cesm.ucar.edu/models/current.html
 
