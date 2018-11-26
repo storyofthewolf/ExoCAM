@@ -1,0 +1,51 @@
+== currently supported planet modifications with ExoCAM, ExoRT ==
+== Author: Wolf, E.T.
+== eric.wolf@colorado.edu
+
+Supported modifications in ExoCAM
+  all modifications are colleted in the file ../SourceMods/src.share/exoplanet_mod.F90
+  These must be changed prior to building the model.  Please see the file for
+  more details and documentation.  Below is an incomplete list of options,
+  some are self-explanatory.  
+
+  Run options:
+  do_exo_synchronous  --> force synchronous rotation  
+
+  Planet parameters:
+  exo_planet_radius
+  exo_surface_gravity
+  exo_ndays  -- length of day scaler used for synchronous rotating worlds
+  exo_scon   -- solar constant
+
+  Atmospheric Constituents:
+  exo_n2bar, exo_h2bar, exo_co2bar, exo_ch4bar
+  (it is the users responsibility to make sure these selections are paired
+  with correct radiative transfer)
+
+
+Fun Features
+  do_exo_rt_clearsky  -- do parallel clearsky radiative calculation, used for
+  determining cloud forcing; include fluxes with "C" appended in user_nl_cam 
+  finidat for clearsky fluxes  (i.e. FUSC, FULC, FDSC, FUSC)
+
+  do_exo_rt_spectral  -- compute spectrally resolved radiative fluxes; include
+  binned spectral fluxes in user_nl_cam finidat (i.e 'FUS_int01','FUS_int02', etc)
+
+
+ExoRT Radiative Transfer Packages
+  src.n28archean == H2O, CO2, CH4, N2, H2, HITRAN 2004, 28 bins, designed for
+                    the Archean Climate (formerly "highco2")
+                 == CO2 up to several tenths of a bar with an N2 background, CO2
+                    accuracy less at higher values (not up-to-date CIA)
+                 == CH4 up to 0.01 bar with an N2 background
+                 == refer to Wolf, E.T. and Toon, O.B. Astrobiology 13(7), 1-18 (2013)
+                 == up to 100 bar total pressures
+                 == N2-N2, N2-H2, H2-H2 CIA
+
+  src.n42h20     == H2O, N2, H2 42 bins, HITRAN 2012 
+                 == refer to Kopparapu et al. ApJ 845:5 (2017)
+                 == up to 10 bar total pressures
+	         == N2-N2, N2-H2, H2-H2 CIA
+  src.n28h2o     == same as n42h2o, 28 bins
+
+

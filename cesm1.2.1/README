@@ -1,6 +1,5 @@
 folders
 /configs            --- model configurations, contains unique SourceMods and namelist files
-	/cam4_aqua_fv  -- cam4 aquaplanet, finite volume dynamical core
 /ccsm_utils_files   --- utility files to faciliate new compsets and machines, shared
 /initial_files      --- shared collection of initial conditions files used by the model
 /instructions       --- collection of instructions manuals

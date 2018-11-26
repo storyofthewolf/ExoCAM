@@ -4,12 +4,7 @@ cam4_aqua_fv
   cam4_aqua_fv  --  aquaplanet slab ocean, finite volume dynamical core
   cam4_aqua_se  --  aquaplanet slab ocean, se cubed sphere dynamical ccore
   cam4_land_fv  --  land planet, finite volume dynamical core
+  carma         --  hook up with CARMA for cloud and aerosol treatments, add-on
 
-
-under construction
-  carma  --  hook up with CARMA for cloud and aerosol treatments
-
-planned
-  cam4_land_se
 
 

@@ -1,20 +1,29 @@
 ccsm_utils_files
 
-place the following files in directory 
+
+place the following files in directory
 ../cesm1_2_1/scripts/ccsm_utils/Machines
 
   config_compilers.xml
   config_machines.xml 
   env_mach_specific.hyak 
   env_mach_specific.summit  
+  env_mach_specific.discover
   mkbatch.hyak  
   mkbatch.summit
+  mkbatch.discover
 
 
 place the following file in directory
 ../cesm1_2_1/scripts/ccsm_utils/Case.template
 
   config_compilers.xml
+
+
+place the follwing file in directory
+../cesm1_2_1/models/atm/cam/bld/namelist_files
+
+  namelist_definition.xml
 
 
 for hyak only! replace the following file

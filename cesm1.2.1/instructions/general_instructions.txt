@@ -1,0 +1,105 @@
+== general instructions for running ExoCAM and ExoRT ==
+== Author: Wolf, E.T.
+== eric.wolf@colorado.edu
+
+This document provides instructions for building and running ExoCAM and
+ExoRT.  Here, system  installations are supported for...
+  University of Washington's  Hyak supercomputer
+  University of Colorado's Summit supuercomputer
+  NASA's, Discover supercomputer
+  For other machines, follow NCAR's instructions for "userdefined" machines.  
+
+  Note, installation of the base model, CESM, on each machine pose individual
+  challenges specific to each system.  These nuances are a "normal"
+  aggravation of running 3D models, and fall outside the scope of this document.
+
+NOTE:  quickstart guides are given in 
+../ExoCAM/cesm1.2.1/configs/$model_config/README
+
+
+STEP 0: Pre-Requistites
+ 
+  Familiarity and relative competence with checking out, building and running the
+  National Center for Atmospheric Research (NCAR) Community Earth System Model
+  (CESM)is assumed.  Please refer to their provided support documents for help,
+  web-addresses given below.  Before beginning with ExoCAM and ExoRT, it is
+  advisable to try building and running a standard supported case to familiarize
+  yourself with the process.
+
+  Users guide
+  http://www.cesm.ucar.edu/models/cesm1.2/cesm/doc/usersguide/ug.pdf
+
+  Technical documents
+  CAM4 http://www.cesm.ucar.edu/models/cesm1.0/cam/docs/description/cam4_desc.pdf
+  CAM5 http://www.cesm.ucar.edu/models/cesm1.0/cam/docs/description/cam5_desc.pdf
+
+  NCAR's help forum
+  https://bb.cgd.ucar.edu/
+
+
+STEP 1: Checkout ExoCAM and ExoRT Github packages
+
+  Go to your favorite directory and issue commands ...
+  git clone https://github.com/storyofthewolf/ExoRT.git
+  git clone https://github.com/storyofthewolf/ExoCAM.git
+
+  On supported machines, you can use existing distributions maintained by
+  Wolf, E.T., found at the following locations...
+
+  Discover: /gpfsm/dnb53/etwolf/models/ExoRT, /gpfsm/dnb53/etwolf/models/ExoCAM
+  Hyak: /suppscr/vsm/gscratch/wolfet/ExoRT, /suppscr/vsm/gscratch/wolfet/ExoCAM
+  Summit:  /projects/wolfet/models/ExoRT, /projects/wolfet/models/ExoCAM
+
+
+STEP 2:  Place new system files into CESM.
+
+  copy the following files from ../ExoCAM/cesm1.2.1/ccsm_utils_files
+  to the appropriate location within the CESM model
+
+  ../cesm1_2_1/scripts/ccsm_utils/Machines/mkbatch.$machine_name
+  ../cesm1_2_1/scripts/ccsm_utils/Machines/env_mach_specific.$machine_name
+  ../cesm1_2_1/scripts/ccsm_utils/Machines/config_compilers.xml
+  ../cesm1_2_1/scripts/ccsm_utils/Machines/config_machines.xml
+  ../cesm1_2_1/scripts/ccsm_utils/Case.template/config_compsets.xml
+  ../cesm1_2_1/models/atm/cam/bld/namelist_files/namelist_definition.xml
+
+
+STEP 3:  Create a new case
+
+  Create a new case.  For example, for an aquaplanet model with the FV
+  dynamical core, go to ../cesm1_2_1/scripts/, and issue command
+
+  create_newcase -case $my_aquaplanet_case -res f45_f45 -mach hyak -compset E2000C4AQI
+
+
+STEP 4:  Link ExoRT radiative transfer model
+
+  Go to your case directory ($CASEROOT, in NCAR parlance)
+  issue command  ...
+
+  xmlchange CAM_CONFIG_OPTS="-nlev 40 -phys cam4 -usr_src $EXORT_PATH/ExoRT/3dmodels/src.cam.n******"
+  
+  Where $EXORT_PATH is the path to where your ExoRT has been checked out.
+  Radiative transfer models, ready for linking with CESM in 3D are located at
+  ../ExoRT/3dmodels 
+
+
+STEP 5:  Copy SourceMods and namelist files to your case
+
+  Copy SourceMods directory from ../ExoCAM/cesm1.2.1/configs/$model_config to
+  your case directory ($CASEROOT)
+
+  Copy namelist files from ../ExoCAM/cesm1.2.1/configs/namelist_files/* to
+  your case directory ($CASEROOT)
+
+  open the namelist files (user_*) and change the paths to initial files to
+  match the location of your ExoCAM distribution.
+
+
+STEP 6:  Building and running
+
+  Within $CASEROOT directory, issue command cesm_setup to setup the model.
+  Within $CASEROOT directory, issue comment $CASE.build to build the model.
+  Within $CASEROOT directory, issue command $CASE.run to run the model.
+
+

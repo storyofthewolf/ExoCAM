@@ -1,0 +1,27 @@
+#! /bin/csh -f
+
+#===============================================================================
+# Summit machine specific settings
+# #===============================================================================
+source /etc/profile.d/modules.csh
+
+if ( $COMPILER == "intel" ) then
+
+module load comp/intel-14.0.3.174
+module load mpi/impi-4.1.0.024
+
+setenv MKL "-mkl=cluster"
+
+  setenv NETCDF_PATH /usr/local/other/netcdf/3.6.2_intel-14.0.3.174 
+  setenv PNETCDF_PATH /usr/local/other/pnetcdf/1.2.0_intel-14.0.3.174_impi-4.1.3.048
+  setenv NETCDF /usr/local/other/netcdf/3.6.2_intel-14.0.3.174
+  setenv MPI_PATH /usr/local/intel/mpi/4.1.0.024.nopbs/bin64/mpirun
+  setenv INC_NETCDF /usr/local/other/netcdf/3.6.2_intel-14.0.3.174/include
+  setenv LIB_NETCDF /usr/local/other/netcdf/3.6.2_intel-14.0.3.174/lib
+
+
+endif
+
+# Run time variables
+
+setenv OMP_STACKSIZE 64M
