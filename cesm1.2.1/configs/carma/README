@@ -2,7 +2,7 @@ carma
 ++ under construction ++
 
 Files for using carma with ExoCAM and ExoRT.  
-Copy these files into SourceMods/src.cam.
+Copy these files into SourceMods/src.cam, in addition to other config files (i.e. aqua_fv, land_fv,etc)
 These provide a linkage with ExoRT, bypassing the native framework for link with CAMRT and RRTMG.   
 A basic template for a generic fractal haze carma model is included.
 
