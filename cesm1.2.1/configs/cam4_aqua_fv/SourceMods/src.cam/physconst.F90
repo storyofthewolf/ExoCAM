@@ -369,6 +369,7 @@ contains
         write(iulog,*) 'CH4 VMR, MMR: ', exo_ch4vmr, exo_ch4mmr
         write(iulog,*) 'CPDAIR: ', SHR_CONST_CPDAIR
         write(iulog,*) 'MWDRY: ', SHR_CONST_MWDAIR
+        write(iulog,*) 'RWV: ', SHR_CONST_RWV
         write(iulog,*) 'RAIR: ', SHR_CONST_RDAIR
         write(iulog,*) 'RHODAIR: ', SHR_CONST_RHODAIR
         write(iulog,*) 'ZVIR: ', SHR_CONST_ZVIR

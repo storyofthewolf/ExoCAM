@@ -19,7 +19,7 @@ module zm_conv
   use ppgrid,          only: pcols, pver, pverp
   use cloud_fraction,  only: cldfrc_fice
   use physconst,       only: cpair, epsilo, gravit, latice, latvap, tmelt, rair, &
-                             cpwv, cpliq, rh2o
+                             cpwv, cpliq, rh2o, zvir
   use abortutils,      only: endrun
   use cam_logfile,     only: iulog
 
@@ -59,7 +59,6 @@ module zm_conv
    real(r8),parameter :: c3 = 243.5_r8
    real(r8) :: tfreez
    real(r8) :: eps1
-      
 
    logical :: no_deep_pbl ! default = .false.
                           ! no_deep_pbl = .true. eliminates deep convection entirely within PBL 
@@ -1753,6 +1752,7 @@ subroutine buoyan(lchnk   ,ncol    , &
    real(r8) cp
    real(r8) e
    real(r8) grav
+   real(r8) zvirp1
 
    integer i
    integer k
@@ -1767,6 +1767,8 @@ subroutine buoyan(lchnk   ,ncol    , &
 !
 !-----------------------------------------------------------------------
 !
+   zvirp1 = zvir + 1.0
+
    do n = 1,5
       do i = 1,ncol
          lelten(i,n) = pver
@@ -1788,7 +1790,7 @@ subroutine buoyan(lchnk   ,ncol    , &
 
 !!! RBN - Initialize tv and buoy for output.
 !!! tv=tv : tpv=tpv : qstp=q : buoy=0.
-   tv(:ncol,:) = t(:ncol,:) *(1._r8+1.608*q(:ncol,:))/ (1._r8+q(:ncol,:))
+   tv(:ncol,:) = t(:ncol,:) *(1._r8+zvirp1*q(:ncol,:))/ (1._r8+q(:ncol,:))
    tpv(:ncol,:) = tv(:ncol,:)
    buoy(:ncol,:) = 0._r8
 
@@ -1859,15 +1861,15 @@ subroutine buoyan(lchnk   ,ncol    , &
    do k = pver,msg + 1,-1
       do i=1,ncol
          if (k > lcl(i) .and. k <= mx(i) .and. plge600(i)) then
-            tv(i,k) = t(i,k)* (1._r8+1.608_r8*q(i,k))/ (1._r8+q(i,k))
+            tv(i,k) = t(i,k)* (1._r8+zvirp1*q(i,k))/ (1._r8+q(i,k))
             qstp(i,k) = q(i,mx(i))
             tp(i,k) = t(i,mx(i))* (p(i,k)/p(i,mx(i)))**(0.2854_r8* (1._r8-0.28_r8*q(i,mx(i))))
 !
 ! buoyancy is increased by 0.5 k as in tiedtke
 !
-!-jjh          tpv (i,k)=tp(i,k)*(1.+1.608*q(i,mx(i)))/
+!-jjh          tpv (i,k)=tp(i,k)*(1.+zvirp1*q(i,mx(i)))/
 !-jjh     1                     (1.+q(i,mx(i)))
-            tpv(i,k) = (tp(i,k)+tpert(i))*(1._r8+1.608_r8*q(i,mx(i)))/ (1._r8+q(i,mx(i)))
+            tpv(i,k) = (tp(i,k)+tpert(i))*(1._r8+zvirp1*q(i,mx(i)))/ (1._r8+q(i,mx(i)))
             buoy(i,k) = tpv(i,k) - tv(i,k) + tiedke_add
          end if
       end do
@@ -1879,7 +1881,7 @@ subroutine buoyan(lchnk   ,ncol    , &
    do k = pver,msg + 1,-1
       do i=1,ncol
          if (k == lcl(i) .and. plge600(i)) then
-            tv(i,k) = t(i,k)* (1._r8+1.608_r8*q(i,k))/ (1._r8+q(i,k))
+            tv(i,k) = t(i,k)* (1._r8+zvirp1*q(i,k))/ (1._r8+q(i,k))
             qstp(i,k) = q(i,mx(i))
             tp(i,k) = tl(i)* (p(i,k)/pl(i))**(0.2854_r8* (1._r8-0.28_r8*qstp(i,k)))
 !              estp(i)  =exp(a-b/tp(i,k))
@@ -1908,9 +1910,9 @@ subroutine buoyan(lchnk   ,ncol    , &
 !
 ! buoyancy is increased by 0.5 k in cape calculation.
 ! dec. 9, 1994
-!-jjh          tpv(i,k) =tp(i,k)*(1.+1.608*qstp(i,k))/(1.+q(i,mx(i)))
+!-jjh          tpv(i,k) =tp(i,k)*(1.+zvirp1*qstp(i,k))/(1.+q(i,mx(i)))
 !
-            tpv(i,k) = (tp(i,k)+tpert(i))* (1._r8+1.608_r8*qstp(i,k)) / (1._r8+q(i,mx(i)))
+            tpv(i,k) = (tp(i,k)+tpert(i))* (1._r8+zvirp1*qstp(i,k)) / (1._r8+q(i,mx(i)))
             buoy(i,k) = tpv(i,k) - tv(i,k) + tiedke_add
          end if
       end do
@@ -1921,7 +1923,7 @@ subroutine buoyan(lchnk   ,ncol    , &
    do k = pver - 1,msg + 1,-1
       do i=1,ncol
          if (k < lcl(i) .and. plge600(i)) then
-            tv(i,k) = t(i,k)* (1._r8+1.608_r8*q(i,k))/ (1._r8+q(i,k))
+            tv(i,k) = t(i,k)* (1._r8+zvirp1*q(i,k))/ (1._r8+q(i,k))
             qstp(i,k) = qstp(i,k+1)
             tp(i,k) = tp(i,k+1)* (p(i,k)/p(i,k+1))**(0.2854_r8* (1._r8-0.28_r8*qstp(i,k)))
 !          estp(i) = exp(a-b/tp(i,k))
@@ -1942,9 +1944,9 @@ subroutine buoyan(lchnk   ,ncol    , &
            estp(i) = c1*exp((c2* (tp(i,k)-tfreez))/ ((tp(i,k)-tfreez)+c3))
 
             qstp(i,k) = eps1*estp(i)/ (p(i,k)-estp(i))
-!-jjh          tpv(i,k) =tp(i,k)*(1.+1.608*qstp(i,k))/
+!-jjh          tpv(i,k) =tp(i,k)*(1.+zvirp1*qstp(i,k))/
 !jt            (1.+q(i,mx(i)))
-            tpv(i,k) = (tp(i,k)+tpert(i))* (1._r8+1.608_r8*qstp(i,k))/(1._r8+q(i,mx(i)))
+            tpv(i,k) = (tp(i,k)+tpert(i))* (1._r8+zvirp1*qstp(i,k))/(1._r8+q(i,mx(i)))
             buoy(i,k) = tpv(i,k) - tv(i,k) + tiedke_add
          end if
       end do
@@ -2750,6 +2752,7 @@ subroutine closure(lchnk   , &
    real(r8) dltaa
    real(r8) eb
    real(r8) grav
+   real(r8) zvirp1
 
    integer i
    integer il1g
@@ -2767,6 +2770,8 @@ subroutine closure(lchnk   , &
 ! time derivatives per unit cloud-base mass flux, i.e. they
 ! have units of 1/mb instead of 1/sec.
 !
+   zvirp1 = zvir + 1.0
+
    do i = il1g,il2g
       mb(i) = 0._r8
       eb = p(i,mx(i))*q(i,mx(i))/ (eps1+q(i,mx(i)))
@@ -2822,8 +2827,8 @@ subroutine closure(lchnk   , &
    do k = msg + 1,pver
       do i = il1g,il2g
          if (k >= lel(i) .and. k <= lcl(i)) then
-            thetavp(i,k) = tp(i,k)* (1000._r8/p(i,k))** (rd/cp)*(1._r8+1.608_r8*qstp(i,k)-q(i,mx(i)))
-            thetavm(i,k) = t(i,k)* (1000._r8/p(i,k))** (rd/cp)*(1._r8+0.608_r8*q(i,k))
+            thetavp(i,k) = tp(i,k)* (1000._r8/p(i,k))** (rd/cp)*(1._r8+zvirp1*qstp(i,k)-q(i,mx(i)))
+            thetavm(i,k) = t(i,k)* (1000._r8/p(i,k))** (rd/cp)*(1._r8+zvirp1*q(i,k))
             dqsdtp(i,k) = qstp(i,k)* (1._r8+qstp(i,k)/eps1)*eps1*rl/(rd*tp(i,k)**2)
 !
 ! dtpdt is the parcel temperature change due to change of
@@ -2835,9 +2840,9 @@ subroutine closure(lchnk   , &
 !
 ! dboydt is the integrand of cape change.
 !
-            dboydt(i,k) = ((dtpdt(i,k)/tp(i,k)+1._r8/(1._r8+1.608_r8*qstp(i,k)-q(i,mx(i)))* &
-                          (1.608_r8 * dqsdtp(i,k) * dtpdt(i,k) -dqbdt(i))) - (dtmdt(i,k)/t(i,k)+0.608_r8/ &
-                          (1._r8+0.608_r8*q(i,k))*dqmdt(i,k)))*grav*thetavp(i,k)/thetavm(i,k)
+            dboydt(i,k) = ((dtpdt(i,k)/tp(i,k)+1._r8/(1._r8+zvirp1*qstp(i,k)-q(i,mx(i)))* &
+                          (zvirp1 * dqsdtp(i,k) * dtpdt(i,k) -dqbdt(i))) - (dtmdt(i,k)/t(i,k)+zvir/ &
+                          (1._r8+zvir*q(i,k))*dqmdt(i,k)))*grav*thetavp(i,k)/thetavm(i,k)
          end if
       end do
    end do
@@ -2845,13 +2850,13 @@ subroutine closure(lchnk   , &
    do k = msg + 1,pver
       do i = il1g,il2g
          if (k > lcl(i) .and. k < mx(i)) then
-            thetavp(i,k) = tp(i,k)* (1000._r8/p(i,k))** (rd/cp)*(1._r8+0.608_r8*q(i,mx(i)))
-            thetavm(i,k) = t(i,k)* (1000._r8/p(i,k))** (rd/cp)*(1._r8+0.608_r8*q(i,k))
+            thetavp(i,k) = tp(i,k)* (1000._r8/p(i,k))** (rd/cp)*(1._r8+zvir*q(i,mx(i)))
+            thetavm(i,k) = t(i,k)* (1000._r8/p(i,k))** (rd/cp)*(1._r8+zvir*q(i,k))
 !
 ! dboydt is the integrand of cape change.
 !
-            dboydt(i,k) = (dtbdt(i)/t(i,mx(i))+0.608_r8/ (1._r8+0.608_r8*q(i,mx(i)))*dqbdt(i)- &
-                          dtmdt(i,k)/t(i,k)-0.608_r8/ (1._r8+0.608_r8*q(i,k))*dqmdt(i,k))* &
+            dboydt(i,k) = (dtbdt(i)/t(i,mx(i))+zvir/ (1._r8+zvir*q(i,mx(i)))*dqbdt(i)- &
+                          dtmdt(i,k)/t(i,k)-zvir/ (1._r8+zvir*q(i,k))*dqmdt(i,k))* &
                           grav*thetavp(i,k)/thetavm(i,k)
          end if
       end do
@@ -3088,7 +3093,8 @@ subroutine buoyan_dilute(lchnk   ,ncol    , &
    real(r8) cp
    real(r8) e
    real(r8) grav
-
+   real(r8) zvirp1
+  
    integer i
    integer k
    integer msg
@@ -3102,6 +3108,8 @@ subroutine buoyan_dilute(lchnk   ,ncol    , &
 !
 !-----------------------------------------------------------------------
 !
+   zvirp1 = zvir + 1.0
+
    do n = 1,5
       do i = 1,ncol
          lelten(i,n) = pver
@@ -3123,7 +3131,7 @@ subroutine buoyan_dilute(lchnk   ,ncol    , &
 
 !!! RBN - Initialize tv and buoy for output.
 !!! tv=tv : tpv=tpv : qstp=q : buoy=0.
-   tv(:ncol,:) = t(:ncol,:) *(1._r8+1.608_r8*q(:ncol,:))/ (1._r8+q(:ncol,:))
+   tv(:ncol,:) = t(:ncol,:) *(1._r8+zvirp1*q(:ncol,:))/ (1._r8+q(:ncol,:))
    tpv(:ncol,:) = tv(:ncol,:)
    buoy(:ncol,:) = 0._r8
 
@@ -3192,7 +3200,7 @@ subroutine buoyan_dilute(lchnk   ,ncol    , &
    do k = pver,msg + 1,-1
       do i=1,ncol
          if (k <= mx(i) .and. plge600(i)) then   ! Define buoy from launch level to cloud top.
-            tv(i,k) = t(i,k)* (1._r8+1.608_r8*q(i,k))/ (1._r8+q(i,k))
+            tv(i,k) = t(i,k)* (1._r8+zvirp1*q(i,k))/ (1._r8+q(i,k))
             buoy(i,k) = tpv(i,k) - tv(i,k) + tiedke_add  ! +0.5K or not?
          else
             qstp(i,k) = q(i,k)
@@ -3329,6 +3337,7 @@ real(r8) tscool     ! Super cooled temperature offset (in degC) (eg -35).
 real(r8) qxsk, qxskp1        ! LCL excess water (k, k+1)
 real(r8) dsdp, dqtdp, dqxsdp ! LCL s, qt, p gradients (k, k+1)
 real(r8) slcl,qtlcl,qslcl    ! LCL s, qt, qs values.
+real(r8) zvirp1
 
 integer rcall       ! Number of ientropy call for errors recording
 integer nit_lheat     ! Number of iterations for condensation/freezing loop.
@@ -3346,7 +3355,7 @@ integer i,k,ii   ! Loop counters.
 !
 ! Set some values that may be changed frequently.
 !
-
+zvirp1 = zvir + 1
 nit_lheat = 2 ! iterations for ds,dq changes from condensation freezing.
 dmpdz=-1.e-3_r8        ! Entrainment rate. (-ve for /m)
 !dmpdpc = 3.e-2_r8   ! In cloud entrainment rate (/mb).
@@ -3499,7 +3508,7 @@ do k = pver, msg+1, -1
 
          tp(i,k)    = tmix(i,k)
          qstp(i,k)  = q(i,k) 
-         tpv(i,k)   =  (tp(i,k) + tpert(i)) * (1._r8+1.608_r8*qstp(i,k)) / (1._r8+qstp(i,k))
+         tpv(i,k)   =  (tp(i,k) + tpert(i)) * (1._r8+zvirp1*qstp(i,k)) / (1._r8+qstp(i,k))
          
       end if
 
@@ -3559,7 +3568,7 @@ do k = pver, msg+1, -1
             qstp(i,k) = new_q
          end if
 
-         tpv(i,k) = (tp(i,k)+tpert(i))* (1._r8+1.608_r8*qstp(i,k)) / (1._r8+ new_q) 
+         tpv(i,k) = (tp(i,k)+tpert(i))* (1._r8+zvirp1*qstp(i,k)) / (1._r8+ new_q) 
 
       end if ! k < klaunch
       

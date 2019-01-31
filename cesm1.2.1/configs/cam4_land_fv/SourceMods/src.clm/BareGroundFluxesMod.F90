@@ -43,7 +43,7 @@ contains
     use clmtype
     use clm_atmlnd         , only : clm_a2l
     use clm_varpar         , only : nlevgrnd
-    use clm_varcon         , only : cpair, vkc, grav, denice, denh2o, istsoil
+    use clm_varcon         , only : cpair, vkc, grav, denice, denh2o, istsoil, zvir
     use clm_varcon         , only : istcrop
     use clm_varctl         , only : use_c13
     use shr_const_mod      , only : SHR_CONST_RGAS
@@ -281,7 +281,7 @@ contains
        ur(p) = max(1.0_r8,sqrt(forc_u(g)*forc_u(g)+forc_v(g)*forc_v(g)))
        dth(p) = thm(p)-t_grnd(c)
        dqh(p) = forc_q(c) - qg(c)
-       dthv = dth(p)*(1._r8+0.61_r8*forc_q(c))+0.61_r8*forc_th(c)*dqh(p)
+       dthv = dth(p)*(1._r8+zvir*forc_q(c))+zvir*forc_th(c)*dqh(p)
        zldis(p) = forc_hgt_u_pft(p)
 
        ! Copy column roughness to local pft-level arrays
@@ -316,7 +316,7 @@ contains
           qstar = temp2(p)*dqh(p)
           z0hg_pft(p) = z0mg_pft(p)/exp(0.13_r8 * (ustar(p)*z0mg_pft(p)/1.5e-5_r8)**0.45_r8)
           z0qg_pft(p) = z0hg_pft(p)
-          thvstar = tstar*(1._r8+0.61_r8*forc_q(c)) + 0.61_r8*forc_th(c)*qstar
+          thvstar = tstar*(1._r8+zvir*forc_q(c)) + zvir*forc_th(c)*qstar
           zeta = zldis(p)*vkc*grav*thvstar/(ustar(p)**2*thv(c))
 
           if (zeta >= 0._r8) then                   !stable

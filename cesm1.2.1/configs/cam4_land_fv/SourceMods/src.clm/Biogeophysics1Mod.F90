@@ -65,7 +65,7 @@ contains
     use clm_atmlnd         , only : clm_a2l
     use clm_varcon         , only : denh2o, denice, roverg, hvap, hsub, &
                                     istice, istice_mec, istwet, istsoil, isturb, istdlak, &
-                                    zlnd, zsno, tfrz, &
+                                    zlnd, zsno, tfrz, zvir, &
                                     icol_roof, icol_sunwall, icol_shadewall,     &
                                     icol_road_imperv, icol_road_perv, tfrz, spval, istdlak
     use clm_varcon         , only : istcrop
@@ -410,7 +410,7 @@ contains
        if (ityplun(l) /= isturb) then
           if (ityplun(l)==istice .or. ityplun(l)==istice_mec) then
 !             emg(c) = 0.97_r8
-             emg(c) = 1.0_r8
+             emg(c) = 1.0_r8  ! Wolf set ground emissivity to 1
           else
 !             emg(c) = (1._r8-frac_sno(c))*0.96_r8 + frac_sno(c)*0.97_r8
              emg(c) = (1._r8-frac_sno(c))*1.0_r8 + frac_sno(c)*1.0_r8
@@ -439,7 +439,7 @@ contains
 
        beta(c) = 1._r8
        zii(c)  = 1000._r8
-       thv(c)  = forc_th(c)*(1._r8+0.61_r8*forc_q(c))
+       thv(c)  = forc_th(c)*(1._r8+zvir*forc_q(c))
 
     end do ! (end of columns loop)
     

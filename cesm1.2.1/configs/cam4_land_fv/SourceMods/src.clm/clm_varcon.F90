@@ -16,7 +16,7 @@ module clm_varcon
                            SHR_CONST_LATSUB,SHR_CONST_LATICE,SHR_CONST_RHOFW, &
                            SHR_CONST_RHOICE,SHR_CONST_TKFRZ,SHR_CONST_REARTH, &
                            SHR_CONST_PDB, SHR_CONST_PI, SHR_CONST_CDAY,       &
-                           SHR_CONST_RGAS
+                           SHR_CONST_RGAS, SHR_CONST_ZVIR
   use clm_varpar   , only: numrad, nlevgrnd, nlevlak
 !
 ! !PUBLIC TYPES:
@@ -46,6 +46,7 @@ module clm_varcon
   real(r8) :: rwat   = SHR_CONST_RWV    !gas constant for water vapor [J/(kg K)]
   real(r8) :: rair   = SHR_CONST_RDAIR  !gas constant for dry air [J/kg/K]
   real(r8) :: roverg = SHR_CONST_RWV/SHR_CONST_G*1000._r8 !Rw/g constant = (8.3144/0.018)/(9.80616)*1000. mm/K
+  real(r8) :: zvir   = SHR_CONST_ZVIR   ! virtual temperature correction
   real(r8) :: cpliq  = SHR_CONST_CPFW   !Specific heat of water [J/kg-K]
   real(r8) :: cpice  = SHR_CONST_CPICE  !Specific heat of ice [J/kg-K]
   real(r8) :: cpair  = SHR_CONST_CPDAIR !specific heat of dry air [J/kg/K]

@@ -50,8 +50,8 @@ module exoplanet_mod
   !!real(r8), public, parameter :: exo_ndays  = 24.737_r8          !! length of day scaled to number of Earth days.
 
   ! ORBITAL OPTIONS
-  !! Note: exo_sdays becomes orbital-rotational period if (do_exo_sycnhronous)
-  !!real(r8), public, parameter :: exo_sday = 86400.0_r8 * exo_ndays   !! sidereal period [sec], uncomment for scaling
+  !! Note: exo_ndays scales orbital-rotational period if (do_exo_sycnhronous)
+  !!real(r8), public, parameter :: exo_sday = 86400.0_r8 * exo_ndays   !! sidereal period [sec], uncomment for do_exo_synchronous
   real(r8), public, parameter :: exo_sday = 86164.0_r8                 !! sidereal period [sec], uncomment for Earth value = 86164.0
 
 
