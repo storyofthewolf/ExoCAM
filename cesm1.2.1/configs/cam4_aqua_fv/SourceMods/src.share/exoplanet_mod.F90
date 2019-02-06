@@ -65,7 +65,7 @@ module exoplanet_mod
 
   ! SOLAR SPECTRAL FILE
   !! Make sure solar file matches spectral intervals for selected RT configuration !!
-  character(len=256), public, parameter :: exo_solar_file = '/projects/wolfet/models/ExoRT/data/solar/G2V_SUN_n28.nc '
+  character(len=256), public, parameter :: exo_solar_file = '/gpfsm/dnb53/etwolf/models/ExoRT/data/solar/G2V_SUN_n28.nc '
 
 
   ! ATMOSPHERIC CONSTITUENT PARAMETERS
