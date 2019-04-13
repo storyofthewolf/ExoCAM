@@ -359,6 +359,7 @@ contains
         write(iulog,*) 'SURFACE GRAVITY (m/s2): ', SHR_CONST_G
         write(iulog,*) 'SURFACE PRESSURE: ', SHR_CONST_PSTD
         write(iulog,*) 'LENGTH OF DAY: ', EXO_NDAYS
+        write(iulog,*) 'SIDEREAL DAY: ', EXO_SDAY
         write(iulog,*) 'N2 BAR: ', exo_n2bar
         write(iulog,*) 'H2 BAR: ', exo_h2bar
         write(iulog,*) 'CO2 BAR: ', exo_co2bar

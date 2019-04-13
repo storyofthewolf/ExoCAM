@@ -5,7 +5,7 @@ module seq_flux_mct
   use shr_flux_mod,      only: shr_flux_atmocn
   use shr_orb_mod,       only: shr_orb_params, shr_orb_cosz, shr_orb_decl
   use shr_mct_mod
-  use exoplanet_mod,     only: exo_albdir, exo_albdif
+  use exoplanet_mod,     only: exo_albdir, exo_albdif, exo_ndays
 
   use mct_mod
   use seq_flds_mod
@@ -435,7 +435,7 @@ contains
 
 !===============================================================================
 
-  subroutine seq_flux_ocnalb_mct( cdata_o, xao_o, fractions_o)
+  subroutine seq_flux_ocnalb_mct( cdata_o, xao_o, fractions_o, year)
 
     !-----------------------------------------------------------------------
     !
@@ -444,6 +444,7 @@ contains
     type(seq_cdata), intent(in)    :: cdata_o
     type(mct_aVect), intent(inout) :: xao_o
     type(mct_aVect), intent(inout) :: fractions_o
+    integer, intent(in)            :: year  
     !
     ! Local variables
     !
@@ -478,6 +479,7 @@ contains
     !! real(R8),parameter :: albdir = 0.07_R8 ! 60 deg reference albedo, direct 
     real(R8),parameter :: albdif = exo_albdif ! 60 deg reference albedo, diffuse
     real(R8),parameter :: albdir = exo_albdir ! 60 deg reference albedo, direct 
+    real(r8)   :: frac_day
     character(*),parameter :: subName =   '(seq_flux_ocnalb_mct) '
     !
     !-----------------------------------------------------------------------
@@ -541,12 +543,24 @@ contains
           orb_mvelpp=mvelpp, orb_lambm0=lambm0, orb_obliqr=obliqr)
        if (nextsw_cday >= -0.5_r8) then
           calday = nextsw_cday
+          calday = calday-1.
           call shr_orb_decl(calday, eccen, mvelpp,lambm0, obliqr, delta, eccf)
+  
+          !! WOLF, Adjust zenith angle calculation for different rotation rates
+          calday = calday + 365.*year
+          frac_day = calday/exo_ndays - FLOOR(calday / exo_ndays)
+          !write(*,*) "frac_day seq_flux", year, calday, frac_day
+
           ! Compute albedos 
           do n=1,nloc_o
              rlat = const_deg2rad * lats(n)
              rlon = const_deg2rad * lons(n)
-             cosz = shr_orb_cosz( calday, rlat, rlon, delta )
+
+             ! WOLF, Adjust zenith angle calculation for different rotation rates
+             !cosz = shr_orb_cosz( calday, rlat, rlon, delta )
+             cosz = shr_orb_cosz( frac_day, rlat, rlon, delta )
+             ! /WOLF
+ 
              if (cosz  >  0.0_R8) then !--- sun hit --
                 anidr = (.026_R8/(cosz**1.7_R8 + 0.065_R8)) +   &
                         (.150_R8*(cosz         - 0.100_R8 ) *   &

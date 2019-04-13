@@ -71,7 +71,7 @@ file_aerosoldep_out = '/projects/btoon/wolfet/exofiles/ocn/aquaplanet/aerosoldep
 ;--- 4x5 ---  from my simulations
 ;file_bndtopo = '/lustre/janus_scratch/cesm/inputdata/atm/cam/topo/USGS-gtopo30_4x5_remap_c050520.nc'
 ;file_dom_domain = '/lustre/janus_scratch/cesm/inputdata/share/domains/domain.ocn.gx3v7.120323.nc'
-file_domfile = '/lustre/janus_scratch/cesm/inputdata/ocn/docn7/SOM/pop_frc.gx3v7.110128.nc'
+;file_domfile = '/lustre/janus_scratch/cesm/inputdata/ocn/docn7/SOM/pop_frc.gx3v7.110128.nc'
 ;;;;file_ncdata = '/lustre/janus_scratch/cesm/inputdata/atm/cam/inic/fv/cami_0001-01-01_4x5_L26_c060608.nc'
 ;;;file_ncdata ='/projects/wolfet/EXO_RESTART/control_L26_0053-01-01-00000/control.cam.i.0053-01-01-00000.nc'
 ;;;file_ncdata = '/projects/wolfet/EXO_RESTART/control_L45_0040-01-01-00000/control_L45.cam.i.0040-01-01-00000.nc'
@@ -91,12 +91,23 @@ file_domfile = '/lustre/janus_scratch/cesm/inputdata/ocn/docn7/SOM/pop_frc.gx3v7
 ;file_bndtopo_out = "/projects/wolfet/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/topo_0.47x0.63_aquaplanet.nc"
 
 ;--- ocean domain files in/out ---
-file_ocn_domain = '/gpfs/summit/datasets/CESM/inputdata/share/domains/domain.ocn.0.47x0.63_gx1v6_090408.nc'
-file_ocn_domain_out =  "/projects/wolfet/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/domain.ocn.0.47x0.63_aquaplanet.nc"
+;file_ocn_domain = '/gpfs/summit/datasets/CESM/inputdata/share/domains/domain.ocn.0.47x0.63_gx1v6_090408.nc'
+;file_ocn_domain_out =  "/projects/wolfet/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/domain.ocn.0.47x0.63_aquaplanet.nc"
 
 ;--- ocn master files in/out ---
-file_ocn_master = "/gpfs/summit/datasets/CESM/inputdata/share/domains/domain.ocn.0.47x0.63_gx1v6_090408.nc"
-file_ocn_master_out = "/projects/wolfet/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/pop_frc.0.47x0.63d_aquaplanet_0OHT.nc"
+;file_ocn_master = "/gpfs/summit/datasets/CESM/inputdata/share/domains/domain.ocn.0.47x0.63_gx1v6_090408.nc"
+;file_ocn_master_out = "/projects/wolfet/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/pop_frc.0.47x0.63d_aquaplanet_0OHT.nc"
+
+
+;--- pop.frc files in/out ---
+file_pop_frc = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/pop_frc.4x5d.090130_aquaplanet_300Kiso.nc"
+file_pop_frc_out = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/pop_frc.4x5d.090130_aquaplanet_200Kiso.nc"
+
+
+;--- ncdata files in/oout --
+;file_ncdata = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/ic_P1bar_L40_300Kiso_ic.nc"
+file_ncdata = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/ic_P1bar_L40_ic.nc"
+file_ncdata_out = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/ic_P1bar_L40_test_ic.nc"
 
 ;-- new file names --
 ;file_domfile_out = '/projects/btoon/wolfet/exofiles/ocn/aquaplanet/pop_frc.gx3v7.110128.nc_0OHT.nc'
@@ -111,6 +122,7 @@ file_ocn_master_out = "/projects/wolfet/models/ExoCAM/cesm1.2.1/initial_files/ca
 ;file_ocn_master_out = '/projects/btoon/wolfet/exofiles/ocn/aquaplanet/pop_frc.4x5d.090130_aquaplanet_Earth.nc'
 ;file_ocn_master_out = '/projects/btoon/wolfet/exofiles/ocn/aquaplanet/pop_frc.1x1d.090130_aquaplanet.nc'
 ;file_ocn_master_out = '/projects/btoon/wolfet/exofiles/ocn/aquaplanet/pop_frc.4x5d_warm_aqua_300K_1barN2.nc'
+
 ;========== BND_TOPO =====================
 if (make_bndtopo eq 1) then begin
 
@@ -159,10 +171,10 @@ if (make_bndtopo eq 1) then begin
 endif
 
 if (make_popfrc eq 1) then begin
-  oprstr="cp -r " + file_popfrc + " " + file_popfrc_out
+  oprstr="cp -r " + file_pop_frc + " " + file_pop_frc_out
   spawn, oprstr
 
-  ncid=ncdf_open(file_domfile, /nowrite)
+  ncid=ncdf_open(file_pop_frc, /nowrite)
   ncdf_varget,ncid,'mask',mask
   ncdf_varget,ncid,'T',T     ; temperature
   ncdf_varget,ncid,'hblt',hblt  ; boundary later depth
@@ -176,7 +188,7 @@ if (make_popfrc eq 1) then begin
 
   ;set everything to zero
 ;  mask(*,*) = 1.0   
-  T(*,*,*) = 10.0  ; degrees celcius
+  T(*,*,*) = -73.16  ; degrees celcius
   hblt(*,*,*) = 50.0 ; meter mixed layer depth
   qdp(*,*,*) = 0.0
   dhdx(*,*,*) = 0.0
@@ -186,9 +198,9 @@ if (make_popfrc eq 1) then begin
   S(*,*,*) = 0.0  
 
   ;---- update dom file ----
-  ncid = ncdf_open(file_domfile_out, /WRITE)
-  print, "updating dom_domain"
-  print, file_domfile_out
+  ncid = ncdf_open(file_pop_frc_out, /WRITE)
+  print, "updating pop_frc_out"
+  print, file_pop_frc_out
 ;  ncdf_varput, ncid, 'mask',mask
   ncdf_varput, ncid, 'T',T
   ncdf_varput, ncid, 'hblt',hblt
@@ -260,32 +272,41 @@ if (make_ncdata eq 1) then begin
   ICEFRAC_OUT(*,*)=0.0
   SICTHK_OUT(*,*)=0.0
   SNOWHICE_OUT(*,*)=0.0
+  T_OUT(*,*,*) = 200.0
+  TS1_OUT(*,*) = 200.0
+  TS2_OUT(*,*) = 200.0
+  TS3_OUT(*,*) = 200.0
+  TS4_OUT(*,*) = 200.0
+  CLDICE_OUT(*,*,*) = 0.0
+  CLDLIQ_OUT(*,*,*) = 0.0
+  VS_OUT(*,*,*) = 0.0
+  US_OUT(*,*,*) = 0.0
 
 
   iv=nlat
   for i=0,nlat-1 do begin
     iv=iv-1
-;    TS_OUT(*,i) = mean((TS(*,i)+TS(*,iv))/2.)
-;    TS1_OUT(*,i) = mean((TS1(*,i)+TS1(*,iv))/2.)
-;    TS2_OUT(*,i) = mean((TS2(*,i)+TS2(*,iv))/2.)
-;    TS3_OUT(*,i) = mean((TS3(*,i)+TS3(*,iv))/2.)
-;    TS4_OUT(*,i) = mean((TS4(*,i)+TS4(*,iv))/2.)
+    ;TS_OUT(*,i) = mean((TS(*,i)+TS(*,iv))/2.)
+    TS1_OUT(*,i) = mean((TS1(*,i)+TS1(*,iv))/2.)
+    TS2_OUT(*,i) = mean((TS2(*,i)+TS2(*,iv))/2.)
+    TS3_OUT(*,i) = mean((TS3(*,i)+TS3(*,iv))/2.)
+    TS4_OUT(*,i) = mean((TS4(*,i)+TS4(*,iv))/2.)
     for k=0,nlev-1 do begin
-;      CLDICE_OUT(*,i,k) = mean((CLDICE(*,i,k)+CLDICE(*,iv,*))/2.)
-;      CLDLIQ_OUT(*,i,k) = mean((CLDLIQ(*,i,k)+CLDLIQ(*,iv,k))/2.)
-;      Q_OUT(*,i,k) = mean((Q(*,i,k)+Q(*,iv,k))/2.)
-;      T_OUT(*,i,k) = mean((T(*,i,k)+T(*,iv,k))/2.)
+    ;  CLDICE_OUT(*,i,k) = mean((CLDICE(*,i,k)+CLDICE(*,iv,*))/2.)
+    ;  CLDLIQ_OUT(*,i,k) = mean((CLDLIQ(*,i,k)+CLDLIQ(*,iv,k))/2.)
+      Q_OUT(*,i,k) = mean((Q(*,i,k)+Q(*,iv,k))/2.)
+      T_OUT(*,i,k) = mean((T(*,i,k)+T(*,iv,k))/2.)
 ;      VS_OUT(*,i,k) = mean((VS(*,i,k)+VS(*,iv,k))/2.)
     endfor
    endfor
 
-  iv=nslat
-  for i=0,nslat-1 do begin
-    iv=iv-1
-    for k=0,nlev-1 do begin
-  ;    US_OUT(*,i,k) = mean((US(*,i,k)+US(*,iv,k))/2.)
-    endfor
-  endfor
+;  iv=nslat
+;  for i=0,nslat-1 do begin
+;    iv=iv-1
+;    for k=0,nlev-1 do begin
+;  ;    US_OUT(*,i,k) = mean((US(*,i,k)+US(*,iv,k))/2.)
+;    endfor
+;  endfor
 
 
 
@@ -293,21 +314,21 @@ if (make_ncdata eq 1) then begin
   ncid = ncdf_open(file_ncdata_out, /WRITE)
   print, "updatinf ncdata file"
   print, file_ncdata_out
- ; ncdf_varput, ncid, 'P0',P0_OUT
- ; ncdf_varput, ncid, 'PS',PS_OUT
+  ncdf_varput, ncid, 'P0',P0_OUT
+  ncdf_varput, ncid, 'PS',PS_OUT
  ; ncdf_varput, ncid, 'TSICE',TSICE_OUT
  ; ncdf_varput, ncid, 'SICTHK',SICTHK_OUT
  ; ncdf_varput, ncid, 'TS',TS_OUT
- ; ncdf_varput, ncid, 'TS1',TS1_OUT
- ; ncdf_varput, ncid, 'TS2',TS2_OUT
- ; ncdf_varput, ncid, 'TS3',TS3_OUT
- ; ncdf_varput, ncid, 'TS4',TS4_OUT
- ; ncdf_varput, ncid, 'CLDICE',CLDICE_OUT
- ; ncdf_varput, ncid, 'CLDLIQ',CLDLIQ_OUT
- ; ncdf_varput, ncid, 'Q',Q_OUT
- ; ncdf_varput, ncid, 'T',T_OUT
- ; ncdf_varput, ncid, 'VS',VS_OUT
- ; ncdf_varput, ncid, 'US',US_OUT
+  ncdf_varput, ncid, 'TS1',TS1_OUT
+  ncdf_varput, ncid, 'TS2',TS2_OUT
+  ncdf_varput, ncid, 'TS3',TS3_OUT
+  ncdf_varput, ncid, 'TS4',TS4_OUT
+  ncdf_varput, ncid, 'CLDICE',CLDICE_OUT
+  ncdf_varput, ncid, 'CLDLIQ',CLDLIQ_OUT
+  ncdf_varput, ncid, 'Q',Q_OUT
+  ncdf_varput, ncid, 'T',T_OUT
+  ncdf_varput, ncid, 'VS',VS_OUT
+  ncdf_varput, ncid, 'US',US_OUT
   ncdf_close, ncid
 
 
@@ -371,8 +392,8 @@ endif
 if (make_ocn_master eq 1) then begin
 
   ;optiona read in .cam.i. file for exact temperature match
-  ;copyT_file = "/projects/btoon/wolfet/exofiles/atm/warm_aqua_300K_1barN2.cam.i.nc"
-  copyT_file = "/gpfs/summit/datasets/CESM/inputdata/atm/cam/inic/fv/cami_0000-09-01_0.47x0.63_L26_c061106.nc"
+  copyT_file = "/projects/btoon/wolfet/exofiles/atm/warm_aqua_300K_1barN2.cam.i.nc"
+  ;copyT_file = "/gpfs/summit/datasets/CESM/inputdata/atm/cam/inic/fv/cami_0000-09-01_0.47x0.63_L26_c061106.nc"
   ncid=ncdf_open(copyT_file, /nowrite)
   ncdf_varget,ncid,'TS',T_match_in
   ncdf_close,ncid
@@ -387,8 +408,8 @@ help, T_match_in
 
   ;dimensions
   ;kludge
-  nlon = 576
-  nlat = 384
+  ;nlon = 576
+  ;nlat = 384
   ntime = 12
 
   ;data

@@ -19,6 +19,6 @@
 ! Set maxpatch_glcmec    with GLC_NEC                            option
 !----------------------------------------------------------------------------------
 
-finidat = "/projects/wolfet/models/ExoCAM/cesm1.2.1/initial_files/cam4_land_fv/landplanet_q0_wt10.clm2.r.nc"
-fsurdat = "/projects/wolfet/models/ExoCAM/cesm1.2.1/initial_files/cam4_land_fv/surfdata_4x5_dune_fmax0.5_sc5.nc"
+finidat = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_land_fv/landplanet_q0_wt10.clm2.r.nc"
+fsurdat = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_land_fv/surfdata_4x5_dune_fmax0.5_sc5.nc"
 hist_nhtfrq = 0

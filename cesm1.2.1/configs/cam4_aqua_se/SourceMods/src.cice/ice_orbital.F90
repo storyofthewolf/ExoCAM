@@ -26,8 +26,7 @@
       use ice_domain_size
       use ice_constants
       use shr_orb_mod
-      use exoplanet_mod
-
+      use exoplanet_mod, only: exo_ndays
 ! 2 Jan07 BPB
       use ice_diagnostics
 !
@@ -110,7 +109,7 @@
 ! !USES:
 !
       use ice_calendar, only: yday, sec, secday, days_per_year, &
-                              calendar_type, nextsw_cday
+                              calendar_type, nextsw_cday, nyr
 ! 
 ! !INPUT/OUTPUT PARAMETERS: 
 ! 
@@ -140,7 +139,10 @@
          j   , & ! domain latitude index
          ij      ! horizontal index, combines i and j loops
  
- 
+ !WOLF
+       real (kind=dbl_kind) :: frac_day, day_in_year
+       integer (kind=int_kind) :: ncol
+
 ! Solar declination for next time step
  
 #ifdef CCSMCOUPLED
@@ -160,27 +162,37 @@
 
       coszen(:,:) = c0  ! sun at horizon
 
+      !Wolf  
+      ydayp1 = ydayp1 + 365.*(nyr-1)
+      ydayp1=ydayp1-1
+      frac_day = ydayp1/exo_ndays - FLOOR(ydayp1 / exo_ndays)
+      ! day_in_year = yday - (365)*FLOOR(yday/(365))  ! scaling for different length years not operable
+      !write(*,*) "coszen, frac_day, yday", frac_day, ydayp1
+      ! \Wolf
+
 !DIR$ CONCURRENT !Cray
 !cdir nodep      !NEC
 !ocl novrec      !Fujitsu
-      do ij = 1, icells
-         i = indxi(ij)
-         j = indxj(ij)
-!lipscomb - function inlined to improve vector efficiency
-!         coszen(i,j) = shr_orb_cosz(ydayp1, &
-!                                    tlat(i,j),tlon(i,j),delta)
-
+        !WOLF 
         if (do_exo_synchronous) then    !synchronous rotation
-          coszen(i,j) = sin(tlat(i,j))*sin(delta) - &
-                        cos(tlat(i,j))*cos(delta)   &
-                       *cos(ydayp1*c2*pi + tlon(i,j))
+          do ij = 1, icells
+             i = indxi(ij)
+             j = indxj(ij)
+             coszen(i,j) = sin(tlat(i,j))*sin(delta) - &
+                           cos(tlat(i,j))*cos(delta)   &
+                           *cos(tlon(i,j))
+          enddo
         else
-          coszen(i,j) = sin(tlat(i,j))*sin(delta) - &
-                        cos(tlat(i,j))*cos(delta)*cos(tlon(i,j))
+          do ij = 1, icells
+             i = indxi(ij)
+             j = indxj(ij)
+             coszen(i,j) = sin(tlat(i,j))*sin(delta) - &
+                           cos(tlat(i,j))*cos(delta)   &
+                           *cos(frac_day*c2*pi + tlon(i,j))
+          enddo
         endif
+      
 
-      enddo
- 
       endif
 
       end subroutine compute_coszen
