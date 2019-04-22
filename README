@@ -10,14 +10,14 @@ http://www.cesm.ucar.edu/models/cesm1.2/cesm/doc/usersguide/ug.pdf
 
 ExoCAM is intended to be run with ExoRT, a correlated-k radiative transfer package available at https://github.com/storyofthewolf/ExoRT.  
 
+SPECIFC INSTRUCTIONS are located individual config directories located at ../ExoCAM/cesm1.2.1/configs/*/README
 
 !! Disclaimer.
 The code is constantly evolving.  Not all functionalties are supported. While support for ExoCAM and ExoRT is limited, if you intend to use ExoCAM and ExoRT, please contact eric.wolf@colorado.edu to ensure that your particular application is reasonable, and importantly, I may help you avoid potential pit falls, traps, and other idiosyncracies in the model that could result in lost productivity.
-
-
 
 /folders
 cesm1.2.1  -- model versions for CESM1.2.1
 idl_progs  -- a colletion of idl utilities
 
-(in the future cesm2 branches can be added here)
+
+
