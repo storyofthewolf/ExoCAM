@@ -1,7 +1,10 @@
-QuickStart Guide
+QuickStart Guide :: cam4_land_fv
+physics:            cam4
+surface type:       land
+dynamical core:     finite volume
 
 == create the case
-create_newcase -case $my_landplanet_case -res f45_f45 -mach hyak -compset L2000
+create_newcase -case $my_landplanet_case -res f45_f45 -mach discover -compset L2000
 
 == set the ExoRT radiative transfer package
 xmlchange CAM_CONFIG_OPTS="-nlev 40 -phys cam4 -usr_src $EXORT_PATH/ExoRT/3dmodels/src.cam.n******"

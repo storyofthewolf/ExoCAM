@@ -6,7 +6,7 @@ pro mod_cesm_files
 ;-------------------------------
 
 make_bndtopo = 0 ; topograph files  
-make_popfrc = 0 ; modify existing popfrc file
+make_popfrc = 1 ; modify existing popfrc file
 make_ncdata = 0
 make_tropopause_climo_file = 0
 make_ozone = 0
@@ -14,7 +14,7 @@ make_aerosoldep = 0
 make_prescribed_aerofil = 0
 make_lnd_domain = 0
 make_ocn_domain = 0
-make_ocn_master = 1   ; make new popfrc files, because one doesn't exist on file
+make_ocn_master = 0   ; make new popfrc files, because one doesn't exist on file
 
 make_ne5np4_popfile = 0
 make_ne5np4_icfile = 0
@@ -100,8 +100,11 @@ file_aerosoldep_out = '/projects/btoon/wolfet/exofiles/ocn/aquaplanet/aerosoldep
 
 
 ;--- pop.frc files in/out ---
-file_pop_frc = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/pop_frc.4x5d.090130_aquaplanet_300Kiso.nc"
-file_pop_frc_out = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/pop_frc.4x5d.090130_aquaplanet_200Kiso.nc"
+;file_pop_frc = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/pop_frc.4x5d.090130_aquaplanet_300Kiso.nc"
+;file_pop_frc_out = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/pop_frc.4x5d.090130_aquaplanet_200Kiso.nc"
+
+file_pop_frc = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_mixed_fv/pop_frc.gx3v7.110128.nc
+file_pop_frc_out = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_mixed_fv/pop_frc.gx3v7.110128_annual_mean.nc
 
 
 ;--- ncdata files in/oout --
@@ -186,16 +189,31 @@ if (make_popfrc eq 1) then begin
   ncdf_varget,ncid,'S',S  ; salinity ppt
   ncdf_close,ncid
 
-  ;set everything to zero
+  ;set everything to fixed value
 ;  mask(*,*) = 1.0   
-  T(*,*,*) = -73.16  ; degrees celcius
-  hblt(*,*,*) = 50.0 ; meter mixed layer depth
-  qdp(*,*,*) = 0.0
-  dhdx(*,*,*) = 0.0
-  dhdy(*,*,*) = 0.0
-  U(*,*,*) = 0.0
-  V(*,*,*) = 0.0
-  S(*,*,*) = 0.0  
+;  T(*,*,*) = -73.16  ; degrees celcius
+;  hblt(*,*,*) = 50.0 ; meter mixed layer depth
+;  qdp(*,*,*) = 0.0
+;  dhdx(*,*,*) = 0.0
+;  dhdy(*,*,*) = 0.0
+;  U(*,*,*) = 0.0
+;  V(*,*,*) = 0.0
+;  S(*,*,*) = 0.0  
+  ; average over time
+  for x=0,99 do begin 
+    for y=0,115 do begin 
+      for ti=0,11 do begin
+        T(x,y,ti) = mean(T(x,y,*)) 
+        hblt(x,y,ti) = mean(hblt(x,y,*))
+        qdp(x,y,ti) = mean(qdp(x,y,*))
+        dhdx(x,y,ti) = mean(dhdx(x,y,*))
+        U(x,y,ti) = mean(U(x,y,*)) 
+        V(x,y,ti) = mean(V(x,y,*)) 
+        S(x,y,ti) = mean(S(x,y,*)) 
+      endfor
+    endfor
+  endfor
+
 
   ;---- update dom file ----
   ncid = ncdf_open(file_pop_frc_out, /WRITE)
