@@ -13,11 +13,38 @@ ExoCAM is intended to be run with ExoRT, a correlated-k radiative transfer packa
 SPECIFC INSTRUCTIONS are located individual config directories located at ../ExoCAM/cesm1.2.1/configs/*/README
 
 !! Disclaimer.
-The code is constantly evolving.  Not all functionalties are supported. While support for ExoCAM and ExoRT is limited, if you intend to use ExoCAM and ExoRT, please contact eric.wolf@colorado.edu to ensure that your particular application is reasonable, and importantly, I may help you avoid potential pit falls, traps, and other idiosyncracies in the model that could result in lost productivity.
+The code is constantly evolving.  There are no gaurantees of mercantibility
+and warrantability, etc.  Sometimes I make mistakes.    Not all functionalties are supported.  While support for ExoCAM and ExoRT is limited, if you intend to use ExoCAM and ExoRT, please contact eric.wolf@colorado.edu to ensure that your particular application is reasonable, and importantly, I may help you avoid potential pit falls, traps, and other idiosyncracies in the model that could result in lost productivity.
+
+!! Citing ExoCAM
+If you use ExoCAM in your work, please footnote to where the model is available.  I.e. my Github pages.
+https://github.com/storyofthewolf/ExoCAM
+https://github.com/storyofthewolf/ExoRT
+
+No particular citataions are required.  However, note that ExoCAM and ExoRT are the culmination of years of gradual development.
+- LIST OF PAPERS Using ExoCAM/ExoRT -
+Wolf, E.T. and Toon, O.B. (2013) AsBio 13,7,1-18
+Wolf, E.T. and Toon, O.B. (2014) GRL 41,1,167-172
+Wolf, E.T. and Toon, O.B. (2014) AsBio 14,3,241-252
+Wolf, E.T. and Toon, O.B. (2015) JGR-Atmos 120,12,5775-5794
+Yang, J., Leconte, J., Wolf, E.T. (2016) ApJ 826,222
+Wolf, E.T., Shields, A.L., Kopparapu, R.K. et al. (2017) ApJ 837,107
+Wolf, E.T. (2017) ApJ 837,107
+Kopparapu, R.K., Wolf, E.T., Arney, G., et al. (2017) ApJ 845,5
+Haqq-Misra, J. Wolf, E.T., Joshi, M., et al. (2018) ApJ 852,67
+Wolf, E.T., Haqq-Misra, J. and Toon, O.B. (2018) JGR-Atmos 123,21,11861-11874
+Yang, J., Leconte, J., Wolf, E.T. et al. (2019) ApJ 875,46
+Adams, A.D., Boos, W.R., and Wolf, E.T. (2019) ApJ 157,189
+Komacek, T.D. and Abbot, D.S. (2019) ApJ 871,245 
+
+
+
+
 
 /folders
 cesm1.2.1  -- model versions for CESM1.2.1
 idl_progs  -- a colletion of idl utilities
+
 
 
 
