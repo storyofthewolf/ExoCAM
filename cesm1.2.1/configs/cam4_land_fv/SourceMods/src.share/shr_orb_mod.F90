@@ -10,7 +10,9 @@ MODULE shr_orb_mod
    use shr_const_mod
    use shr_log_mod, only: s_loglev  => shr_log_Level
    use shr_log_mod, only: s_logunit => shr_log_Unit
-   use exoplanet_mod,  only: exo_eccen, exo_obliq, exo_mvelp, do_exo_synchronous
+   use exoplanet_mod,  only: exo_eccen, exo_obliq, exo_mvelp, &
+       		       	     exo_circumbinary_ampl, exo_circumbinary_peri, &
+                             do_exo_synchronous, exo_porb
 
    IMPLICIT none
 
@@ -21,6 +23,7 @@ MODULE shr_orb_mod
    public :: shr_orb_params
    public :: shr_orb_decl
    public :: shr_orb_print
+   public :: shr_orb_circumbinary
 
    real   (SHR_KIND_R8),public,parameter :: SHR_ORB_UNDEF_REAL = 1.e36_SHR_KIND_R8 ! undefined real 
    integer(SHR_KIND_IN),public,parameter :: SHR_ORB_UNDEF_INT  = 2000000000        ! undefined int
@@ -70,7 +73,8 @@ real(SHR_KIND_R8) FUNCTION shr_orb_cosz(jday,lat,lon,declin)
      &          cos(lat)*cos(declin)*cos(lon)
    else   ! default, Earth present day orbit
      shr_orb_cosz = sin(lat)*sin(declin) - &
-     &              cos(lat)*cos(declin)*cos(jday*2.0_SHR_KIND_R8*pi + lon)
+!     &              cos(lat)*cos(declin)*cos(jday*2.0_SHR_KIND_R8*pi + lon)
+      &              cos(lat)*cos(declin)*cos((jday-1.0)*2.0_SHR_KIND_R8*pi + lon)
    endif
 
 END FUNCTION shr_orb_cosz
@@ -558,8 +562,12 @@ SUBROUTINE shr_orb_decl(calday ,eccen ,mvelpp ,lambm0 ,obliqr ,delta ,eccf)
    real   (SHR_KIND_R8),intent(out) :: eccf   ! Earth-sun distance factor (ie. (1/r)**2)
  
    !---------------------------Local variables-----------------------------
-   real   (SHR_KIND_R8),parameter :: dayspy = 365.0_SHR_KIND_R8  ! days per year
-   real   (SHR_KIND_R8),parameter :: ve     = 80.5_SHR_KIND_R8   ! Calday of vernal equinox
+
+   real   (SHR_KIND_R8),parameter :: dayspy = exo_porb                   ! days per year
+   real   (SHR_KIND_R8),parameter :: ve     = 1.0_SHR_KIND_R8   ! Calday of vernal equinox
+
+   !!real   (SHR_KIND_R8),parameter :: dayspy = 365.0_SHR_KIND_R8  ! days per year
+   !!real   (SHR_KIND_R8),parameter :: ve     = 80.5_SHR_KIND_R8   ! Calday of vernal equinox
                                                      ! assumes Jan 1 = calday 1
  
    real   (SHR_KIND_R8) ::   lambm  ! Lambda m, mean long of perihelion (rad)
@@ -661,5 +669,40 @@ SUBROUTINE shr_orb_print( iyear_AD, eccen, obliq, mvelp )
  
 END SUBROUTINE shr_orb_print
 !===============================================================================
+
+
+!===============================================================================
+
+SUBROUTINE shr_orb_circumbinary(calday, eccf)
+
+!-------------------------------------------------------------------------------
+!
+! Compute earth/orbit parameters using formula suggested by
+! Duane Thresher.
+!
+!---------------------------Code history----------------------------------------
+!
+! Original version:  Eric T. Wolf
+! Date:              April, 2019
+!
+!-------------------------------------------------------------------------------
+
+   !------------------------------Arguments--------------------------------
+   real   (SHR_KIND_R8),intent(in)  :: calday ! Calendar day, including fraction
+   real   (SHR_KIND_R8),intent(out) :: eccf   ! Earth-sun distance factor (ie. (1/r)**2)
+
+   !---------------------------Local variables-----------------------------
+   ! Compute a time varying solar constant, to simulate a planet in a
+   ! circumbinary system.  The SED and zenith angles are considered as a
+   ! signle star, but the amplitude of stellar flux is modulated in time.
+   !
+   
+   ! Set solar binary flux factor
+   eccf   = 1.0+exo_circumbinary_ampl*(sin((calday-1.)*SHR_CONST_PI/exo_circumbinary_peri))
+
+   return
+
+END SUBROUTINE shr_orb_circumbinary
+
 
 END MODULE shr_orb_mod

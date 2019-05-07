@@ -344,22 +344,35 @@ contains
         write(iulog,*) '******************************************************'
         write(iulog,*) '******************************************************'
         write(iulog,*) '******************************************************'
-        write(iulog,*) '***     exoplanet_mod run options      ***'
+        write(iulog,*) '***       ExoCAM: exoplanet_mod run options        ***'
+        write(iulog,*) '******************************************************'
         write(iulog,*) 'DO_EXO_RT: ', do_exo_rt
         write(iulog,*) 'DO_EXO_ATMCONST: ', do_exo_atmconst
         write(iulog,*) 'DO_EXO_SYNCHRONOUS: ', do_exo_synchronous
         write(iulog,*) 'DO_EXO_RT_CLEARSKY: ', do_exo_rt_clearsky
         write(iulog,*) 'DO_EXO_RT_SPECTRAL: ', do_exo_rt_spectral
         write(iulog,*) 'EXO_RAD_STEP: ', exo_rad_step
+        write(iulog,*) 'DO_EXO_CIRCUMBINARY ', do_exo_circumbinary
         write(iulog,*) '******************************************************'
-        write(iulog,*) '***     New physical constants; exoplanet_mod      ***'
+        write(iulog,*) '***       ExoCAM: Stellar Spectral Options         ***'
+        write(iulog,*) '******************************************************'
         write(iulog,*) 'SOLAR CONSTANT: ', SHR_CONST_SCON
         write(iulog,*) 'SOLAR SPECTRUM FILE: ', exo_solar_file
+        if (do_exo_circumbinary) then
+          write(iulog,*) 'CIRCUMBINARY SFLUX AMPLITUDE ', exo_circumbinary_ampl
+          write(iulog,*) 'CIRCUMBINARY SFLUX PERIOD ', exo_circumbinary_peri
+        end if
+        write(iulog,*) '******************************************************'
+        write(iulog,*) '***           ExoCAM: Planet properties            ***'
+        write(iulog,*) '******************************************************'
         write(iulog,*) 'PLANET RADIUS (m): ', SHR_CONST_REARTH
         write(iulog,*) 'SURFACE GRAVITY (m/s2): ', SHR_CONST_G
-        write(iulog,*) 'SURFACE PRESSURE: ', SHR_CONST_PSTD
         write(iulog,*) 'LENGTH OF DAY: ', EXO_NDAYS
         write(iulog,*) 'SIDEREAL DAY: ', EXO_SDAY
+        write(iulog,*) '******************************************************'
+        write(iulog,*) '***           ExoCAM: Atmosphere properties            ***'
+        write(iulog,*) '******************************************************'
+        write(iulog,*) 'SURFACE PRESSURE: ', SHR_CONST_PSTD
         write(iulog,*) 'N2 BAR: ', exo_n2bar
         write(iulog,*) 'H2 BAR: ', exo_h2bar
         write(iulog,*) 'CO2 BAR: ', exo_co2bar
@@ -375,6 +388,7 @@ contains
         write(iulog,*) 'RHODAIR: ', SHR_CONST_RHODAIR
         write(iulog,*) 'ZVIR: ', SHR_CONST_ZVIR
         write(iulog,*) 'CPVIR: ', SHR_CONST_CPVIR
+        write(iulog,*) '******************************************************'
         write(iulog,*) '******************************************************'
       end if
 
