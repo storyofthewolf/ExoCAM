@@ -95,7 +95,7 @@ module exoplanet_mod
   !!real(r8), public, parameter :: exo_porb = exo_ndays                   !! orbital period 
   !!real(r8), public, parameter :: exo_sday = 86400.0_r8 * exo_ndays      !! sidereal period, synchronous rotator
 
-  !! if (do_exo_synchronous) and user_nl_cpl::orb_iyear = -1
+  !! if set user_nl_cpl::orb_iyear = -1
   real(r8), public, parameter :: exo_eccen = 0.0_r8   ! eccentricity
   real(r8), public, parameter :: exo_obliq = 23.5_r8   ! obliquity [degrees]
   real(r8), public, parameter :: exo_mvelp = 0.0_r8   ! vernal equinox
