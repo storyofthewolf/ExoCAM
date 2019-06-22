@@ -103,14 +103,14 @@ file_aerosoldep_out = '/projects/btoon/wolfet/exofiles/ocn/aquaplanet/aerosoldep
 ;file_pop_frc = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/pop_frc.4x5d.090130_aquaplanet_300Kiso.nc"
 ;file_pop_frc_out = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/pop_frc.4x5d.090130_aquaplanet_200Kiso.nc"
 
-file_pop_frc = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_mixed_fv/pop_frc.gx3v7.110128.nc
-file_pop_frc_out = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_mixed_fv/pop_frc.gx3v7.110128_annual_mean.nc
+file_pop_frc = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_mixed_fv/pop_frc.gx3v7.110128_annual_mean.nc"
+file_pop_frc_out = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_mixed_fv/pop_frc.gx3v7.110128_0OHT.nc"
 
 
 ;--- ncdata files in/oout --
 ;file_ncdata = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/ic_P1bar_L40_300Kiso_ic.nc"
-file_ncdata = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/ic_P1bar_L40_ic.nc"
-file_ncdata_out = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/ic_P1bar_L40_test_ic.nc"
+;file_ncdata = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/ic_P1bar_L40_ic.nc"
+;file_ncdata_out = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/ic_P1bar_L40_test_ic.nc"
 
 ;-- new file names --
 ;file_domfile_out = '/projects/btoon/wolfet/exofiles/ocn/aquaplanet/pop_frc.gx3v7.110128.nc_0OHT.nc'
@@ -191,7 +191,7 @@ if (make_popfrc eq 1) then begin
 
   ;set everything to fixed value
 ;  mask(*,*) = 1.0   
-;  T(*,*,*) = -73.16  ; degrees celcius
+;  T(*,*,*) = 15.0  ; degrees celcius
 ;  hblt(*,*,*) = 50.0 ; meter mixed layer depth
 ;  qdp(*,*,*) = 0.0
 ;  dhdx(*,*,*) = 0.0
@@ -199,18 +199,34 @@ if (make_popfrc eq 1) then begin
 ;  U(*,*,*) = 0.0
 ;  V(*,*,*) = 0.0
 ;  S(*,*,*) = 0.0  
+
   ; average over time
+  ;for x=0,99 do begin 
+  ;  for y=0,115 do begin 
+  ;    for ti=0,11 do begin
+  ;      T(x,y,ti) = mean(T(x,y,*)) 
+  ;      hblt(x,y,ti) = mean(hblt(x,y,*))
+  ;      qdp(x,y,ti) = mean(qdp(x,y,*))
+  ;      dhdx(x,y,ti) = mean(dhdx(x,y,*))
+  ;      U(x,y,ti) = mean(U(x,y,*)) 
+  ;      V(x,y,ti) = mean(V(x,y,*)) 
+  ;      S(x,y,ti) = mean(S(x,y,*)) 
+  ;    endfor
+  ;  endfor
+  ;endfor
+
+  ; only where mask > 0
   for x=0,99 do begin 
     for y=0,115 do begin 
-      for ti=0,11 do begin
-        T(x,y,ti) = mean(T(x,y,*)) 
-        hblt(x,y,ti) = mean(hblt(x,y,*))
-        qdp(x,y,ti) = mean(qdp(x,y,*))
-        dhdx(x,y,ti) = mean(dhdx(x,y,*))
-        U(x,y,ti) = mean(U(x,y,*)) 
-        V(x,y,ti) = mean(V(x,y,*)) 
-        S(x,y,ti) = mean(S(x,y,*)) 
-      endfor
+      if (hblt(x,y) gt 0) then begin
+         T(x,y,*) = 15.0
+         hblt(x,y,*) = 50.0
+         qdp(x,y,*) = 0.0
+         dhdx(x,y,*) = 0.0
+         U(x,y,*) = 0.0 
+         V(x,y,*) = 0.0
+         S(x,y,*) = 33.0
+      endif
     endfor
   endfor
 
