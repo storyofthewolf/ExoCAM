@@ -2828,7 +2828,7 @@ subroutine closure(lchnk   , &
       do i = il1g,il2g
          if (k >= lel(i) .and. k <= lcl(i)) then
             thetavp(i,k) = tp(i,k)* (1000._r8/p(i,k))** (rd/cp)*(1._r8+zvirp1*qstp(i,k)-q(i,mx(i)))
-            thetavm(i,k) = t(i,k)* (1000._r8/p(i,k))** (rd/cp)*(1._r8+zvirp1*q(i,k))
+            thetavm(i,k) = t(i,k)* (1000._r8/p(i,k))** (rd/cp)*(1._r8+zvir*q(i,k))
             dqsdtp(i,k) = qstp(i,k)* (1._r8+qstp(i,k)/eps1)*eps1*rl/(rd*tp(i,k)**2)
 !
 ! dtpdt is the parcel temperature change due to change of

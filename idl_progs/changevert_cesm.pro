@@ -11,8 +11,8 @@ pro changevert_cesm
 do_write_file=1
 ;fname_out = '/projects/btoon/wolfet/exofiles/atm/control_L60.cam.i.0048-01-01-00000.nc'
 fname_out = '/projects/btoon/wolfet/exofiles/atm/ic_1bar_L40_0.47x0.63d.nc'
-nlev_out = 40
-nilev_out = 41
+nlev_out = 50
+nilev_out = 51
 
 
 ;read in appropriate lev, hyai for N>26

@@ -6,8 +6,8 @@ pro mod_cesm_files
 ;-------------------------------
 
 make_bndtopo = 0 ; topograph files  
-make_popfrc = 1 ; modify existing popfrc file
-make_ncdata = 0
+make_popfrc = 0 ; modify existing popfrc file
+make_ncdata = 1
 make_tropopause_climo_file = 0
 make_ozone = 0
 make_aerosoldep = 0
@@ -103,14 +103,14 @@ file_aerosoldep_out = '/projects/btoon/wolfet/exofiles/ocn/aquaplanet/aerosoldep
 ;file_pop_frc = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/pop_frc.4x5d.090130_aquaplanet_300Kiso.nc"
 ;file_pop_frc_out = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/pop_frc.4x5d.090130_aquaplanet_200Kiso.nc"
 
-file_pop_frc = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_mixed_fv/pop_frc.gx3v7.110128_annual_mean.nc"
-file_pop_frc_out = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_mixed_fv/pop_frc.gx3v7.110128_0OHT.nc"
+;file_pop_frc = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_mixed_fv/pop_frc.gx3v7.110128_annual_mean.nc"
+;file_pop_frc_out = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_mixed_fv/pop_frc.gx3v7.110128_0OHT.nc"
 
 
 ;--- ncdata files in/oout --
 ;file_ncdata = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/ic_P1bar_L40_300Kiso_ic.nc"
-;file_ncdata = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/ic_P1bar_L40_ic.nc"
-;file_ncdata_out = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/ic_P1bar_L40_test_ic.nc"
+file_ncdata = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/ic_1bar_L51_ic.nc"
+file_ncdata_out = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/ic_1bar_L51_zmean_ic.nc"
 
 ;-- new file names --
 ;file_domfile_out = '/projects/btoon/wolfet/exofiles/ocn/aquaplanet/pop_frc.gx3v7.110128.nc_0OHT.nc'
@@ -299,24 +299,25 @@ if (make_ncdata eq 1) then begin
   VS_OUT = fltarr(nlon,nlat,nlev)
   US_OUT = fltarr(nlon,nslat,nlev)
 
-  ;set variables
+  ;set variables fo constants
   P0_OUT=1.e5
   PS_OUT(*,*) =1.e5
-  TSICE_OUT(*,*)=0.0   ;273.15
-  ICEFRAC_OUT(*,*)=0.0
-  SICTHK_OUT(*,*)=0.0
-  SNOWHICE_OUT(*,*)=0.0
-  T_OUT(*,*,*) = 200.0
-  TS1_OUT(*,*) = 200.0
-  TS2_OUT(*,*) = 200.0
-  TS3_OUT(*,*) = 200.0
-  TS4_OUT(*,*) = 200.0
-  CLDICE_OUT(*,*,*) = 0.0
-  CLDLIQ_OUT(*,*,*) = 0.0
-  VS_OUT(*,*,*) = 0.0
-  US_OUT(*,*,*) = 0.0
+;  TSICE_OUT(*,*)=0.0   ;273.15
+;  ICEFRAC_OUT(*,*)=0.0
+;  SICTHK_OUT(*,*)=0.0
+;  SNOWHICE_OUT(*,*)=0.0
+;  T_OUT(*,*,*) = 200.0
+;  TS1_OUT(*,*) = 200.0
+;  TS2_OUT(*,*) = 200.0
+;  TS3_OUT(*,*) = 200.0
+;  TS4_OUT(*,*) = 200.0
+;  CLDICE_OUT(*,*,*) = 0.0
+;  CLDLIQ_OUT(*,*,*) = 0.0
+;  VS_OUT(*,*,*) = 0.0
+;  US_OUT(*,*,*) = 0.0
 
 
+;\zonal mean
   iv=nlat
   for i=0,nlat-1 do begin
     iv=iv-1
@@ -326,22 +327,22 @@ if (make_ncdata eq 1) then begin
     TS3_OUT(*,i) = mean((TS3(*,i)+TS3(*,iv))/2.)
     TS4_OUT(*,i) = mean((TS4(*,i)+TS4(*,iv))/2.)
     for k=0,nlev-1 do begin
-    ;  CLDICE_OUT(*,i,k) = mean((CLDICE(*,i,k)+CLDICE(*,iv,*))/2.)
-    ;  CLDLIQ_OUT(*,i,k) = mean((CLDLIQ(*,i,k)+CLDLIQ(*,iv,k))/2.)
+      CLDICE_OUT(*,i,k) = mean((CLDICE(*,i,k)+CLDICE(*,iv,*))/2.)
+      CLDLIQ_OUT(*,i,k) = mean((CLDLIQ(*,i,k)+CLDLIQ(*,iv,k))/2.)
       Q_OUT(*,i,k) = mean((Q(*,i,k)+Q(*,iv,k))/2.)
       T_OUT(*,i,k) = mean((T(*,i,k)+T(*,iv,k))/2.)
-;      VS_OUT(*,i,k) = mean((VS(*,i,k)+VS(*,iv,k))/2.)
+      VS_OUT(*,i,k) = mean((VS(*,i,k)+VS(*,iv,k))/2.)
     endfor
    endfor
 
-;  iv=nslat
-;  for i=0,nslat-1 do begin
-;    iv=iv-1
-;    for k=0,nlev-1 do begin
-;  ;    US_OUT(*,i,k) = mean((US(*,i,k)+US(*,iv,k))/2.)
-;    endfor
-;  endfor
-
+  iv=nslat
+  for i=0,nslat-1 do begin
+    iv=iv-1
+    for k=0,nlev-1 do begin
+      US_OUT(*,i,k) = mean((US(*,i,k)+US(*,iv,k))/2.)
+    endfor
+  endfor
+; \zonal mean
 
 
   ;---- update ncdata file ----
