@@ -390,8 +390,8 @@ contains
 
        ! 2 m height specific humidity
 
-       !q_ref2m(p) = forc_q(c) + temp2(p)*dqh(p)*(1._r8/temp22m(p) - 1._r8/temp2(p))
-       q_ref2m(p) = forc_q(c) !set 2-m specific humidity equal to grid box specific humidity.
+       q_ref2m(p) = forc_q(c) + temp2(p)*dqh(p)*(1._r8/temp22m(p) - 1._r8/temp2(p))
+       !q_ref2m(p) = forc_q(c) !set 2-m specific humidity equal to grid box specific humidity.
 
        ! 2 m height relative humidity
                                                                                 

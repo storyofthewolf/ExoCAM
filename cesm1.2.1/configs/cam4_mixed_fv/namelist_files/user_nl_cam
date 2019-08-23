@@ -14,6 +14,7 @@ eddy_scheme='HB'
 kv_top_pressure=0.0   !Pa (mb)  ! set to zero to turn off
 kv_top_scale=0.5
 trop_cloud_top_press = 1.
+cldfrc_rhminl = 0.88
 
 ncdata ='/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/control_L40.cam.i.0009-01-01-00000.nc'
 !bnd_topo = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/USGS-gtopo_aquaplanet_4x5.nc'
