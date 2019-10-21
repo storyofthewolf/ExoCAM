@@ -110,7 +110,7 @@ file_aerosoldep_out = '/projects/btoon/wolfet/exofiles/ocn/aquaplanet/aerosoldep
 ;--- ncdata files in/oout --
 ;file_ncdata = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/ic_P1bar_L40_300Kiso_ic.nc"
 file_ncdata = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/ic_1bar_L51_ic.nc"
-file_ncdata_out = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/ic_1bar_L51_zmean_ic.nc"
+file_ncdata_out = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/ic_1bar_L51_iso300_ic.nc"
 
 ;-- new file names --
 ;file_domfile_out = '/projects/btoon/wolfet/exofiles/ocn/aquaplanet/pop_frc.gx3v7.110128.nc_0OHT.nc'
@@ -306,11 +306,11 @@ if (make_ncdata eq 1) then begin
 ;  ICEFRAC_OUT(*,*)=0.0
 ;  SICTHK_OUT(*,*)=0.0
 ;  SNOWHICE_OUT(*,*)=0.0
-;  T_OUT(*,*,*) = 200.0
-;  TS1_OUT(*,*) = 200.0
-;  TS2_OUT(*,*) = 200.0
-;  TS3_OUT(*,*) = 200.0
-;  TS4_OUT(*,*) = 200.0
+  T_OUT(*,*,*) = 300.0
+  TS1_OUT(*,*) = 300.0
+  TS2_OUT(*,*) = 300.0
+  TS3_OUT(*,*) = 300.0
+  TS4_OUT(*,*) = 300.0
 ;  CLDICE_OUT(*,*,*) = 0.0
 ;  CLDLIQ_OUT(*,*,*) = 0.0
 ;  VS_OUT(*,*,*) = 0.0
@@ -322,15 +322,15 @@ if (make_ncdata eq 1) then begin
   for i=0,nlat-1 do begin
     iv=iv-1
     ;TS_OUT(*,i) = mean((TS(*,i)+TS(*,iv))/2.)
-    TS1_OUT(*,i) = mean((TS1(*,i)+TS1(*,iv))/2.)
-    TS2_OUT(*,i) = mean((TS2(*,i)+TS2(*,iv))/2.)
-    TS3_OUT(*,i) = mean((TS3(*,i)+TS3(*,iv))/2.)
-    TS4_OUT(*,i) = mean((TS4(*,i)+TS4(*,iv))/2.)
+;    TS1_OUT(*,i) = mean((TS1(*,i)+TS1(*,iv))/2.)
+;    TS2_OUT(*,i) = mean((TS2(*,i)+TS2(*,iv))/2.)
+;    TS3_OUT(*,i) = mean((TS3(*,i)+TS3(*,iv))/2.)
+;    TS4_OUT(*,i) = mean((TS4(*,i)+TS4(*,iv))/2.)
     for k=0,nlev-1 do begin
       CLDICE_OUT(*,i,k) = mean((CLDICE(*,i,k)+CLDICE(*,iv,*))/2.)
       CLDLIQ_OUT(*,i,k) = mean((CLDLIQ(*,i,k)+CLDLIQ(*,iv,k))/2.)
       Q_OUT(*,i,k) = mean((Q(*,i,k)+Q(*,iv,k))/2.)
-      T_OUT(*,i,k) = mean((T(*,i,k)+T(*,iv,k))/2.)
+ ;     T_OUT(*,i,k) = mean((T(*,i,k)+T(*,iv,k))/2.)
       VS_OUT(*,i,k) = mean((VS(*,i,k)+VS(*,iv,k))/2.)
     endfor
    endfor
