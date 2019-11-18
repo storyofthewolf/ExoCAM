@@ -27,8 +27,6 @@ module exoplanet_mod
                                                                 !! Slow, use sparingly
   logical, public, parameter :: do_exo_rt_spectral = .false.    !! collect and output spectrally resolved radiative fluxes
                                                                 !! 
-  logical, public, parameter :: do_exo_circumbinary = .false.    !! Stellar flux calculation for binary star systems
-
   integer, public, parameter :: exo_rad_step = 2                !! freq. of radiation calc in time steps (positive)
                                                                 !! or hours (negative).
 
@@ -108,10 +106,6 @@ module exoplanet_mod
   ! SOLAR SPECTRAL FILE
   !! Make sure solar file matches spectral intervals for selected RT configuration !!
   character(len=256), public, parameter :: exo_solar_file = '/gpfsm/dnb53/etwolf/models/ExoRT/data/solar/G2V_SUN_n28.nc'
-
-  !! if (do_exo_circumbinary) 
-  real(r8), public, parameter :: exo_circumbinary_ampl = 0.5_r8   ! amplitude factor
-  real(r8), public, parameter :: exo_circumbinary_peri = 60.0_r8   !period in Earth days
 
 
   !! ============== ATMOSPHERIC CONSTITUENT PARAMETERS ============== !!

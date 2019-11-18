@@ -352,16 +352,11 @@ contains
         write(iulog,*) 'DO_EXO_RT_CLEARSKY: ', do_exo_rt_clearsky
         write(iulog,*) 'DO_EXO_RT_SPECTRAL: ', do_exo_rt_spectral
         write(iulog,*) 'EXO_RAD_STEP: ', exo_rad_step
-        write(iulog,*) 'DO_EXO_CIRCUMBINARY ', do_exo_circumbinary
         write(iulog,*) '******************************************************'
         write(iulog,*) '***       ExoCAM: Stellar Spectral Options         ***'
         write(iulog,*) '******************************************************'
         write(iulog,*) 'SOLAR CONSTANT: ', SHR_CONST_SCON
         write(iulog,*) 'SOLAR SPECTRUM FILE: ', exo_solar_file
-        if (do_exo_circumbinary) then
-          write(iulog,*) 'CIRCUMBINARY SFLUX AMPLITUDE ', exo_circumbinary_ampl
-          write(iulog,*) 'CIRCUMBINARY SFLUX PERIOD ', exo_circumbinary_peri
-        end if
         write(iulog,*) '******************************************************'
         write(iulog,*) '***           ExoCAM: Planet properties            ***'
         write(iulog,*) '******************************************************'
