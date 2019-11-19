@@ -1,10 +1,12 @@
 supported configurations
 
-cam4_aqua_fv 
-  cam4_aqua_fv  --  aquaplanet slab ocean, finite volume dynamical core
-  cam4_aqua_se  --  aquaplanet slab ocean, se cubed sphere dynamical ccore
-  cam4_land_fv  --  land planet, finite volume dynamical core
-  carma         --  hook up with CARMA for cloud and aerosol treatments, add-on
+  cam4_aqua_fv   --  aquaplanet slab ocean, finite volume dynamical core
+  cam4_aqua_se   --  aquaplanet slab ocean, se cubed sphere dynamical ccore
+  cam4_land_fv   --  land planet, finite volume dynamical core
+  cam4_mixed_fv  --  slab ocean and continents, finite volume dynamical core
+  carma          --  add on for hooking up with CARMA for cloud and aerosol treatments
 
+
+  
 
 

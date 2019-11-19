@@ -82,7 +82,7 @@ STEP 4:  Link ExoRT radiative transfer model
   Where $EXORT_PATH is the path to where your ExoRT has been checked out.
   Radiative transfer models, ready for linking with CESM in 3D are located at
   ../ExoRT/3dmodels 
-
+  option -nlev = number of vertical levels
 
 STEP 5:  Copy SourceMods and namelist files to your case
 
@@ -95,6 +95,9 @@ STEP 5:  Copy SourceMods and namelist files to your case
   open the namelist files (user_*) and change the paths to initial files to
   match the location of your ExoCAM distribution.
 
+  Optional: if you wish to make modifications to the radiative transfer
+  modules, copy the RT folder $EXORT_PATH/ExoRT/3dmodels/src.cam.n****** into your
+  $CASEROOT/SourceMods directory, and change -usr_src config opt approriately.
 
 STEP 6:  Building and running
 

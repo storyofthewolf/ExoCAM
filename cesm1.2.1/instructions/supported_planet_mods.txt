@@ -2,6 +2,23 @@
 == Author: Wolf, E.T.
 == eric.wolf@colorado.edu
 
+Supported configurations
+
+  cam4_aqua_fv   --  aquaplanet slab ocean, finite volume dynamical core
+  cam4_aqua_se   --  aquaplanet slab ocean, se cubed sphere dynamical ccore
+  cam4_land_fv   --  land planet, finite volume dynamical core
+  cam4_mixed_fv  --  slab ocean and continents, finite volume dynamical core
+  carma          --  add on for hooking up with CARMA for cloud and aerosol treatments
+
+  vertical levels:  provided are initial condition files for 
+                    1) 40 levels, 1 mb model top
+                    2) 51 levels, 0.01 mb model top
+
+  horizontal resolution:  provide are initial condition files for
+  	                  1) fv 4x5
+			  2) se ne16np4, ne5np4
+
+
 Supported modifications in ExoCAM
   all modifications are colleted in the file ../SourceMods/src.share/exoplanet_mod.F90
   These must be changed prior to building the model.  Please see the file for
@@ -49,3 +66,12 @@ ExoRT Radiative Transfer Packages
   src.n28h2o     == same as n42h2o, 28 bins
 
 
+
+
+A Note on CESM
+  CESM 1.2 has many features other features that can be accessed by the motivated
+  users, including a high-top model (WACCM), various chemistry modules
+  (MOZART), a dynamic ocean model (POP2), various radiative transfer codes
+  (CAMRT, RRTMG), various column physics packages (CAM4, CAM5), a sectional
+  aerosol module (CARMA).  Numerous other Horizontal and vertical grids
+  available.   
