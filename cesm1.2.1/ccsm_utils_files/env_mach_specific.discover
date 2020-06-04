@@ -4,22 +4,48 @@
 # Summit machine specific settings
 # #===============================================================================
 source /etc/profile.d/modules.csh
+set SLES=`cat /etc/SuSE-release | \grep VERSION`
+echo "You are in SLES ${SLES}"
+if ( "${SLES}" == "VERSION = 12" ) then
+	if ( $COMPILER == "intel" ) then
+        module purge
+	module load git/2.24.0
+	module load comp/intel/19.0.4.243
+	module load mpi/impi/19.0.4.243
+	module load idl/8.5
+	module load nco/4.8.1
+        
+	limit stacksize unlimited	
+	setenv MKL "-mkl=cluster"
 
-if ( $COMPILER == "intel" ) then
+        setenv NETCDF_PATH /usr/local/other/netcdf3/3.6.3/intel/19.0.4.243
+        setenv PNETCDF_PATH /usr/local/other/netcdf3/pnetcdf/1.3.1/impi/19.0.4.243
+        setenv NETCDF /usr/local/other/netcdf3/3.6.3/intel/19.0.4.243
+        setenv MPI_PATH /usr/local/intel/2019/compilers_and_libraries_2019.4.243/linux/mpi/intel64/bin/mpirun
+        setenv INC_NETCDF /usr/local/other/netcdf3/3.6.3/intel/19.0.4.243/include
+        setenv LIB_NETCDF /usr/local/other/netcdf3/3.6.3/intel/19.0.4.243/lib
 
-module load comp/intel-14.0.3.174
-module load mpi/impi-4.1.0.024
+        endif
+else
+	if ( $COMPILER == "intel" ) then
+	module purge
+	module load other/git
+	module load comp/intel-14.0.3.174
+	module load mpi/impi-4.1.0.024
+	module load tool/idl-8.5
+	module load other/svn-1.9.5
+	module load other/nco-4.6.8-gcc-5.3-sp3
 
-setenv MKL "-mkl=cluster"
+	setenv MKL "-mkl=cluster"
 
-  setenv NETCDF_PATH /usr/local/other/netcdf/3.6.2_intel-14.0.3.174 
-  setenv PNETCDF_PATH /usr/local/other/pnetcdf/1.2.0_intel-14.0.3.174_impi-4.1.3.048
-  setenv NETCDF /usr/local/other/netcdf/3.6.2_intel-14.0.3.174
-  setenv MPI_PATH /usr/local/intel/mpi/4.1.0.024.nopbs/bin64/mpirun
-  setenv INC_NETCDF /usr/local/other/netcdf/3.6.2_intel-14.0.3.174/include
-  setenv LIB_NETCDF /usr/local/other/netcdf/3.6.2_intel-14.0.3.174/lib
+  	setenv NETCDF_PATH /usr/local/other/netcdf/3.6.2_intel-14.0.3.174 
+  	setenv PNETCDF_PATH /usr/local/other/pnetcdf/1.2.0_intel-14.0.3.174_impi-4.1.3.048
+  	setenv NETCDF /usr/local/other/netcdf/3.6.2_intel-14.0.3.174
+  	setenv MPI_PATH /usr/local/intel/mpi/4.1.0.024.nopbs/bin64/mpirun
+  	setenv INC_NETCDF /usr/local/other/netcdf/3.6.2_intel-14.0.3.174/include
+ 	setenv LIB_NETCDF /usr/local/other/netcdf/3.6.2_intel-14.0.3.174/lib
 
-
+	endif
 endif
 
 # Run time variables

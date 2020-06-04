@@ -206,7 +206,7 @@ for mct, etc.
   <FREEFLAGS> -free </FREEFLAGS>
   <FIXEDFLAGS> -fixed -132 </FIXEDFLAGS>
   <ADD_FFLAGS DEBUG="TRUE"> -g -CU -check pointers -fpe0 </ADD_FFLAGS>
-  <FFLAGS> -O2 -fp-model source -convert big_endian -assume byterecl -ftz -traceback </FFLAGS>
+  <FFLAGS> -O2 -fp-model source -convert big_endian -assume byterecl -ftz -traceback -mcmodel=medium </FFLAGS>
   <CFLAGS> -O2 -fp-model precise </CFLAGS>
   <FFLAGS_NOOPT> -O0 </FFLAGS_NOOPT>
   <FC_AUTO_R8> -r8 </FC_AUTO_R8>
@@ -728,6 +728,20 @@ for mct, etc.
   <TRILINOS_PATH>$(TRILINOS_PATH)</TRILINOS_PATH>
 </compiler>
 
+
+<compiler MACH="discover" COMPILER="intel">
+  <ADD_SLIBS>$(shell $(NETCDF_PATH)/bin/nc-config --flibs) -mkl=cluster</ADD_SLIBS>
+  <MPICC>mpiicc</MPICC>
+  <MPICXX>mpiicpc </MPICXX>
+  <MPIFC>mpiifort </MPIFC>
+  <SFC>ifort </SFC>
+  <SCXX>icpc </SCXX>
+  <SCC>icc </SCC>
+  <PIO_FILESYSYEM_HINTS>gpfs</PIO_FILESYSYEM_HINTS>
+  <ADD_FFLAGS>-xHost -march=core-avx2</ADD_FFLAGS>
+  <ADD_CFLAGS>-xHost -march=core-avx2</ADD_CFLAGS>
+  <ADD_SLIBS></ADD_SLIBS>
+</compiler>
 
 
 

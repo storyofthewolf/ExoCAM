@@ -41,7 +41,7 @@ cat >! $file << EOF1
 #SBATCH --ntasks-per-node ${MAX_TASKS_PER_NODE}   
 #SBATCH --constraint=hasw
 #SBATCH -o run.out          
-
+limit stacksize unlimited
 
 EOF1
 
