@@ -1,0 +1,148 @@
+LIST OF PAPERS
+
+In the beginning, there was CAM.  ExoCAM and its radiative transfer package
+ExoRT arose from the ashes of Eric T. Wolf's graduate work on the Archean
+Earth, and the faint young Sun paradox.  Over the years E.T. Wolf developed
+CAM to use for paleoclimate and exoplanetary atmospheres.  ExoCAM and ExoRT
+were formalized on Github for public use in the summer of 2019.  Below is a
+list of papers published that directly use ExoCAM, ExoRT, and their ancestral
+versions to conduct 3D climate simulations.   
+
+If you have a paper that you think belongs on this list, please contact me at
+eric.wolf@colorado.edu.
+
+
+Total Number (22)
+Number by year
+2020 (3)
+2019 (9)
+2018 (2)
+2017 (3)
+2016 (1) 
+2015 (1)
+2014 (2)
+2013 (1)
+
+
+================================== 2020 =======================================
+"TRAPPIST-1 Habitable Atmosphere Intercomparison (THAI). Part I: Motivations 
+  and Protocol."  
+ Fauchez, T., Turbet, M, Wolf, E.T., Way, M.J., Boutle, I., Del Genio, A.D.,
+  Kopparapu, R.K., Forget, F., Mayne, N.J., and Domagal-Goldman, S.D. 
+ Geoscientific Model Development 13, 707-716, 2020
+
+"O2 and CO Rich Atmospheres for Potential Habitable Environments on TRAPPIST-1
+  Planets." 
+ Hu, R, Peterson, L., and Wolf, E.T. 
+ The Astrophysical Journal, 888:122 (15pp), 2020
+
+"Clouds will likely prevent the detection of water vapor in JWST transmission
+  spectra of terrestrial exoplanets"   
+ Komacek, T., Fauchez, T., Wolf, E.T., and Abbot, D.S.
+ The Astrophysical Journal 888:L20 (6pp), 2020
+
+
+================================== 2019 =======================================
+"Regime Transition between Eddy-driven and Moist-driven Circulation on High
+  Obliquity Planets."
+ Kang, W.
+ The Astrophysical Journal, 884:89 (13pp), 2019
+
+"Scaling Relations for Terrestrial Exoplanet Atmospheres from Baroclinic
+  Criticality." 
+ Komacek, T.D., Jansen, M.F., Wolf, E.T. , and Abbot, D.S.
+ The Astrophysical Journal 883:46 (8pp), 2019
+
+"Simulated Phase Dependent Water Vapor and Cloud Spectra of Synchronously
+  Rotating Aquaplanets Near the Habitable Zone."   
+ Wolf, E.T., Kopparapu, R.K., and Haqq-Misra, J. 
+ The Astrophysical Journal, 877:35  (18pp), 2019
+
+"Effects of Radius and Gravity on the Inner Edge of the Habitable Zone."
+ Yang, H., Komacek, T.D., and Abbot, D.S.
+ The Astrophysical Journal Letters, 876:L27 (7pp). 2019
+
+"Wetter Stratospheres on High-obliquity Planets."
+ Kang, W.
+ The Astrophysical Journal 877:L6 (6pp), 2019
+
+"Mechanisms Leading to a Warmer Climate on High-obliquity Planets."
+ Kang, W.
+ The Astrophysical Journal Letters, 876:L1 (5pp), 2019
+
+"Aquaplanet Models on Eccentric Orbits - Effects of Rotation Rate on
+  Observables."   
+ Adams, A.D., Boos, W.R., and Wolf, E.T.
+ The Astrophysical Journal, 157:189 (19pp), 2019
+
+"3D Dynamical Effects of the Simulation of Water Vapor and Clouds on the Inner
+  Edge of the Habitable Zone."  
+ Yang, J., Leconte, J., Wolf, E.T., Merlis, T., Koll, D.B.D., Forget, F., and
+  Abbot, D.S.
+ The Astrophysical Journal, 875:46 (16pp), 2019
+
+"The Atmospheric Circulation and Climate of Terrestrial Planets Orbiting
+  Sun-like and M Dwarf Stars over a Broad Range of Planetary Parameters."
+ Komacek, T.D., and Abbot, D.S.
+ The Astrophysical Journal Letters, 871:245 (20pp), 2019
+
+
+================================== 2018 =======================================
+“Demarcating circulation regimes of synchronously rotating terrestrial planets
+  within the habitable zone.” 
+ Haqq-Misra, J., Wolf, E.T., Joshi, M., Zhang, X., and Kopparapu, R.K.
+ The Astrophysical Journal 852:67 (16 pp), 2018
+
+“Evaluating Climate Sensitivity to CO2 Across Earth’s History.”
+ Wolf, E.T., Haqq-Misra, J., and Toon, O.B. (2018)  
+ JGR-Atmospheres, 123, doi.org/10.1029/2018JD029262, 2018
+
+
+================================== 2017 =======================================
+“Habitable Moist-Greenhouse Atmospheres Around Low Mass Stars.”
+ Kopparapu, R.K., Wolf, E.T., Arney, G., Batalha, N., Haqq-Misra, J., Grimm,
+   S.L. & Heng, K.  
+ The Astrophysical Journal 845:5 (16pp), 2017
+
+“Assessing the Habitability of the TRAPPIST-1 System Using a 3D Climate
+  Model.” 
+ Wolf, E.T.
+ The Astrophysical Journal Letters 839:L1 (6pp), 2017
+ Erratum: ApJL 855:L14 (2pp), 2018
+
+"Constraints on Climate and Habitability for Earth-like Exoplanets Determined
+  from a General Circulation Model.”
+ Wolf, E.T., Shields, A.L., Kopparapu, R.K., Haqq-Misra, J., and Toon,
+  O.B. (2017)
+ The Astrophysical Journal 837:107 (11pp)
+
+
+================================== 2016 =======================================
+"Differences in Water Vapor Radiative Transfer Among 1D Models Can
+  Significantly Affect The Inner Edge of the Habitable Zone."
+ Yang, J., Leconte, J., Wolf, E.T., Goldblatt, C., Feldl, N., Merlis, T.,
+  Wang, Y, Koll, D.B.D., Ding, F., Forget, F. and Abbot, D.S. (2016)
+ The Astrophysical Journal, 826:222 (11pp)
+
+
+================================== 2015 =======================================
+"The evolution of habitable climates under the brightening Sun."
+ Wolf, E.T. and Toon, O.B. (2015)
+ Journal of Geophysical Research: Atmospheres 120, 5775-5794.
+
+
+================================== 2014 =======================================
+“Controls on the Archean climate system investigated with a global climate
+  model.”
+ Wolf, E.T. and Toon, O.B.  (2014)   
+ Astrobiology 14(3) 241-252.
+
+“Delayed onset of runaway and moist greenhouse climates for Earth.”
+ Wolf, E.T. and Toon, O.B.  (2014) 
+ Geophysical Research Letters 41, doi:10.1002/2013GL058376.
+
+
+================================== 2013 =======================================
+“Hospitable Archean Climates Simulated by a General Circulation Model.”
+ Wolf, E.T. and Toon, O.B.  (2013) 
+ Astrobiology 13(7) 1-18.
