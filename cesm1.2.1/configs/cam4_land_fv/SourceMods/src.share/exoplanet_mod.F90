@@ -29,7 +29,8 @@ module exoplanet_mod
                                                                 !! 
   integer, public, parameter :: exo_rad_step = 2                !! freq. of radiation calc in time steps (positive)
                                                                 !! or hours (negative).
-
+  logical, public, parameter :: do_carma_exort = .false.        !! Set to true only if running with the CARMA microphyiscs package
+                                                                !! and linking aerosol absorption to ExoRT  
   
   !! ==============  planet parameters ============== !!
   !! It is the responsibility of the USER to set do_exo_synchronous, exo_ndays
