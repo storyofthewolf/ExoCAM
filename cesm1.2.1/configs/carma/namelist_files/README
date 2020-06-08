@@ -1,9 +1,11 @@
 # add the following to user_nl_cam 
-# incomplete
 
 
-carma_emis_file = "/projects/wolfet/models/ExoRT/data/aerosol/early_earth_haze.nc"
+carma_emis_file ="/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/carma/early_earth_haze.nc"
+carma_escale_file = " "
 carma_emis_total = 50000.0
-ncdata = '/projects/btoon/wolfet/exofiles/atm/ic_1barN2_0.1barCO2_0.02barCH4_L50_ic.nc'  ! 50 levels !
+carma_do_fixedinit = .false.
 
-fincl1 = 'HAZE01EM'
+
+ncdata = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/ic_1bar_L51_zmean_ic.nc'
+

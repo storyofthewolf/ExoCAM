@@ -1,12 +1,26 @@
-carma
-++ under construction ++
+carma ExoCAM, ExoRT linkage
 
-Files for using carma with ExoCAM and ExoRT.  
-Copy these files into SourceMods/src.cam, in addition to other config files (i.e. aqua_fv, land_fv,etc)
+USE at your own risk.  This is preliminary work.
+CARMA is complicated in its own right.  Limited support available from me.
+Eventually, new CARMA cloud/aerosol "models" should be saved and linked via
+-carma $exoModel.  For now, we piggy back off of the "meteor_smoke" model
+
+
+---------------------------------------------------------------------------------
+
+Instructions:
+make sure that your version of CESM1.2.1/CARMA has the fractal aggregrate
+add-ons to the CARMA directorty, copy and unzip base.tar into
+../cesm1_2_1/models/atm/cam/src/physics/carma
+
+
+Copy src.cam folder files into SourceMods/src.cam, in addition to other
+SourceMods files from the base config (i.e. cam4_aqua_fv, cam4_land_fv,etc)
 These provide a linkage with ExoRT, bypassing the native framework for link with CAMRT and RRTMG.   
+
 A basic template for a generic fractal haze carma model is included.
 
-CAM_CONFIG_OPTS = -phys cam4 -nlev 50 -usr_src /projects/wolfet/models/ExoRT/3dmodels/src.cam.n28archean.haze -carma meteor_smoke -nadv 43
+CAM_CONFIG_OPTS = -phys cam4 -nlev 51 -usr_src $PATH/ExoRT/3dmodels/src.cam.n28archean.haze -carma -nadv 43
 	loads basic smoke model, but this is overwritten by SourceMods files for generic fractal haze
 	-nadv = number of advected constituents = (H2O water, H2O ice, H2O liquid, + N CARMA bins)
 	-nlev = number of vertical levels (need higher model top for stratospheric haze

@@ -1,0 +1,18 @@
+Description of Files
+
+
+carma_exort_mod.F90 
+-- this module provides routines for coupling ExoRT with CESM/CARMA
+-- within this file we set the location of and read in the optical constant for CARMA aerosols
+-- shortname for optical constants are kludged in here also
+
+carma_model_mod.F90
+-- the heart of the CARMA cloud/aerosol being modeled
+
+carma_model_flags_mod.F90
+-- additional namelist variables for CARMA model set here
+-- Note, primary namelist variables set in configure script for -carma
+
+carma_intr.F90
+-- CAM-CARMA main interface routine
+-- contains changes for fractal aggregates
