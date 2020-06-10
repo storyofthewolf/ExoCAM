@@ -17,8 +17,7 @@ create_newcase -case $my_aquaplanet_case -res f45_g37 -mach discover -compset
 E2000C4
 
 == set levels, physics, and the ExoRT radiative transfer package
-xmlchange CAM_CONFIG_OPTS="-nlev 40 -phys cam4 -usr_src
-$EXORT_PATH/ExoRT/3dmodels/src.cam.n******"
+xmlchange CAM_CONFIG_OPTS="-nlev 40 -phys cam4 -usr_src $CASE/SourceMods/src.cam.n28archean.cb
 xmlchange RTM_MODE=NULL
 
 == transfer files
@@ -27,6 +26,11 @@ copy namelist files into your $Case directory
 
 == finish
 build and run
+
+---------------------------------------------------------------------------------
+How to use the circumbinary code:  
+as usual all of the system parameter sections fall into SourceMods/src.share/exoplanet_mod.F90
+...
 
 
 
