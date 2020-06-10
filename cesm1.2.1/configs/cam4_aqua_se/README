@@ -1,14 +1,24 @@
 QuickStart Guide :: cam4_aqua_se
+---------------------------------------------------------------------------------
+description:        basic configuration
 physics:            cam4
-surface type:       slab ocean
+surface type:       slab ocean aquaplanet
 dynamical core:     spectral element cubed sphere
+radiation scheme:   user selected from ExoRT/3dmodels
 
+== create the case
 create_newcase -case $my_aquaplanet_case -res ne16np4_ne16np4 -mach summit -compset E2000C4AQI
    { for low resolution -res ne5np4_ne5np4 }
+
+== set dycore, levels, physics, and the ExoRT radiative transfer package
 xmlchange CAM_DYCORE=se
 xmlchange CAM_CONFIG_OPTS="-nlev 40 -phys cam4 -usr_src $EXORT_PATH/ExoRT/3dmodels/src.cam.n******"
+
+== transfer files
 copy SourceMods folder directly into your $Case directory
 copy namelist files into your $Case directory
+
+== finish
 build and run
 
 

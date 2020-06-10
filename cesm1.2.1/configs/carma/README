@@ -1,6 +1,13 @@
-carma ExoCAM, ExoRT linkage
+QuickStart Guide :: cam4_aqua_fv
+---------------------------------------------------------------------------------
+description:        carma aerosol model add-on
+physics:            cam4
+surface type:       user selected
+dynamical core:     user selected
+radiation scheme:   src.cam.n28archean.haze
 
-USE at your own risk.  This is preliminary work.
+NOTES: These files provide a very music linkage between ExoCAM, ExoRT, and
+CARMA. Use at your own risk.  This is preliminary work.
 CARMA is complicated in its own right.  Limited support available from me.
 Eventually, new CARMA cloud/aerosol "models" should be saved and linked via
 -carma $exoModel.  For now, we piggy back off of the "meteor_smoke" model
@@ -13,15 +20,16 @@ make sure that your version of CESM1.2.1/CARMA has the fractal aggregrate
 add-ons to the CARMA directorty, copy and unzip base.tar into
 ../cesm1_2_1/models/atm/cam/src/physics/carma
 
-
-Copy src.cam folder files into SourceMods/src.cam, in addition to other
+Begin by creating a basic aquaplanet or landplanet case (i.e cam4_aqua_fv, cam4_land_fv)
+In addition to the build instructions for these configurations ...
+Copy src.cam folder files into /$CASENAME/SourceMods/src.cam, in addition to other
 SourceMods files from the base config (i.e. cam4_aqua_fv, cam4_land_fv,etc)
 These provide a linkage with ExoRT, bypassing the native framework for link with CAMRT and RRTMG.   
 
 A basic template for a generic fractal haze carma model is included.
 
-CAM_CONFIG_OPTS = -phys cam4 -nlev 51 -usr_src $PATH/ExoRT/3dmodels/src.cam.n28archean.haze -carma -nadv 43
-	loads basic smoke model, but this is overwritten by SourceMods files for generic fractal haze
+xmlchange CAM_CONFIG_OPTS="-phys cam4 -nlev 51 -usr_src $PATH/ExoRT/3dmodels/src.cam.n28archean.haze -carma -nadv 43"
+This loads basic smoke model, but this is overwritten by SourceMods files for generic fractal haze
 	-nadv = number of advected constituents = (H2O water, H2O ice, H2O liquid, + N CARMA bins)
 	-nlev = number of vertical levels (need higher model top for stratospheric haze
 	-build with n28archean.haze ExoRT, it is the only currently supported with carma link

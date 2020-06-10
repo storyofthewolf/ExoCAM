@@ -1,12 +1,15 @@
 QuickStart Guide :: cam4_land_fv
+---------------------------------------------------------------------------------
+description:        basic configuration
 physics:            cam4
 surface type:       land
 dynamical core:     finite volume
+radiation scheme:   user selected from ExoRT/3dmodels
 
 == create the case
 create_newcase -case $my_landplanet_case -res f45_f45 -mach discover -compset L2000
 
-== set the ExoRT radiative transfer package
+== set levels, physics, and the ExoRT radiative transfer package
 xmlchange CAM_CONFIG_OPTS="-nlev 40 -phys cam4 -usr_src $EXORT_PATH/ExoRT/3dmodels/src.cam.n******"
 
 == set domain file from xml command
@@ -14,8 +17,11 @@ xmlchange LND_DOMAIN_PATH=$EXOC_PATH/ExoCAM/cesm1.2.1/initial_files/cam4_land_fv
 xmlchange LND_DOMAIN_FILE=domain.lnd.fv4x5_landplanet.nc
 xmlchange RTM_MODE=NULL  ; turns off river routing
 
+== transfer files
 copy SourceMods folder directly into your $Case directory
 copy namelist files into your $Case directory
+
+== finish
 build and run
 
 

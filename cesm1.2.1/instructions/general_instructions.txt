@@ -66,8 +66,10 @@ STEP 2:  Place new system files into CESM.
 
 STEP 3:  Create a new case
 
-  Create a new case.  For example, for an aquaplanet model with the FV
-  dynamical core, go to ../cesm1_2_1/scripts/, and issue command
+  Create a new case.  Refer to ../ExoCAM/cesm1.2.1/configs/README and 
+  also README files in configs/* directories for build configurations and 
+  specific instructions.  For an example, for an aquaplanet model with the FV
+  dynamical core, go to ../ExoCAM/cesm1_2_1/scripts/, and issue command
 
   create_newcase -case $my_aquaplanet_case -res f45_f45 -mach hyak -compset E2000C4AQI
 
