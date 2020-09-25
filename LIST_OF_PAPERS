@@ -6,15 +6,16 @@ Earth, and the faint young Sun paradox.  Over the years E.T. Wolf developed
 CAM to use for paleoclimate and exoplanetary atmospheres.  ExoCAM and ExoRT
 were formalized on Github for public use in the summer of 2019.  Below is a
 list of papers published that directly use ExoCAM, ExoRT, and their ancestral
-versions to conduct 3D climate simulations.   
+versions to conduct 3D climate simulations.  I do not include papers that used
+CESM/CAM/WACCM, etc that do not formally use the ExoCAM package.
 
 If you have a paper that you think belongs on this list, please contact me at
 eric.wolf@colorado.edu.
 
 
-Total Number (22)
+Total Number (26)
 Number by year
-2020 (3)
+2020 (7)
 2019 (9)
 2018 (2)
 2017 (3)
@@ -25,6 +26,27 @@ Number by year
 
 
 ================================== 2020 =======================================
+"The Resilience of Habitable Climates Around Circumbinary Stars."
+ Wolf, E.T., Haqq-Misra, J.H., Kopparapu, R.K., Fauchez, T.J., Welsh, W.F.,
+  Kane, S.R., Kostov, V., and Eggl, S.
+ Journal of Geophysical Research: Planets, 125, e2020JE006576 doi.org/10.1029/2020JE006576
+
+"The First Habitable-zone Earth-sized PLanet from TESS. III. Climate States
+  and Characterization Prospects for TI-700 d."
+ Suissa, G., Wolf, E.T., Kopparapu, R.k., Villanueva, G.L., Fauchez, T., 
+  Mandell, A.M., Arney, G., Gilbert, E.A., Schlieder, J.E., and Barclay, T.
+ The Astronomical Journal, 160:118 (19pp)
+
+"Small Sensitivity of the Simulated Climate of Tidally Locked Aquaplanets to
+  Model Resolution."
+ Wei, M., Zhang, Y. and Yang, J.
+ The Astrophysical Journal, 898:156
+
+"Hurricane genesis is favorable on terrestrial exoplanets orbiting late-type M
+  dwarf stars."
+ Komacek T.D., Chavas, D.R. and Abbot, D.S.
+ The Astrophysical Journal, 898:115 (11pp)
+
 "TRAPPIST-1 Habitable Atmosphere Intercomparison (THAI). Part I: Motivations 
   and Protocol."  
  Fauchez, T., Turbet, M, Wolf, E.T., Way, M.J., Boutle, I., Del Genio, A.D.,
