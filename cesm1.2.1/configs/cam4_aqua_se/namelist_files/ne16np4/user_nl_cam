@@ -6,12 +6,15 @@ mfilt=1
 nhtfrq=0
 trop_cloud_top_press = 1.
 
+dtime = 1800           ! physics timesteps in seconds
 interp_gridtype = 3
 interp_nlat = 90
 interp_nlon = 144
 interp_type = 1
 interpolate_analysis = .true.
-se_nsplit = 2
+se_nsplit = 2          ! number of dynamics timesteps per physics timestep
+!se_rsplit = 4          ! vertical remap substeps
+!se_qsplit = 4          ! tracer advection
 se_ftype = 0
 
 

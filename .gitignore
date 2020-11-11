@@ -1,0 +1,8 @@
+#gitignore file
+
+# dynamic ocean stuff that's not ready for sharing
+idl_progs/mksrf_cesm.pro
+idl_progs/topobathy.pro
+idl_progs/*.nc
+cesm1.2.1/configs/cam4_aqua_dynocn_fv
+

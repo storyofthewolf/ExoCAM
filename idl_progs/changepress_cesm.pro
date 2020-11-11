@@ -34,9 +34,9 @@ cpar = 0.520e3
 cpco2 = 0.846e3
 cpch4 = 2.226e3
 
-co2bar = 0.0 ;bar
+co2bar = 0.0065 ;bar
 ch4bar = 0.0 ;bar
-n2bar = 4.0  ; - co2bar - ch4bar      ;bar
+n2bar = 0.0  ; - co2bar - ch4bar      ;bar
 
 psbar = co2bar + ch4bar  + n2bar
 
@@ -69,14 +69,20 @@ print, "------------------------------"
 ;==============================================================
 ;  file_out =  '/projects/btoon/wolfet/exofiles/atm/CO2_0.00000976562bar_L45_ic.nc'
 ;  file_out =   '/projects/btoon/wolfet/exofiles/atm/ic_1barN2_0.2barCO2_L40_ic.nc'
-  file_out =  '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_land_fv/ic_4bar_L51_eyeball_dry_ic.nc'
+;  file_out =  '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_land_fv/ic_0.1bar_L51_eyeball_dry_ic.nc'
+;  file_out =  '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/ic_P0.01bar_L40_ic.nc'
+;  file_out =
+;  '/discover/nobackup/etwolf/models/CESM_Mars/marsfiles/atm/mars_4bar.cami.4x5.dry.nc'
+;file_out ='/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/ic_P8bar_L40_dry_ic.nc'
 ;  file_out = '/projects/btoon/wolfet/exofiles/atm/ohz_t2700K_temp_ic.nc'
 ;  file_out = '/projects/btoon/wolfet/exofiles/atm/archean_360ppmCO2_1bN2_L40_ic.nc'
 ;  ncdata_in = '/projects/btoon/wolfet/exofiles/atm/cami_0001-01-01_4x5_L26_c060608.nc'
 
 ; standard present day initial conditions
 
- ncdata_in =  '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/ic_1bar_L51_eyeball_ic.nc'
+;ncdata_in = '/discover/nobackup/etwolf/models/CESM_Mars/marsfiles/atm/mars.cam.i.0002-01-01-00000.nc'
+; ncdata_in =  '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/ic_1bar_L51_eyeball_ic.nc'
+; ncdata_in =  '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/ic_P0.25bar_L40_ic.nc'
 ;ncdata_in = '/projects/wolfet/EXO_RESTART/trappist1e_1barN2_0.1barCO2_aqua_0061-01-01/trappist1e_1barN2_0.1barCO2_aqua.cam.i.0061-01-01-00000.nc'
 ;ncdata_in = '/gpfs/summit/scratch/wolfet/archive/t3300_s1400_p22.1392_0.25bar/rest/0017-01-01-00000/t3300_s1400_p22.1392_0.25bar.cam.i.0017-01-01-00000.nc'
   ;ncdata_in = '/projects/btoon/wolfet/exofiles/atm/ic_1bar_L51_ic.nc'
@@ -87,6 +93,11 @@ print, "------------------------------"
         ;  ncdata_in = '/lustre/janus_scratch/wolfet/t2700K_s304.836_p14.8548_ohz/run/t2700K_s304.836_p14.8548_ohz.cam.i.0002-01-01-00000.nc'
 ;hot climate
 ;ncdata_in = '/lustre/janus_scratch/wolfet/archive/CO2_184320ppm/rest/0049-01-01-00000/CO2_184320ppm.cam.i.0049-01-01-00000.nc'
+;ncdata_in = '/gpfsm/dnb53/etwolf/cesm_scratch/rundir/mars_2barCO2/run/mars_2barCO2.cam.i.0012-02-01-00000.nc'
+;ncdata_in   ='/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/ic_P0.1bar_L40_dry_ic.nc'
+ncdata_in  = '/gpfsm/dnb53/etwolf/cesm_scratch/archive/mars_0.1barCO2/rest/0031-01-01-00000/mars_0.1barCO2.cam.i.0031-01-01-00000.nc'
+file_out ='//gpfsm/dnb53/etwolf/models/CESM_Mars/marsfiles/atm/present_day_mars.cam.i.L40.nc'
+
   outstring = "cp " + ncdata_in + " "+ file_out
 
 

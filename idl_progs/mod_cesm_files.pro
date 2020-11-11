@@ -5,8 +5,8 @@ pro mod_cesm_files
 ; -- e t w --
 ;-------------------------------
 
-make_bndtopo = 0 ; topograph files  
-make_popfrc = 1 ; modify existing popfrc file
+make_bndtopo = 1 ; topograph files  
+make_popfrc = 0 ; modify existing popfrc file
 make_ncdata = 0
 make_tropopause_climo_file = 0
 make_ozone = 0
@@ -84,6 +84,12 @@ file_aerosoldep_out = '/projects/btoon/wolfet/exofiles/ocn/aquaplanet/aerosoldep
 ;file_lnd_domain = '/gpfs/summit/datasets/CESM/inputdata/share/domains/domain.lnd.fv4x5_gx3v7.091218.nc'
 ;file_ocn_domain = '/gpfs/summit/datasets/CESM/inputdata/share/domains/domain.ocn.0.47x0.63_gx1v6_090408.nc'
 ;file_ocn_master = '/lustre/janus_scratch/cesm/inputdata/ocn/docn7/SOM/pop_frc.1x1d.090130.nc'
+
+
+;--- ocean domain files in/out ---
+file_lnd_domain = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_land_fv/domain.lnd.fv4x5_landplanet.nc'
+file_lnd_domain_out =  "test_domain.nc"
+
 
 
 ;---  topography files in/out ---
@@ -397,11 +403,29 @@ if (make_lnd_domain eq 1) then begin
   ncid=ncdf_open(file_lnd_domain, /nowrite)
   ncdf_varget,ncid,'mask',mask
   ncdf_varget,ncid,'frac',frac
+  ncdf_varget,ncid,'xc',lat
+  ncdf_varget,ncid,'yc',lon
   ncdf_close,ncid
 
   ;set everything to zero
   mask(*,*) = 0.0
   frac(*,*) = 0.0
+  mask(*,0:2) = 1
+  mask(*,43:45) = 1
+  frac(*,0:2) = 1
+  frac(*,43:45) = 1
+
+  help, mask, frac
+  
+  nlon=n_elements(lon)
+  nlat=n_elements(lat)
+
+;  for x=nlon-1 do begin
+;    for y=nlat-1 do begin       
+;    endfor
+;  endfor
+
+
 
   ;---- update lnd domain file ----
   ncid = ncdf_open(file_lnd_domain_out, /WRITE)

@@ -13,6 +13,7 @@ use perf_mod
 use cam_logfile,        only: iulog
 use hycoef,             only: hycoef_init, hyai, hybi
 use pio,                only: file_desc_t
+use shr_const_mod,      only: SHR_CONST_PSTD
 
 implicit none
 private
@@ -266,7 +267,7 @@ subroutine dyn_init(file, dyn_state, dyn_in, dyn_out, NLFileName )
   allocate( ak(plev+1) )
   allocate( bk(plev+1) )
   do k = 1, plev+1
-     ak(k) = hyai(k) * D1E5
+     ak(k) = hyai(k) * SHR_CONST_PSTD ! Mars, D1E5
      bk(k) = hybi(k)
      if( bk(k) == D0_0 ) ks = k-1
   end do  

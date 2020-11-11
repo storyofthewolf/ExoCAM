@@ -7,7 +7,7 @@ dynamical core:     spectral element cubed sphere
 radiation scheme:   user selected from ExoRT/3dmodels
 
 == create the case
-create_newcase -case $my_aquaplanet_case -res ne16np4_ne16np4 -mach summit -compset E2000C4AQI
+create_newcase -case $my_aquaplanet_case -res ne16np4_ne16np4 -mach discover -compset E2000C4AQI
    { for low resolution -res ne5np4_ne5np4 }
 
 == set dycore, levels, physics, and the ExoRT radiative transfer package
