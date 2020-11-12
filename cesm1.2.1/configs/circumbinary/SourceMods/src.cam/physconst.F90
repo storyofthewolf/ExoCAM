@@ -352,6 +352,7 @@ contains
         write(iulog,*) 'DO_EXO_RT_CLEARSKY: ', do_exo_rt_clearsky
         write(iulog,*) 'DO_EXO_RT_SPECTRAL: ', do_exo_rt_spectral
         write(iulog,*) 'EXO_RAD_STEP: ', exo_rad_step
+        write(iulog,*) 'DO_GRAVITY_WAVES: ', do_exo_gw
         write(iulog,*) 'DO_EXO_CIRCUMBINARY ', do_exo_circumbinary
         write(iulog,*) '******************************************************'
         write(iulog,*) '***       ExoCAM: Stellar Spectral Options         ***'

@@ -1498,15 +1498,14 @@ subroutine tphysac (ztodt,   cam_in,  &
     !===================================================
     ! Gravity wave drag
     !===================================================
-    call t_startf('gw_intr')
-
-!!  Wolf :: comment out to turn off gravity waves
-    call gw_intr(state, sgh, pbuf, ztodt, ptend, cam_in%landfrac)
-
-    call physics_update(state, ptend, ztodt, tend)
-    ! Check energy integrals
-    call check_energy_chng(state, tend, "gwdrag", nstep, ztodt, zero, zero, zero, zero)
-    call t_stopf('gw_intr')
+    if (do_exo_gw) then 
+      call t_startf('gw_intr')
+      call gw_intr(state, sgh, pbuf, ztodt, ptend, cam_in%landfrac)
+      call physics_update(state, ptend, ztodt, tend)
+      ! Check energy integrals
+      call check_energy_chng(state, tend, "gwdrag", nstep, ztodt, zero, zero, zero, zero)
+      call t_stopf('gw_intr')
+    endif
 
 #if ( defined WACCM_PHYS )
 

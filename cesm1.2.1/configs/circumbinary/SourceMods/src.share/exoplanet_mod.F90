@@ -31,7 +31,8 @@ module exoplanet_mod
 
   integer, public, parameter :: exo_rad_step = 2                !! freq. of radiation calc in time steps (positive)
                                                                 !! or hours (negative).
-
+  logical, public, parameter :: do_exo_gw = .false.             !! flag to turn on gravity waves.  Note, present gw wave parameterization
+                                                                !! does not work for low pressure atmospheres.
   
   !! ==============  planet parameters ============== !!
   !! It is the responsibility of the USER to set do_exo_synchronous, exo_ndays
