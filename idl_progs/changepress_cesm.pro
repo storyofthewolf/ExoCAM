@@ -24,6 +24,14 @@ pro changepress_cesm
 do_write = 1  ;if 1 write output file
 do_dry = 1
 
+do_flat_psfield = 1 ; write output pressures equal to sum of partial pressures
+                                ; pressure field is assumed flat across
+                                ; surface, regardless of topography
+
+do_scalce_psfield = 1 ; write output pressures by scaling press field from 
+                                ; the input file in being used (ncdata).
+
+
 mwn2 = 28.
 mwar = 40.
 mwco2 = 44.
@@ -34,6 +42,8 @@ cpar = 0.520e3
 cpco2 = 0.846e3
 cpch4 = 2.226e3
 
+
+; used with do_flat_psfield
 co2bar = 0.0065 ;bar
 ch4bar = 0.0 ;bar
 n2bar = 0.0  ; - co2bar - ch4bar      ;bar
@@ -48,25 +58,37 @@ mwdry = co2vmr*mwco2 + ch4vmr*mwch4 + n2vmr*mwn2
 cpdry = co2vmr*cpco2 + ch4vmr*cpch4 + n2vmr*cpn2 
 
 
-print, "============================="
-print, "N2BAR: ", N2BAR
-print, "CO2BAR: ", CO2BAR
-print, "CH4BAR: ", CH4BAR
-print, "------------------------------"
-print, "TOTAL: ",N2BAR+CO2BAR+CH4BAR
-print, "============================="
-print, "N2VMR: ", N2VMR
-print, "CO2VMR: ", CO2VMR
-print, "CH4VMR: ", CH4VMR
-print, "------------------------------"
-print, "TOTAL: ",N2VMR+CO2VMR+CH4VMR
-print, "------------------------------"
-print, "mwdry: ", mwdry
-print, "cpdry: ", cpdry
-print, "------------------------------"
+if (do_flat_psfield eq 1) then begin
+  print, "using flat pressure field"
+  print, "============================="
+  print, "N2BAR: ", N2BAR
+  print, "CO2BAR: ", CO2BAR
+  print, "CH4BAR: ", CH4BAR
+  print, "------------------------------"
+  print, "TOTAL: ",N2BAR+CO2BAR+CH4BAR
+  print, "============================="
+  print, "N2VMR: ", N2VMR
+  print, "CO2VMR: ", CO2VMR
+  print, "CH4VMR: ", CH4VMR
+  print, "------------------------------"
+  print, "TOTAL: ",N2VMR+CO2VMR+CH4VMR
+  print, "------------------------------"  
+  print, "mwdry: ", mwdry
+  print, "cpdry: ", cpdry
+  print, "------------------------------"
+endif
+
+if (do_scale_psfield) then begin
+  print, "scaling from input file"
+  print, "multiplicative scale factor", scalefac
+endif
 
 
-;==============================================================
+;=======================================================================================================================
+;=======================================================================================================================
+;  FILES
+;=======================================================================================================================
+;=======================================================================================================================
 ;  file_out =  '/projects/btoon/wolfet/exofiles/atm/CO2_0.00000976562bar_L45_ic.nc'
 ;  file_out =   '/projects/btoon/wolfet/exofiles/atm/ic_1barN2_0.2barCO2_L40_ic.nc'
 ;  file_out =  '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_land_fv/ic_0.1bar_L51_eyeball_dry_ic.nc'
@@ -100,7 +122,12 @@ ncdata_in  = '/gpfsm/dnb53/etwolf/cesm_scratch/archive/mars_0.1barCO2/rest/0031-
 ncdata_in = '/gpfsm/dnb53/etwolf/cesm_scratch/archive/mars_dev2/rest/0001-01-21-00000/mars_dev2.cam.i.0001-01-21-00000.nc'
 file_out ='/gpfsm/dnb53/etwolf/models/CESM_Mars/marsfiles/atm/mars_dev2_0.01bar.cam.i.0001-01-21-00000.nc'
 
-  outstring = "cp " + ncdata_in + " "+ file_out
+;=======================================================================================================================
+;=======================================================================================================================
+;=======================================================================================================================
+
+
+outstring = "cp " + ncdata_in + " "+ file_out
 
 
 if (do_write eq 1) then  spawn, outstring
@@ -141,15 +168,13 @@ if (do_write eq 1) then  spawn, outstring
 
   for x=0,nlon-1 do begin
     for y=0,nlat-1 do begin
-      for z=0, nlev-1 do begin
-      endfor
-;      PS(x,y) = PS_in(x,y)*psbar*1.0e5/P0_in
-;       PS(x,y) = psbar*1.0e5
-      PS(x,y) = PS_in(x,y)/10.
+      if (do_flat_psfield) then  PS(x,y) = psbar*1.0e5
+      if (do_scale_psfield) then  PS(x,y) = PS_in(x,y)*scalefac.
     endfor
   endfor
-;  P0 = psbar*1.0e5
-  P0 = P0_in/10.
+  if (do_flat_psfield) then P0 = psbar*1.0e5
+  if (do_scale_psfield) then P0 = P0_in*scalefac
+
 
   ;; testing ---
   lev_P=fltarr(nlon,nlat,nlev)
