@@ -16,6 +16,8 @@ xmlchange CAM_CONFIG_OPTS="-nlev 40 -phys cam4 -usr_src $EXORT_PATH/ExoRT/3dmode
 xmlchange LND_DOMAIN_PATH=$EXOC_PATH/ExoCAM/cesm1.2.1/initial_files/cam4_land_fv
 xmlchange LND_DOMAIN_FILE=domain.lnd.fv4x5_landplanet.nc
 xmlchange RTM_MODE=NULL  ; turns off river routing
+xmlchange ROF_GRID=null  ; turns off river routing grid.  alternatively can
+                         ; use -res f45_f45_noRTM in creating case
 
 == transfer files
 copy SourceMods folder directly into your $Case directory

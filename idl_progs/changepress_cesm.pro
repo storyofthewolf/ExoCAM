@@ -95,8 +95,10 @@ print, "------------------------------"
 ;ncdata_in = '/lustre/janus_scratch/wolfet/archive/CO2_184320ppm/rest/0049-01-01-00000/CO2_184320ppm.cam.i.0049-01-01-00000.nc'
 ;ncdata_in = '/gpfsm/dnb53/etwolf/cesm_scratch/rundir/mars_2barCO2/run/mars_2barCO2.cam.i.0012-02-01-00000.nc'
 ;ncdata_in   ='/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/ic_P0.1bar_L40_dry_ic.nc'
+
 ncdata_in  = '/gpfsm/dnb53/etwolf/cesm_scratch/archive/mars_0.1barCO2/rest/0031-01-01-00000/mars_0.1barCO2.cam.i.0031-01-01-00000.nc'
-file_out ='//gpfsm/dnb53/etwolf/models/CESM_Mars/marsfiles/atm/present_day_mars.cam.i.L40.nc'
+ncdata_in = '/gpfsm/dnb53/etwolf/cesm_scratch/archive/mars_dev2/rest/0001-01-21-00000/mars_dev2.cam.i.0001-01-21-00000.nc'
+file_out ='/gpfsm/dnb53/etwolf/models/CESM_Mars/marsfiles/atm/mars_dev2_0.01bar.cam.i.0001-01-21-00000.nc'
 
   outstring = "cp " + ncdata_in + " "+ file_out
 
@@ -142,12 +144,12 @@ if (do_write eq 1) then  spawn, outstring
       for z=0, nlev-1 do begin
       endfor
 ;      PS(x,y) = PS_in(x,y)*psbar*1.0e5/P0_in
-       PS(x,y) = psbar*1.0e5
-;      PS(x,y) = PS_in(x,y)*psbar*1.0e5/PS_avg
+;       PS(x,y) = psbar*1.0e5
+      PS(x,y) = PS_in(x,y)/10.
     endfor
   endfor
-  P0 = psbar*1.0e5
-
+;  P0 = psbar*1.0e5
+  P0 = P0_in/10.
 
   ;; testing ---
   lev_P=fltarr(nlon,nlat,nlev)
