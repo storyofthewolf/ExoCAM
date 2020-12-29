@@ -32,15 +32,24 @@ eric.wolf@colorado.edu
   Please see also the LICENSE.
 
 !! SUPPORT:
-  Support for ExoCAM and ExoRT is generally limited (to me, eric.wolf@colorado.edu).
-  If using this code, I encourage you to reach out to me to ensure that your
-  particular application is possible with the code as as is.  I also encourage
-  you to report bugs found in the code. Note, many common troubleshoots needed
-  in CESM can be solved by looking here https://bb.cgd.ucar.edu/cesm/.  This
-  site is a wealth on information.   
+  This is research grade code(!), and the model support and development team is
+  limited to pretty much just me (eric.wolf@colorado.edu).  While I do my
+  best to  keep the code coherent, usable, and documented, while fixing bugs,
+  developing new features, addressing user questions, and trying to do my own
+  science on the side, it is impossible for me to address all concerns and
+  contigencies.  I encourage users to experiment different ways to implement,
+  configure, and use ExoCAM and ExoRT with CESM1.2.1.   
+
+  With that said, if you are planning to use this code, I encourage you to
+  reach out to me to ensure that your particular application is possible with
+  the code as is, and that there are no gotchas or hidden idiosyncracies.  I
+  also encourage you to report bugs found in the code. Note, many common
+  troubleshoots needed in CESM can be solved by looking here
+  https://bb.cgd.ucar.edu/cesm/.  This site is a wealth on information.   
 
 !! CITING:
-  If you use ExoCAM in your work, please footnote to where the model is available.  I.e. my Github pages.
+  If you use ExoCAM in your work, please footnote to where the model is
+  available.  I.e. my Github pages.
   https://github.com/storyofthewolf/ExoCAM
   https://github.com/storyofthewolf/ExoRT
   If you are feeling generous, can cite a paper or two of mine from the list.
@@ -49,6 +58,8 @@ eric.wolf@colorado.edu
   I encourage all users to make their 3D model output files publicly available
   when appropriate.  Many academic journals are now requiring this.  I store
   model outputs from my published work at: https://archive.org/details/@eric_t_wolf
+  and also on zenodo, or made available upon request.
+
 
 
 /folders

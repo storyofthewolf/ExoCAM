@@ -1,30 +1,24 @@
 -- supported configurations --
 
-1)  cam4_aqua_fv 
-    --  aquaplanet, slab ocean, finite volume dynamical core
+1)  cam_aqua_fv 
+    --  aquaplanet, slab ocean, finite volume dynamical core, cam4/5 phys
     --  must link external radiative transfer options from ../ExoRT/3dmodels
 
-2)  cam4_aqua_se   
-    --  aquaplanet, slab ocean, se cubed sphere dynamical core
+2)  cam_aqua_se   
+    --  aquaplanet, slab ocean, se cubed sphere dynamical core, cam4/5 phys
     --  must link external radiative transfer options from ../ExoRT/3dmodels
 
-3)  cam4_land_fv  
-    --  land planet, finite volume dynamical core dynamical core
+3)  cam_land_fv  
+    --  land planet, finite volume dynamical core dynamical core, cam4/5 phys
     --  must link external radiative transfer options from ../ExoRT/3dmodels
 
-4)  cam4_mixed_fv
-    --  continents + slab ocean, finite volume dynamical core
+4)  cam_mixed_fv
+    --  continents + slab ocean, finite volume dynamical core, cam4/5 phys
     --  must link external radiative transfer options from ../ExoRT/3dmodels
 
-5)  cam4_aqua_dynocn_fv (NOT WORKING)
-    --  aquaplanet, dynamic ocean model, finite volume dynamical core
-    --  must link external radiative transfer options from ../ExoRT/3dmodels
-
-6)  circumbinary
-    --  continents + slab ocean, finite volume dycore
+5)  circumbinary
+    --  continents + slab ocean, finite volume dycore, cam4 phys
     --  src.n28archean radiation included in SoureMods
-
-
 
 -- add ons --
 

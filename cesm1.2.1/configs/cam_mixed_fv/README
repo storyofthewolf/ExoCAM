@@ -1,36 +1,34 @@
-QuickStart Guide :: circumbinary
+QuickStart Guide :: cam4_mixed_fv
 ---------------------------------------------------------------------------------
-description:        complete model for circumbinary planets 
-physics:            cam4
-surface type:       mixed (ocean/land)
+description:        basic configuration
+physics:            "RK" or "MG"
+surface type:       land and slab ocean mixed
 dynamical core:     finite volume
-radiation scheme:   src.cam.n28archean 
-
-Notes: Contains all elements of the model build for circumbinary planets.  The
-radiation scheme is included in SourceMods here. Thus it is NOT
-interchangeable with other ExoRT/3dmodels
-
----------------------------------------------------------------------------------
+radiation scheme:   user selected from ExoRT/3dmodels
 
 == create the case ==
 create_newcase -case $my_aquaplanet_case -res f45_g37 -mach discover -compset E2000C4
 
+
 == set levels, physics, and the ExoRT radiative transfer package ==
-xmlchange CAM_CONFIG_OPTS="-nlev 40 -phys cam4 -usr_src $CASE/SourceMods/src.cam.n28archean.cb
+-- default command below uses "RK" (i.e. cam4) clouds.
+xmlchange CAM_CONFIG_OPTS="-nlev 40 -phys cam4 -usr_src $EXORT_PATH/ExoRT/3dmodels/src.cam.n******"
+
+-- command below builds with "MG" (cam5) clouds
+xmlchange CAM_CONFIG_OPTS="-nlev 40 -phys cam4 -usr_src $EXORT_PATH/ExoRT/3dmodels/src.cam.n****** -chem none -microphys mg1"
+
+
+== turn off river routings ==
 xmlchange RTM_MODE=NULL
+
 
 == transfer files ==
 copy SourceMods folder directly into your $Case directory
 copy namelist files into your $Case directory
+     for "MG" clouds, uncomment blocks in user_nl_cam
 
 == finish ==
 build and run
-
----------------------------------------------------------------------------------
-How to use the circumbinary code:  
-as usual all of the system parameter sections fall into SourceMods/src.share/exoplanet_mod.F90
-...
-
 
 
 ---------------------------------------------------------------------------------

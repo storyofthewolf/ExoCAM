@@ -3,12 +3,11 @@
 == eric.wolf@colorado.edu
 
 Supported configurations
-
-  cam4_aqua_fv   --  aquaplanet slab ocean, finite volume dynamical core
-  cam4_aqua_se   --  aquaplanet slab ocean, se cubed sphere dynamical ccore
-  cam4_land_fv   --  land planet, finite volume dynamical core
-  cam4_mixed_fv  --  slab ocean and continents, finite volume dynamical core
-  carma          --  add on for hooking up with CARMA for cloud and aerosol treatments
+  cam_aqua_fv   --  aquaplanet slab ocean, finite volume dynamical core
+  cam_aqua_se   --  aquaplanet slab ocean, se cubed sphere dynamical ccore
+  cam_land_fv   --  land planet, finite volume dynamical core
+  cam_mixed_fv  --  slab ocean and continents, finite volume dynamical core
+  carma         --  add on for hooking up with CARMA for cloud and aerosol treatments
 
   vertical levels:  provided are initial condition files for 
                     1) 40 levels, 1 mb model top
@@ -18,7 +17,10 @@ Supported configurations
   	                  1) fv 4x5
 			  2) se ne16np4, ne5np4
 
-
+  cloud modules -- ExoCAM can be built using either the CAM4 or CAM5 moist physics
+                   1) "rk" Rasch and Kristjansson scheme CAM4, default
+                   2) "mg1" Morrison and Gettelman two moment scheme CAM5.1
+  
 Supported modifications in ExoCAM
   all modifications are colleted in the file ../SourceMods/src.share/exoplanet_mod.F90
   These must be changed prior to building the model.  Please see the file for
@@ -50,6 +52,25 @@ Fun Features
 
 
 ExoRT Radiative Transfer Packages
+  src.n68equiv   == As of September 2020, this is the recommended version to use for all cases
+                 == Correlated-k coefficients produced with HELIOS-K (Grimm et al. 2015)
+                 == H2O, HITRAN 2016, Voigt lineshape, 25 cm-1 cutoff, plinth remove
+                 == H2O Self and Foreign Continuum from MT_CKDv3.3 fit to gauss pts
+                 == CO2, HITRAN 2016, Perrin and Hartmann (1989) subLorentzian
+                         lineshape, 500 cm-1 cutoff, with CO2-CO2 CIA
+                 == CH4, HITRAN 2016, Voigt lineshape, 25 cm-1 cutoff
+                 == N2-N2, N2-H2, H2-H2 CIA downloaded from HITRAN
+                 == CO2-H2, CO2-CH4 CIA from Turbet et al. (2020)
+                 == 68 spectral intervals, 8 gauss points
+                 == gas overlap using equivalent extinction absorption method (Amundsen et al. 2016)
+                    In each spectral interval, grid box, and time, the
+                    "major" gas is selcted and treated with an 8-gauss
+                    point correlated-k distribution.  Minor species are
+                    then added in as grey absorbers.  Major gases are
+                    selected on the fly.
+                 == Pressures from 10 bars to 0.01 mb
+                 == Temperatures from 100 K to 500 K
+
   src.n28archean == H2O, CO2, CH4, N2, H2, HITRAN 2004, 28 bins, designed for
                     the Archean Climate (formerly "highco2")
                  == CO2 up to several tenths of a bar with an N2 background, CO2

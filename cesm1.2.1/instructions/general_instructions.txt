@@ -9,9 +9,14 @@ ExoRT.  Here, system  installations are supported for...
   NASA's, Discover supercomputer
   For other machines, follow NCAR's instructions for "userdefined" machines.  
 
-  Note, installation of the base model, CESM, on each machine pose individual
+  Note#1: Installation of the base model, CESM, on each machine poses individual
   challenges specific to each system.  These nuances are a "normal"
   aggravation of running 3D models, and fall outside the scope of this document.
+
+  Note#2:  CESM version 1.2.1 is mutli-configurable. A variety of physics
+  packages, dynamical cores, chemistry packages, and namelist options can be
+  experimented with that beyond the setups listed here.  However,
+  cross-configuration compatabilities are not guaranteed.   
 
 NOTE:  quickstart guides are given in 
 ../ExoCAM/cesm1.2.1/configs/$model_config/README
@@ -74,10 +79,10 @@ STEP 3:  Create a new case
   create_newcase -case $my_aquaplanet_case -res f45_f45 -mach hyak -compset E2000C4AQI
 
 
-STEP 4:  Link ExoRT radiative transfer model
+STEP 4:  Link ExoRT radiative transfer model and set configure options
 
   Go to your case directory ($CASEROOT, in NCAR parlance)
-  issue command  ...
+  issue command...
 
   xmlchange CAM_CONFIG_OPTS="-nlev 40 -phys cam4 -usr_src $EXORT_PATH/ExoRT/3dmodels/src.cam.n******"
   
@@ -85,6 +90,17 @@ STEP 4:  Link ExoRT radiative transfer model
   Radiative transfer models, ready for linking with CESM in 3D are located at
   ../ExoRT/3dmodels 
   option -nlev = number of vertical levels
+  option -phys is the physics package
+
+  By default, above setting -phys cam4 builds with the Rasch & Kristjansson "RK"
+  cloud scheme.  You can also build the model using the more advanced Morrison
+  and Gettleman "MG" cloud scheme from cam5 by amending the xmlchange
+  CAM_CONFIG_OPTS command with...
+
+  "-chem none -microphys mg1"
+ 
+  and by uncommenting the appropriate options in the user_nl_cam namelist file. 
+  
 
 STEP 5:  Copy SourceMods and namelist files to your case
 
@@ -100,6 +116,7 @@ STEP 5:  Copy SourceMods and namelist files to your case
   Optional: if you wish to make modifications to the radiative transfer
   modules, copy the RT folder $EXORT_PATH/ExoRT/3dmodels/src.cam.n****** into your
   $CASEROOT/SourceMods directory, and change -usr_src config opt approriately.
+
 
 STEP 6:  Building and running
 

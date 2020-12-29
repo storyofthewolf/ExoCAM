@@ -1,0 +1,39 @@
+      <dataSource>
+         GENERIC
+      </dataSource>
+      <domainInfo>
+         <variableNames>
+            time    time
+            xc      lon
+            yc      lat
+            area    area
+            mask    mask
+         </variableNames>
+         <filePath>
+            /gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv
+         </filePath>
+         <fileNames>
+            domain.ocn.4x5_100120_aquaplanet.nc
+         </fileNames>
+      </domainInfo>
+      <fieldInfo>
+         <variableNames>
+            T     t
+            S     s
+            U     u
+            V     v
+            dhdx  dhdx
+            dhdy  dhdy
+            hblt  h
+            qdp   qbot
+         </variableNames>
+         <filePath>
+            /gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv
+         </filePath>
+         <fileNames>
+            pop_frc.4x5d.090130_aquaplanet_0OHT_Earth.nc
+         </fileNames>
+         <offset>
+            0
+         </offset>
+      </fieldInfo>
