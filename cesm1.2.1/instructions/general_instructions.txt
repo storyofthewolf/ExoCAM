@@ -89,6 +89,10 @@ STEP 4:  Link ExoRT radiative transfer model and set configure options
   Where $EXORT_PATH is the path to where your ExoRT has been checked out.
   Radiative transfer models, ready for linking with CESM in 3D are located at
   ../ExoRT/3dmodels 
+
+  NOTE: If you plan on making changes to the radiation model, I would suggest making
+  a duplicate copy somewhere else on your machine.
+
   option -nlev = number of vertical levels
   option -phys is the physics package
 
