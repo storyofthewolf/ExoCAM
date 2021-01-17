@@ -35,7 +35,7 @@ module physpkg
   use cam_logfile,     only: iulog
   use camsrfexch,      only: cam_export
   use phys_control,    only: do_waccm_phys
-  use exoplanet_mod,      only: do_exo_rt
+  use exoplanet_mod,   only: do_exo_rt, do_exo_gw
 
   implicit none
   private

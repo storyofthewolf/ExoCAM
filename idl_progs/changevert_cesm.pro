@@ -1,7 +1,8 @@
 pro changevert_cesm
 ;====================================================================
 ; Author: Eric T. Wolf
-; Date:  some time long ag
+; Date:  some time long ago
+; needs fixing
 ;====================================================================
 ; Change number of vertical levels in a CAM initial condition file.
 ; This is achieved starting with a 66 level WACCM initial condition
@@ -10,21 +11,20 @@ pro changevert_cesm
 
 do_write_file=1
 ;fname_out = '/projects/btoon/wolfet/exofiles/atm/control_L60.cam.i.0048-01-01-00000.nc'
-fname_out = '/projects/btoon/wolfet/exofiles/atm/ic_1bar_L40_0.47x0.63d.nc'
-nlev_out = 50
-nilev_out = 51
+;fname_out = '/projects/btoon/wolfet/exofiles/atm/ic_1bar_L40_0.47x0.63d.nc'
+fname_out = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/ic_1bar_hab2_L45_ic.nc 
+nlev_out = 45
+nilev_out = 46
 
 
 ;read in appropriate lev, hyai for N>26
-;lev_fname_new = '/lustre/janus_scratch/cesm/inputdata/atm/waccm/ic/cami_2000-01-01_4x5_L66_c041112.nc'
-;lev_fname_new = '/projects/btoon/wolfet/waccmfiles/f2000.waccm-mam3_4x5_L70.cam2.i.0017-01-01.c121113.nc'
-lev_fname_new = '/projects/wolfet/ANALYSIS/oxygen_CE.cam2.avg.nc'
+lev_fname_new = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/other/oxygen_CE.cam2.avg.nc'
 
 ncid=ncdf_open(lev_fname_new, /nowrite)
 ncdf_varget,ncid,'lev',lev_new
 ncdf_varget,ncid,'ilev',ilev_new
-;ncdf_varget,ncid,'lat',lat_new
-;ncdf_varget,ncid,'lon',lon_new
+ncdf_varget,ncid,'lat',lat_new
+ncdf_varget,ncid,'lon',lon_new
 ncdf_varget,ncid,'hyai',hyai_new   ;ilev
 ncdf_varget,ncid,'hybi',hybi_new   ;ilev
 ncdf_varget,ncid,'hyam',hyam_new   ;lev
@@ -33,15 +33,16 @@ ncdf_close,ncid
 
 nlev_new = n_elements(lev_new)
 nilev_new = n_elements(ilev_new)
-;nlat_new = n_elements(lat_new)
-;nlon_new = n_elements(lon_new)
+nlat_new = n_elements(lat_new)
+nlon_new = n_elements(lon_new)
 
 
 
 ;read in data file
 ;ic file with desired 
 ;clim_fname_in ='/projects/btoon/wolfet/exofiles/atm/ic_1barN2_0.1barCO2_0.02barCH4_L48_ic.nc'
-clim_fname_in ="/gpfs/summit/datasets/CESM/inputdata/atm/cam/inic/fv/cami_0000-09-01_0.47x0.63_L26_c061106.nc"
+;clim_fname_in ="/gpfs/summit/datasets/CESM/inputdata/atm/cam/inic/fv/cami_0000-09-01_0.47x0.63_L26_c061106.nc"
+clim_fname_in ="/gpfsm/dnb53/etwolf/cesm_scratch/archive/ExoCAM_thai_hab2_L51_n68equiv/rest/0197-01-01-00000/ExoCAM_thai_hab2_L51_n68equiv.cam.i.0197-01-01-00000.nc" 
 
 ncid=ncdf_open(clim_fname_in, /nowrite)
 ncdf_varget,ncid,'lev',lev_old
@@ -63,7 +64,7 @@ nslon=nlon
 
 ncdf_varget,ncid,'CLDICE',CLDICE_old
 ncdf_varget,ncid,'CLDLIQ',CLDLIQ_old
-ncdf_varget,ncid,'CLOUD',CLOUD_old
+;ncdf_varget,ncid,'CLOUD',CLOUD_old
 ncdf_varget,ncid,'Q',Q_old
 ncdf_varget,ncid,'T',T_old
 ncdf_varget,ncid,'US',US_old
@@ -75,7 +76,7 @@ ncdf_varget,ncid,'slat',slat
 ncdf_varget,ncid,'slon',slon
 ncdf_varget,ncid,'w_stag',w_stag
 ncdf_varget,ncid,'time',time
-;ncdf_varget,ncid,'time_bnds',time_bnds
+ncdf_varget,ncid,'time_bnds',time_bnds
 ncdf_varget,ncid,'date_written',date_written
 ncdf_varget,ncid,'time_written',time_written
 ncdf_varget,ncid,'ntrm',ntrm
@@ -142,7 +143,7 @@ for x=0,nlon-1 do begin
     T_out(x,y,*) = interpol(T_old(x,y,*), lev_P_old(x,y,*), lev_P_new(x,y,n:65))  
     CLDICE_out(x,y,*) = interpol(CLDICE_old(x,y,*), lev_P_old(x,y,*), lev_P_new(x,y,n:65))  
     CLDLIQ_out(x,y,*) = interpol(CLDLIQ_old(x,y,*), lev_P_old(x,y,*), lev_P_new(x,y,n:65))  
-    CLOUD_out(x,y,*)  = interpol(CLOUD_old(x,y,*), lev_P_old(x,y,*), lev_P_new(x,y,n:65))  
+;    CLOUD_out(x,y,*)  = interpol(CLOUD_old(x,y,*), lev_P_old(x,y,*), lev_P_new(x,y,n:65))  
     Q_out(x,y,*) = interpol(Q_old(x,y,*), lev_P_old(x,y,*), lev_P_new(x,y,n:65))  
     VS_out(x,y,*) = interpol(VS_old(x,y,*), lev_P_old(x,y,*), lev_P_new(x,y,n:65))  
   endfor
@@ -178,9 +179,9 @@ endfor
 ;write
 
 if (do_write_file eq 1) then begin
-spawn, "rm -r -f fname_out"
-print, "creating file ...." 
-print, fname_out
+ spawn, "rm -r -f fname_out"
+ print, "creating file ...." 
+ print, fname_out
   id = ncdf_create(fname_out,/clobber)
   dim1 = NCDF_DIMDEF(id, 'lat', nlat)
   dim2 = NCDF_DIMDEF(id, 'lon', nlon)  
@@ -225,7 +226,7 @@ print, fname_out
   varid34 = NCDF_VARDEF(id,'nsteph',dim10)
   varid57 = NCDF_VARDEF(id,'CLDICE',[dim2,dim1,dim5,dim10],/double)
   varid58 = NCDF_VARDEF(id,'CLDLIQ',[dim2,dim1,dim5,dim10],/double)
-  varid58 = NCDF_VARDEF(id,'CLOUD',[dim2,dim1,dim5,dim10],/double)
+ ; varid58 = NCDF_VARDEF(id,'CLOUD',[dim2,dim1,dim5,dim10],/double)
   varid76 = NCDF_VARDEF(id,'ICEFRAC',[dim2,dim1,dim10],/double)
   varid99 = NCDF_VARDEF(id,'PS',[dim2,dim1,dim10],/double)
   varid100 = NCDF_VARDEF(id,'Q',[dim2,dim1,dim5,dim10],/double)
@@ -373,6 +374,5 @@ print, fname_out
   ncdf_close, id
 
 endif
-
 
 end
