@@ -13,6 +13,8 @@
 ! As an example, to modify docn.streams.txt.prescribed, place the modified 
 ! version in $CASEROOT with the name user_docn.streams.txt.prescribed
 !------------------------------------------------------------------------
- domainfile = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_mixed_fv/domain.ocn.gx3v7.120323.nc'
+
+!! ocean domain file
+domainfile = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_mixed_fv/domain.ocn.gx3v7.120323.nc'
 
 

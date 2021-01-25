@@ -4,7 +4,9 @@
 ! Note - that it does not matter what namelist group the namelist_var belongs to
 !----------------------------------------------------------------------------------
 
- 
+!!
+!! domain settings
+!! 
 grid_file = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/domain.ocn.4x5_100120_aquaplanet.nc'
 grid_format = 'nc'
 grid_type = 'latlon'
@@ -12,6 +14,9 @@ gridcpl_file = 'unknown_gridcpl_file'
 kcatbound =  0
 kmt_file = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/domain.ocn.4x5_100120_aquaplanet.nc'
 
+!!
+!! albedo settings
+!!
 shortwave = 'default'
 albedo_type = 'default'
 albicei = 0.30    !0.3

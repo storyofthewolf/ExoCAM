@@ -44,5 +44,7 @@
 ! glc_pestride   => PSTRID_GLC	      rof_pestride => PSTRID_ROF	    
 ! glc_layout     => NINST_GLC_LAYOUT  rof_layout   => NINST_ROF_LAYOUT
 !------------------------------------------------------------------------
+
+!! set orbital mode
 orb_mode = 'fixed_year'
 orb_iyear = -1

@@ -3,26 +3,38 @@
 ! namelist for landplanets
 
 
-nhtfrq = 0
-mfilt = 1
+!!---------------------
+!! input files
+!!
+
+!! atmosphere initial condition file
+ncdata = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_land_fv/control_L40_dry.cam.i.nc'
+
+!! topography file
+bnd_topo = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_land_fv/topo_landplanet_4x5.nc'
+
+!! gravity wave file
+gw_drag_file = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/other/newmfspectra40_dc25.nc'
+
+
+!!---------------------
+!! options
+!!
+
+!! dynamics
 nspltvrm = 4
 nspltrac = 4
 nsplit = 32
-avgflag_pertape = 'A'
-rad_data_output = .false.
 div24del2flag=42
+substep_t = .true.
+substep_uv = .true.
+
+!! physics options
+rad_data_output = .false.
 eddy_scheme='HB'
 kv_top_pressure=0.0   !Pa (mb)  ! set to zero to turn off
 kv_top_scale=0.5
 trop_cloud_top_press = 1.
-
-ncdata = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_land_fv/control_L40_dry.cam.i.nc'
-bnd_topo = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_land_fv/topo_landplanet_4x5.nc'
-
-gw_drag_file = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/other/newmfspectra40_dc25.nc'
-
-substep_t = .true.
-substep_uv = .true.
 
 !! uncomment to use MG clouds
 !! MG cloud options needed to be specified in xmlchange CAM_CONFIG_OPTS
@@ -31,9 +43,17 @@ substep_uv = .true.
 !shallow_scheme         = 'UW'
 !uwshcu_rpen            =  10.0
 
-!additional MG cloud variables, add to end of fincl1 below
+
+
+!!--------------------------------------------
+!! settings for output variables and timings
+!!
+!! additional MG cloud variables, add to end of fincl1 below
 ! 'EFFLIQ','EFFICE','IWC','LWC','ICWNC','ICINC'
 
-
+!! standard outputs, monthly means
+nhtfrq = 0
+mfilt = 1
+avgflag_pertape = 'A'
 fincl1 = 'T','TS','PS','ALDIR','ALDIF','ASDIR','ASDIF','FUL','FUS','FDL','FDS','QRS','QRL','Q','m_CO2_c','m_Q_c','m_CH4_c','CMFSL','CMFLQ','CMFDQ','CMFDQR','CMFDT','CMFMC','CMFMCDZM','FICE','FREQSH','FREQZM','ICLDIWP','ICLDTWP','PBLH','PCONVB','PCONVT','PRECL','PRECSC','PRECSH','PRECSL','PRECT','PSL','FULC','FDLC','FUSC','FDSC','QRSC','QRLC','TROP_T','TROP_Z','TROP_P','CLDTOT','CAPE','CIN','TGCLDIWP','TGCLDLWP','VQ','VT','VU','CBMF','CNVCLD','CONCLD','DTCOND','DTCORE','DQP','DQSED','ENGYCORR','EVAPPREC','EVAPQCM','EVAPQZM','PDELDRY','PTTEND','PTTEND_RESID','QC','SST','TEINP','TEOUT','U','V','OMEGA','ZMDQ','ZMDT','TTEND','REI','REL','LANDFRAC','SOLS','SOLL','SOLSD','SOLLD'
  
