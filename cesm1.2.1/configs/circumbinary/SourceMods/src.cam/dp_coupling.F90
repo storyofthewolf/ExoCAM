@@ -502,8 +502,8 @@ chnk_loop2 : &
                    ! Comment out these log messages since they can make the log files so
                    ! large that they're unusable.
                    !if (debug_adjust_print) write(iulog,*) 'dpcoup cant adjust', m, lchnk, i, qbot, qbotm1, dqreq
-                    if (dqreq>qmin(m) .and. debug_adjust_print) write(iulog,*) 'dpcoup cant adjust', m, lchnk, i, &
-                         qbot, qbotm1, dqreq
+                   ! if (dqreq>qmin(m) .and. debug_adjust_print) write(iulog,*) 'dpcoup cant adjust', m, lchnk, i, &
+                   !      qbot, qbotm1, dqreq
                 end if
              end if
           end do
