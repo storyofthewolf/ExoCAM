@@ -22,7 +22,7 @@ module exoplanet_mod
   	   	   	     		    		        !! .false. = use CAM4 RT, refer elsewhere for operating
                                                                 !! (currently only works for true.  delete option?)
   logical, public, parameter :: do_exo_synchronous = .false.    !! Toggle to synchronous rotation mode
-                                                                !! Eventually replace with better orbital computer
+                                                                !!  overrides exo_diurnal 
   logical, public, parameter :: do_exo_rt_clearsky = .false.    !! Do parallel clearsky radiative calculation for exo rt
                                                                 !! Slow, use sparingly
   logical, public, parameter :: do_exo_rt_spectral = .false.    !! collect and output spectrally resolved radiative fluxes
@@ -31,8 +31,8 @@ module exoplanet_mod
                                                                 !! or hours (negative).
   logical, public, parameter :: do_carma_exort = .false.        !! Set to true only if running with the CARMA microphyiscs package
                                                                 !! and linking aerosol absorption to ExoRT  
-  logical, public, parameter :: do_exo_gw = .false.             !! flag to turn on gravity waves.  Note, present gw wave parameterization    
-                                                                !! does not work for low pressure atmospheres.                  
+  logical, public, parameter :: do_exo_gw = .false.             !! flag to turn on gravity waves.  Note, present gw wave parameterization
+                                                                !! does not work for low pressure atmospheres.
 
   !! ==============  planet parameters ============== !!
   !! It is the responsibility of the USER to set do_exo_synchronous, exo_ndays
@@ -57,30 +57,34 @@ module exoplanet_mod
   !! sidereal period!  Take care in setting exo_ndays and exo_sdays!
   !!
   !! See examples below.   
-  
-  !! Generic
-  real(r8), public, parameter :: exo_planet_radius   = 6.37122e6_R8 !! radius ~ m
-  real(r8), public, parameter :: exo_surface_gravity = 9.80616_R8          !! gravity ~ m/s^2            
-  real(r8), public, parameter :: exo_ndays  = 1.0_R8                    !! scaler to number of Earth days.
-  real(r8), public, parameter :: exo_porb = 365.                        !! orbital period, for obliquity cycle, and optionally for exo_sday
-  !!real(r8), public, parameter :: exo_sday = 86164.0_r8                !! sidereal period Earth
-  !!real(r8), public, parameter :: exo_sday = 86400.0_r8 * exo_ndays    !! sidereal period, for synchronous rotator
-  real(r8), public, parameter :: exo_sday = 86400.0_r8 * exo_ndays / (1._r8 + exo_ndays/exo_porb)  !! sidereal period [sec]
 
-  !! Examples
+
+  !! Examples  
   !! Earth
-  !!real(r8), public, parameter :: exo_planet_radius   = 6.37122e6_R8     !! radius ~ m
-  !!real(r8), public, parameter :: exo_surface_gravity = 9.80616_R8       !! gravity ~ m/s^2
-  !!real(r8), public, parameter :: exo_ndays  = 1.0_R8                    !! scaler to number of Earth days.
-  !!real(r8), public, parameter :: exo_porb = 365.0_R8
-  !!real(r8), public, parameter :: exo_sday = 86164.0_R8                  !! sidereal period [sec], for Earth value = 86164.0 
+  real(r8), public, parameter :: exo_planet_radius   = 6.37122e6_R8     !! radius ~ m 
+  real(r8), public, parameter :: exo_surface_gravity = 9.80616_R8       !! gravity ~ m/s^2
+  real(r8), public, parameter :: exo_diurnal = 86400.0_R8               !! Length of diurnal period, solar-day ~ s
+  real(r8), public, parameter :: exo_ndays  = exo_diurnal/86400.0_R8    !! convert to diurnal period to number of Earth days.
+  real(r8), public, parameter :: exo_porb = 365.0_R8                    !! orbital period in Earth Days, for obliquity/eccentricity cycles
+  real(r8), public, parameter :: exo_sday = 86400.0_R8 * exo_ndays / &  !! sideral period ~ s
+                                            (1._R8 + exo_ndays/exo_porb)8                
+  !! Mars
+  real(r8), public, parameter :: exo_planet_radius   = 3.38992e6_R8     !! radius ~ m 
+  real(r8), public, parameter :: exo_surface_gravity = 3.711_R8         !! gravity ~ m/s^2
+  real(r8), public, parameter :: exo_diurnal = 88800.0_R8               !! Length of diurnal period, solar-day ~ s
+  real(r8), public, parameter :: exo_ndays  = exo_diurnal/86400.0_R8    !! convert to diurnal period to number of Earth days.
+  real(r8), public, parameter :: exo_porb = 687.0_R8                    !! orbital period in Earth Days, for obliquity/eccentricity cycles
+  real(r8), public, parameter :: exo_sday = 88642.663_R8                !! sidereal period ~ s
 
-  !! Earth - slow asynchronous rotator
+  !! Earth - slow asynchronous rotator (30 day rotation rate)
   !!real(r8), public, parameter :: exo_planet_radius   = 6.37122e6_R8      !! radius ~ m
   !!real(r8), public, parameter :: exo_surface_gravity = 9.80616_R8        !! gravity ~ m/s^2
-  !!real(r8), public, parameter :: exo_ndays  = 10.0_R8                    !! scaler to number of Earth days.
+  !!real(r8), public, parameter :: exo_diurnal = 86400.0_R8 * 30.0         !! Length of diurnal period, solar-day ~ s
+  !!real(r8), public, parameter :: exo_ndays  = exo_diurnal/86400.0_R8     !! convert to diurnal period to number of Earth days.
   !!real(r8), public, parameter :: exo_porb = 365.0_R8                     !! orbital period 
-  !!real(r8), public, parameter :: exo_sday = 86400.0_r8 * exo_ndays / (1._r8 + exo_ndays/exo_porb)  !! sidereal period [sec]
+  !!real(r8), public, parameter :: exo_sday = 86400.0_R8 * exo_ndays / &   !! sideral period
+                                            (1._R8 + exo_ndays/exo_porb)8                
+
 
   !! Trappist-1e  (Gillon et al. 2017)  --  synchronous rotator
   !!real(r8), public, parameter :: exo_planet_radius    = 5.84878e6_R8    !! radius ~ m

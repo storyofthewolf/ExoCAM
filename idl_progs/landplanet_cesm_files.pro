@@ -4,8 +4,8 @@ pro landplanet_cesm_files
 
 make_bndtopo = 0 ;1
 make_lnd_domain = 0 
-make_ncdata = 1
-make_finidat = 0
+make_ncdata = 0
+make_finidat = 1
 
 
 ;--- 4x5 ---  from my simulations
@@ -126,8 +126,8 @@ endif
 
 
 
-file_finidat_in = '/Users/wolfe/Desktop/landplanet/initial_files/landplanet_q0_wt10.clm2.r.nc'
-file_finidat_out = '/Users/wolfe/Desktop/landplanet/initial_files/landplanet_small.clm2.r.nc'
+file_finidat_in = '/gpfsm/dnb53/etwolf/cesm_scratch/archive/paleo_mars_1.0bar/rest/0021-01-01-00000/paleo_mars_1.0bar.clm2.r.0021-01-01-00000.nc'
+file_finidat_out = '/gpfsm/dnb53/etwolf/models/CESM_Mars/marsfiles/lnd/paleo_mars_1.0bar_dry.clm2.r.0021-01-01-00000.nc
 ;========== finidat =====================
 if (make_finidat eq 1) then begin
 
@@ -148,6 +148,10 @@ if (make_finidat eq 1) then begin
   ncdf_varget,ncid,'H2OSNO',H2OSNO  & H2OSNO(*) = 0.0    ; snow water
   ncdf_varget,ncid,'H2OSOI_LIQ',H2OSOI_LIQ &  H2OSOI_LIQ(*,*) = 1.0e-20   ; soil liquid water  [kg m-2]
   ncdf_varget,ncid,'H2OSOI_ICE',H2OSOI_ICE &  H2OSOI_ICE(*,*) = 1.0e-20   ; ice lquid water
+
+  ncdf_varget,ncid,'CO2DP',CO2DP  & CO2DP(*) = 0.0    ; co2 frost mass
+  ncdf_varget,ncid,'FRAC_CO2',FRAC_CO2  & FRAC_CO2(*) = 0.0    ; co2 frost mass
+
   ; there are a number of these bullshit variables with some non-zero 
   ; value for where snow exists
   ;ncdf_varget,ncid,'snw_rds',snw_rds & snw_rds(*,*) = 0.0
@@ -175,6 +179,9 @@ if (make_finidat eq 1) then begin
   ncdf_varput,ncid,'H2OSNO',H2OSNO      ; snow water
   ncdf_varput,ncid,'H2OSOI_LIQ',H2OSOI_LIQ   ; soil liquid water
   ncdf_varput,ncid,'H2OSOI_ICE',H2OSOI_ICE   ; ice lquid water
+
+  ncdf_varput,ncid,'CO2DP',CO2DP   ; CO2 surface ice mass
+  ncdf_varput,ncid,'FRAC_CO2',FRAC_CO2   ; CO2 surface ice fraction
   ncdf_close, ncid
 
 endif

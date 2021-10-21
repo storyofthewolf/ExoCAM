@@ -5,9 +5,9 @@ pro mod_cesm_files
 ; -- e t w --
 ;-------------------------------
 
-make_bndtopo = 1 ; topograph files  
+make_bndtopo = 0 ; topograph files  
 make_popfrc = 0 ; modify existing popfrc file
-make_ncdata = 0
+make_ncdata = 1
 make_tropopause_climo_file = 0
 make_ozone = 0
 make_aerosoldep = 0
@@ -114,9 +114,9 @@ file_pop_frc_out = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/ca
 print, file_pop_frc
 
 ;--- ncdata files in/oout --
-;file_ncdata = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/ic_P1bar_L40_300Kiso_ic.nc"
-;file_ncdata = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/ic_1bar_L51_ic.nc"
-;file_ncdata_out = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/ic_1bar_L51_iso300_ic.nc"
+file_ncdata = '/gpfsm/dnb53/etwolf/cesm_scratch/rundir/mars_dev2/run/mars_dev2.cam.i.0001-01-09-00000.nc'
+file_ncdata_out = '/gpfsm/dnb53/etwolf/models/CESM_Mars/marsfiles/atm/mars_dev2_adjusted.cam.i.0001-01-09-00000.nc'
+
 
 ;-- new file names --
 ;file_domfile_out = '/projects/btoon/wolfet/exofiles/ocn/aquaplanet/pop_frc.gx3v7.110128.nc_0OHT.nc'
@@ -316,6 +316,7 @@ if (make_ncdata eq 1) then begin
   TS3_OUT = fltarr(nlon,nlat)
   TS4_OUT = fltarr(nlon,nlat)
   CLDICE_OUT = fltarr(nlon,nlat,nlev)
+  CLDICE_CO2_OUT = fltarr(nlon,nlat,nlev)
   CLDLIQ_OUT = fltarr(nlon,nlat,nlev)
   Q_OUT = fltarr(nlon,nlat,nlev)
   T_OUT = fltarr(nlon,nlat,nlev)
@@ -323,48 +324,50 @@ if (make_ncdata eq 1) then begin
   US_OUT = fltarr(nlon,nslat,nlev)
 
   ;set variables fo constants
-  P0_OUT=1.e5
-  PS_OUT(*,*) =1.e5
+;  P0_OUT=1.e5
+;  PS_OUT(*,*) =1.e5
 ;  TSICE_OUT(*,*)=0.0   ;273.15
 ;  ICEFRAC_OUT(*,*)=0.0
 ;  SICTHK_OUT(*,*)=0.0
 ;  SNOWHICE_OUT(*,*)=0.0
-  T_OUT(*,*,*) = 300.0
-  TS1_OUT(*,*) = 300.0
-  TS2_OUT(*,*) = 300.0
-  TS3_OUT(*,*) = 300.0
-  TS4_OUT(*,*) = 300.0
-;  CLDICE_OUT(*,*,*) = 0.0
-;  CLDLIQ_OUT(*,*,*) = 0.0
+;  T_OUT(*,*,*) = 300.0
+;  TS1_OUT(*,*) = 300.0
+;  TS2_OUT(*,*) = 300.0
+;  TS3_OUT(*,*) = 300.0
+;  TS4_OUT(*,*) = 300.0
+  Q_OUT(*,*,*) = 0.0
+  CLDICE_OUT(*,*,*) = 0.0
+  CLDICE_CO2_OUT(*,*,*) = 0.0
+  CLDLIQ_OUT(*,*,*) = 0.0
 ;  VS_OUT(*,*,*) = 0.0
 ;  US_OUT(*,*,*) = 0.0
 
 
 ;\zonal mean
-  iv=nlat
-  for i=0,nlat-1 do begin
-    iv=iv-1
-    ;TS_OUT(*,i) = mean((TS(*,i)+TS(*,iv))/2.)
+;  iv=nlat
+;  for i=0,nlat-1 do begin
+;    iv=iv-1
+;    ;TS_OUT(*,i) = mean((TS(*,i)+TS(*,iv))/2.)
 ;    TS1_OUT(*,i) = mean((TS1(*,i)+TS1(*,iv))/2.)
 ;    TS2_OUT(*,i) = mean((TS2(*,i)+TS2(*,iv))/2.)
 ;    TS3_OUT(*,i) = mean((TS3(*,i)+TS3(*,iv))/2.)
 ;    TS4_OUT(*,i) = mean((TS4(*,i)+TS4(*,iv))/2.)
-    for k=0,nlev-1 do begin
-      CLDICE_OUT(*,i,k) = mean((CLDICE(*,i,k)+CLDICE(*,iv,*))/2.)
-      CLDLIQ_OUT(*,i,k) = mean((CLDLIQ(*,i,k)+CLDLIQ(*,iv,k))/2.)
-      Q_OUT(*,i,k) = mean((Q(*,i,k)+Q(*,iv,k))/2.)
+;    for k=0,nlev-1 do begin
+;      CLDICE_OUT(*,i,k) = mean((CLDICE(*,i,k)+CLDICE(*,iv,*))/2.)
+;      CLDLIQ_OUT(*,i,k) = mean((CLDLIQ(*,i,k)+CLDLIQ(*,iv,k))/2.)
+;      Q_OUT(*,i,k) = mean((Q(*,i,k)+Q(*,iv,k))/2.)
  ;     T_OUT(*,i,k) = mean((T(*,i,k)+T(*,iv,k))/2.)
-      VS_OUT(*,i,k) = mean((VS(*,i,k)+VS(*,iv,k))/2.)
-    endfor
-   endfor
+;      VS_OUT(*,i,k) = mean((VS(*,i,k)+VS(*,iv,k))/2.)
+;    endfor
+;   endfor
 
-  iv=nslat
-  for i=0,nslat-1 do begin
-    iv=iv-1
-    for k=0,nlev-1 do begin
-      US_OUT(*,i,k) = mean((US(*,i,k)+US(*,iv,k))/2.)
-    endfor
-  endfor
+;  iv=nslat
+;  for i=0,nslat-1 do begin
+;    iv=iv-1
+;    for k=0,nlev-1 do begin
+;      US_OUT(*,i,k) = mean((US(*,i,k)+US(*,iv,k))/2.)
+;    endfor
+;  endfor
 ; \zonal mean
 
 
@@ -372,21 +375,23 @@ if (make_ncdata eq 1) then begin
   ncid = ncdf_open(file_ncdata_out, /WRITE)
   print, "updatinf ncdata file"
   print, file_ncdata_out
-  ncdf_varput, ncid, 'P0',P0_OUT
-  ncdf_varput, ncid, 'PS',PS_OUT
+;  ncdf_varput, ncid, 'P0',P0_OUT
+;  ncdf_varput, ncid, 'PS',PS_OUT
  ; ncdf_varput, ncid, 'TSICE',TSICE_OUT
- ; ncdf_varput, ncid, 'SICTHK',SICTHK_OUT
- ; ncdf_varput, ncid, 'TS',TS_OUT
-  ncdf_varput, ncid, 'TS1',TS1_OUT
-  ncdf_varput, ncid, 'TS2',TS2_OUT
-  ncdf_varput, ncid, 'TS3',TS3_OUT
-  ncdf_varput, ncid, 'TS4',TS4_OUT
+;  ncdf_varput, ncid, 'SICTHK',SICTHK_OUT
+;  ncdf_varput, ncid, 'SICTHK',SICTHK_OUT
+; ncdf_varput, ncid, 'TS',TS_OUT
+;  ncdf_varput, ncid, 'TS1',TS1_OUT
+;  ncdf_varput, ncid, 'TS2',TS2_OUT
+;  ncdf_varput, ncid, 'TS3',TS3_OUT
+;  ncdf_varput, ncid, 'TS4',TS4_OUT
   ncdf_varput, ncid, 'CLDICE',CLDICE_OUT
+  ncdf_varput, ncid, 'CLDICE_CO2',CLDICE_CO2_OUT
   ncdf_varput, ncid, 'CLDLIQ',CLDLIQ_OUT
   ncdf_varput, ncid, 'Q',Q_OUT
-  ncdf_varput, ncid, 'T',T_OUT
-  ncdf_varput, ncid, 'VS',VS_OUT
-  ncdf_varput, ncid, 'US',US_OUT
+;  ncdf_varput, ncid, 'T',T_OUT
+;  ncdf_varput, ncid, 'VS',VS_OUT
+;  ncdf_varput, ncid, 'US',US_OUT
   ncdf_close, ncid
 
 

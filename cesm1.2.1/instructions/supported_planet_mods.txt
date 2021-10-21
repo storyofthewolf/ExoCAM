@@ -8,6 +8,8 @@ Supported configurations
   cam_land_fv   --  land planet, finite volume dynamical core
   cam_mixed_fv  --  slab ocean and continents, finite volume dynamical core
   carma         --  add on for hooking up with CARMA for cloud and aerosol treatments
+  circumbinary  --  circumbinary planet model based on Eggl and Georgakarakos
+                    analytic orbital solutions, with n28archean radiation scheme
 
   vertical levels:  provided are initial condition files for 
                     1) 40 levels, 1 mb model top
@@ -28,18 +30,31 @@ Supported modifications in ExoCAM
   some are self-explanatory.  
 
   Run options:
-  do_exo_synchronous  --> force synchronous rotation  
+  do_exo_synchronous  --> force synchronous rotation for tidally locked planets
 
   Planet parameters:
   exo_planet_radius
   exo_surface_gravity
   exo_ndays  -- length of day scaler used for synchronous rotating worlds
-  exo_scon   -- solar constant
+  exo_eccen  -- orbital eccentrivity
+  exo_obliq  -- orbitl obliquity
+  exo_mvelp  -- vernal equinox
+  ( the user is encouraged to confirm that their orbital configuration is
+  behaving properly by examining the temporal evolution of the incoming solar
+  radiation )
+
+  Stellar options:
+  exo_scon   -- solar flux recieved by the planet
+  exo_solar_file -- path to the spectral energy distribution file
 
   Atmospheric Constituents:
-  exo_n2bar, exo_h2bar, exo_co2bar, exo_ch4bar
-  (it is the users responsibility to make sure these selections are paired
-  with correct radiative transfer)
+  exo_n2bar  -- partial pressure of N2
+  exo_h2bar  -- partial pressure of H2
+  exo_co2bar -- partial pressure of CO2
+  exo_ch4bar -- partial pressure of CH4
+  ( it is the users responsibility to make sure these selections are paired
+  with correct radiative transfer, and that the total pressure matches with
+  the initial condition file, ncdata )
 
 
 Fun Features
@@ -70,6 +85,8 @@ ExoRT Radiative Transfer Packages
                     selected on the fly.
                  == Pressures from 10 bars to 0.01 mb
                  == Temperatures from 100 K to 500 K
+  src.n84equiv   == Same as n68equiv, except spectral bins are extended
+                    shortward of ~0.2 microns.  Use this for F-dwarf SEDS
 
   src.n28archean == H2O, CO2, CH4, N2, H2, HITRAN 2004, 28 bins, designed for
                     the Archean Climate (formerly "highco2")
@@ -84,7 +101,6 @@ ExoRT Radiative Transfer Packages
                  == refer to Kopparapu et al. ApJ 845:5 (2017)
                  == up to 10 bar total pressures
 	         == N2-N2, N2-H2, H2-H2 CIA
-  src.n28h2o     == same as n42h2o, 28 bins
 
 
 

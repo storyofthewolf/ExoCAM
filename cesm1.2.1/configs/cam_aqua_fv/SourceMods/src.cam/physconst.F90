@@ -363,8 +363,12 @@ contains
         write(iulog,*) '******************************************************'
         write(iulog,*) 'PLANET RADIUS (m): ', SHR_CONST_REARTH
         write(iulog,*) 'SURFACE GRAVITY (m/s2): ', SHR_CONST_G
-        write(iulog,*) 'LENGTH OF DAY: ', EXO_NDAYS
-        write(iulog,*) 'SIDEREAL DAY: ', EXO_SDAY
+        write(iulog,*) 'LENGTH OF DIURNAL PERIOD (days): ', EXO_NDAYS
+        write(iulog,*) 'SIDEREAL DAY (seconds): ', EXO_SDAY
+        write(iulog,*) 'ORBITAL PERIOD (days): ',exo_porb
+        write(iulog,*) 'ECCENTRICITY: ',exo_eccen
+        write(iulog,*) 'OBLIQUITY: ',exo_obliq
+        write(iulog,*) 'LONGITUDE OF VERNEL EQUINOX: ',exo_mvelp
         write(iulog,*) '******************************************************'
         write(iulog,*) '***           ExoCAM: Atmosphere properties            ***'
         write(iulog,*) '******************************************************'
