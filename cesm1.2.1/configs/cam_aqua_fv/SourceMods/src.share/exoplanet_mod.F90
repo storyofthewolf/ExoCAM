@@ -98,7 +98,7 @@ module exoplanet_mod
 
   !! if set user_nl_cpl::orb_iyear = -1
   real(r8), public, parameter :: exo_eccen = 0.0_r8   ! eccentricity
-  real(r8), public, parameter :: exo_obliq = 23.5_r8   ! obliquity [degrees]
+  real(r8), public, parameter :: exo_obliq = 0.0_r8   ! obliquity [degrees]
   real(r8), public, parameter :: exo_mvelp = 0.0_r8   ! vernal equinox
 
     
