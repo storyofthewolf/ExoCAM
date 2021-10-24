@@ -183,7 +183,8 @@ subroutine cloud_diagnostics_calc(state,  pbuf)
     use physics_buffer,only: physics_buffer_desc, pbuf_get_field, pbuf_old_tim_idx
     use pkg_cldoptics, only: cldovrlap, cldclw,  cldems
     use conv_water,    only: conv_water_4rad
-    use radiation,     only: radiation_do
+    !!use radiation,     only: radiation_do
+    use exo_radiation_cam_intr,     only: exo_radiation_do
     use cloud_cover_diags, only: cloud_cover_diags_out
 
     implicit none
@@ -243,8 +244,10 @@ subroutine cloud_diagnostics_calc(state,  pbuf)
     if (.not.do_cld_diag) return
 
     if(rk_clouds) then
-       dosw     = radiation_do('sw')      ! do shortwave heating calc this timestep?
-       dolw     = radiation_do('lw')      ! do longwave heating calc this timestep?
+       !dosw     = radiation_do('sw')      ! do shortwave heating calc this timestep?
+       !dolw     = radiation_do('lw')      ! do longwave heating calc this timestep?
+       dosw     = exo_radiation_do()      ! do shortwave heating calc this timestep?
+       dolw     = exo_radiation_do()      ! do longwave heating calc this timestep?
     else
        dosw     = .true.
        dolw     = .true.

@@ -63,6 +63,7 @@ module exo_radiation_cam_intr
   public :: exo_radiation_init        
   public :: exo_radiation_tend  
   public :: exo_radiation_nextsw_cday
+  public :: exo_radiation_do
 
 !------------------------------------------------------------------------
 !
