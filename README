@@ -6,6 +6,16 @@ eric.wolf@colorado.edu
 :: Members of VPL slack can follow us on ::
 :: the "exocam" channel                  ::
 
+:: Primary Reference Paper
+:: Please cite the following paper if you use ExoCAM in any form 
+
+   "ExoCAM: A 3D Climate Model for Exoplanet Atmospheres"
+    Wolf, E.T., Kopparapu, R.K., Haqq-Misra, J., and Fauchez, T.J.
+    The Planetary Science Journal, 3:7 (17pp), 2022
+    doi:10.3847/PSJ/ac3f3d
+
+:: ----------------------------------------------------------------------------
+
 !! DESCRIPTION: 
   This software (ExoCAM) contains system files, source code files, 
   initial conditions files, namelists, and documentations needed to adapt the 
