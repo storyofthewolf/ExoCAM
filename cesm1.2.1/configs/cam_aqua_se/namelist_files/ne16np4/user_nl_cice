@@ -7,12 +7,12 @@
 !!
 !! domain settings
 !!
-grid_file = '/projects/wolfet/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_se/domain.ocn.ne16np4_gx3v7.120406_aquaplanet.nc'
+grid_file = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_se/domain.ocn.ne16np4_gx3v7.120406_aquaplanet.nc'
 grid_format = 'nc'
 grid_type = 'latlon'
 gridcpl_file = 'unknown_gridcpl_file'
 kcatbound =  0
-kmt_file = '/projects/wolfet/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_se/domain.ocn.ne16np4_gx3v7.120406_aquaplanet.nc'
+kmt_file = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_se/domain.ocn.ne16np4_gx3v7.120406_aquaplanet.nc'
 
 !!
 !! albedo settings

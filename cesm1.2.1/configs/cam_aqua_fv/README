@@ -1,4 +1,4 @@
-QuickStart Guide :: cam4_aqua_fv
+QuickStart Guide :: cam_aqua_fv
 ---------------------------------------------------------------------------------
 description:        basic configuration
 cloud physics:      "RK" or "MG"

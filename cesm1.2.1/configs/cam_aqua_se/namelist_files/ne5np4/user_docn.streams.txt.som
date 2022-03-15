@@ -10,7 +10,7 @@
             mask    mask
          </variableNames>
          <filePath>
-            /projects/wolfet/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_se
+            /gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_se
          </filePath>
          <fileNames>
             domain.ocn.ne5np4_gx3v7.140810_aquaplanet.nc
@@ -28,7 +28,7 @@
             qdp   qbot
          </variableNames>
          <filePath>
-            /projects/wolfet/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_se
+            /gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_se
          </filePath>
          <fileNames>
             ocean_ne5np4.nc

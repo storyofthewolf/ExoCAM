@@ -7,5 +7,5 @@ carma_emis_total = 50000.0
 carma_do_fixedinit = .false.
 
 
-ncdata = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/ic_1bar_L51_zmean_ic.nc'
+ncdata = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/ic_1bar_L51_zmean_ic.nc'
 

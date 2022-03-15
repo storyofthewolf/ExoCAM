@@ -8,10 +8,10 @@
 !!
 
 !! atmosphere initial condition file
-ncdata = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_land_fv/control_L40_dry.cam.i.nc'
+ncdata = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_land_fv/control_L40_dry.cam.i.nc'
 
 !! topography file
-bnd_topo = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_land_fv/topo_landplanet_4x5.nc'
+bnd_topo = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_land_fv/topo_landplanet_4x5.nc'
 
 !! gravity wave file
 gw_drag_file = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/other/newmfspectra40_dc25.nc'

@@ -6,7 +6,7 @@ surface type:       user selected
 dynamical core:     user selected
 radiation scheme:   src.cam.n28archean.haze
 
-NOTES: These files provide a very music linkage between ExoCAM, ExoRT, and
+NOTES: These files provide a very basic linkage between ExoCAM, ExoRT, and
 CARMA. Use at your own risk.  This is preliminary work.
 CARMA is complicated in its own right.  Limited support available from me.
 Eventually, new CARMA cloud/aerosol "models" should be saved and linked via
@@ -20,7 +20,7 @@ make sure that your version of CESM1.2.1/CARMA has the fractal aggregrate
 add-ons to the CARMA directorty, copy and unzip base.tar into
 ../cesm1_2_1/models/atm/cam/src/physics/carma
 
-Begin by creating a basic aquaplanet or landplanet case (i.e cam4_aqua_fv, cam4_land_fv)
+Begin by creating a basic aquaplanet or landplanet case (i.e cam_aqua_fv, cam_land_fv)
 In addition to the build instructions for these configurations ...
 Copy src.cam folder files into /$CASENAME/SourceMods/src.cam, in addition to other
 SourceMods files from the base config (i.e. cam4_aqua_fv, cam4_land_fv,etc)

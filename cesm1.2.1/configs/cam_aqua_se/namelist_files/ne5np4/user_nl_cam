@@ -6,10 +6,10 @@
 !! 
 
 !! atmosphere initial condition file
-ncdata = '/projects/wolfet/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_se/cami_0000-01-01_ne5np4_L30_ape_c101201_aquaplanet.nc'
+ncdata = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_se/cami_0000-01-01_ne5np4_L30_ape_c101201_aquaplanet.nc'
 
 !! topography file
-bnd_topo = '/projects/wolfet/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_se/USGS-gtopo30_ne5np4_c140808_aquaplanet.nc'
+bnd_topo = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_se/USGS-gtopo30_ne5np4_c140808_aquaplanet.nc'
 
 
 !!---------------------

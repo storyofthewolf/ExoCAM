@@ -15,4 +15,4 @@
 !------------------------------------------------------------------------
 
 !! ocean domain file
-domainfile = '/projects/wolfet/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_se/domain.ocn.ne16np4_gx3v7.120406_aquaplanet.nc'
+domainfile = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_se/domain.ocn.ne16np4_gx3v7.120406_aquaplanet.nc'

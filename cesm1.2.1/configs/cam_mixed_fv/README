@@ -1,4 +1,4 @@
-QuickStart Guide :: cam4_mixed_fv
+QuickStart Guide :: cam_mixed_fv
 ---------------------------------------------------------------------------------
 description:        basic configuration
 physics:            "RK" or "MG"
