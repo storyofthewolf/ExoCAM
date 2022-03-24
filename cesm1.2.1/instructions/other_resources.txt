@@ -1,0 +1,7 @@
+This document contains a list of additional GoogleDoc resources for ExoCAM/ExoRT
+--------------------------------------------------------------------------------
+
+1)  A google doc link walking through the modeling processes on discover, purveyed
+    by Dr. Thomas Fauchez in his working with the code with students.
+
+https://docs.google.com/document/d/1AjaQNGGp6ia6cOe6oZh6YU6r_pmKfUb7WsMJ8lWzwHE/edit?usp=sharing
