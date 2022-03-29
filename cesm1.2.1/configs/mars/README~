@@ -1,0 +1,27 @@
+Mars/paleo Mars ExoCAM model in progress.
+
+xmlchange CAM_CONFIG_OPTS="-phys cam4 -nlev 40 -usr_src
+/gpfsm/dnb53/etwolf/models/ExoRT/source/experimental/src.n68equiv_exp/shr"
+
+
+== create the case ==
+create_newcase -case $my_landplanet_case -res f45_f45 -mach discover -compset
+L2000
+
+
+== set levels, physics, and the ExoRT radiative transfer package ==
+-- default command below uses "RK" (i.e. cam4) clouds.
+xmlchange CAM_CONFIG_OPTS="-nlev 40 -phys cam4 -usr_src
+$EXORT_PATH/ExoRT/3dmodels/src.cam.n******"
+
+-- command below builds with "MG" (cam5) clouds
+xmlchange CAM_CONFIG_OPTS="-nlev 40 -phys cam4 -usr_src
+$EXORT_PATH/ExoRT/3dmodels/src.cam.n****** -chem none -microphys mg1"
+
+== set domain file from xml command ==
+xmlchange
+LND_DOMAIN_PATH=$EXOC_PATH/ExoCAM/cesm1.2.1/initial_files/cam4_land_fv
+xmlchange LND_DOMAIN_FILE=domain.lnd.fv4x5_landplanet.nc
+xmlchange RTM_MODE=NULL  ; turns off river routing
+xmlchange ROF_GRID=null  ; turns off river routing grid.  alternatively can
+                         ; use -res f45_f45_noRTM in creating case

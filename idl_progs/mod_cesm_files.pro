@@ -87,31 +87,30 @@ file_aerosoldep_out = '/projects/btoon/wolfet/exofiles/ocn/aquaplanet/aerosoldep
 
 
 ;--- ocean domain files in/out ---
-file_lnd_domain = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_land_fv/domain.lnd.fv4x5_landplanet.nc'
+file_lnd_domain = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_land_fv/domain.lnd.fv4x5_landplanet.nc'
 file_lnd_domain_out =  "test_domain.nc"
 
 
 
 ;---  topography files in/out ---
 ;file_bndtopo = "/gpfs/summit/datasets/CESM/inputdata/atm/cam/topo/USGS_gtopo30_0.47x0.63_remap_c061106.nc"
-;file_bndtopo_out = "/projects/wolfet/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/topo_0.47x0.63_aquaplanet.nc"
+;file_bndtopo_out = "/projects/wolfet/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/topo_0.47x0.63_aquaplanet.nc"
 
 ;--- ocean domain files in/out ---
 ;file_ocn_domain = '/gpfs/summit/datasets/CESM/inputdata/share/domains/domain.ocn.0.47x0.63_gx1v6_090408.nc'
-;file_ocn_domain_out =  "/projects/wolfet/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/domain.ocn.0.47x0.63_aquaplanet.nc"
+;file_ocn_domain_out =  "/projects/wolfet/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/domain.ocn.0.47x0.63_aquaplanet.nc"
 
 ;--- ocn master files in/out ---
 ;file_ocn_master = "/gpfs/summit/datasets/CESM/inputdata/share/domains/domain.ocn.0.47x0.63_gx1v6_090408.nc"
-;file_ocn_master_out = "/projects/wolfet/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/pop_frc.0.47x0.63d_aquaplanet_0OHT.nc"
+;file_ocn_master_out = "/projects/wolfet/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/pop_frc.0.47x0.63d_aquaplanet_0OHT.nc"
 
 
 ;--- pop.frc files in/out ---
-;file_pop_frc = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/pop_frc.4x5d.090130_aquaplanet_300Kiso.nc"
-;file_pop_frc_out = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/pop_frc.4x5d.090130_aquaplanet_200Kiso.nc"
+;file_pop_frc = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/pop_frc.4x5d.090130_aquaplanet_300Kiso.nc"
+;file_pop_frc_out = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/pop_frc.4x5d.090130_aquaplanet_200Kiso.nc"
 
-file_pop_frc = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_mixed_fv/pop_frc.gx3v7.110128_annual_mean.nc"
-file_pop_frc_out = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/pop_frc.gx3v7.110128_zmean.nc"
-print, file_pop_frc
+file_pop_frc = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_mixed_fv/pop_frc.gx3v7.110128_annual_mean.nc"
+file_pop_frc_out = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/pop_frc.gx3v7.110128_zmean.nc"
 
 ;--- ncdata files in/oout --
 file_ncdata = '/gpfsm/dnb53/etwolf/cesm_scratch/rundir/mars_dev2/run/mars_dev2.cam.i.0001-01-09-00000.nc'
