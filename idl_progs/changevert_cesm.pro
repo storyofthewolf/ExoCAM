@@ -16,7 +16,7 @@ do_write_file=1
 ;================================
 ;fname_out = '/projects/btoon/wolfet/exofiles/atm/control_L60.cam.i.0048-01-01-00000.nc'
 ;fname_out = '/projects/btoon/wolfet/exofiles/atm/ic_1bar_L40_0.47x0.63d.nc'
-;fname_out = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/ic_1bar_hab2_L45_ic.nc'
+;fname_out = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/ic_1bar_hab2_L45_ic.nc'
 fname_out = '/gpfsm/dnb05/projects/p54/users/etwolf/samosa/icfiles/ic_P0.16bar_L31_ic.nc'
 
 
