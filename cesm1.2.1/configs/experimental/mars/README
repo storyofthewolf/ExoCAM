@@ -1,4 +1,12 @@
-Mars/paleo Mars ExoCAM model in progress.
+Mars/paleo Mars ExoCAM model 
+
+!----------------------------------------------------!
+!!!!WARNING!!!!!!DANGER!!!!!!!!WATCH YOURSELF!!!!!!!!!
+MODEL UNDER DEVELOPMENT AND NOT YET READY FOR SCIENCE!
+DATE: 3/28/22
+
+
+
 
 xmlchange CAM_CONFIG_OPTS="-phys cam4 -nlev 40 -usr_src
 /gpfsm/dnb53/etwolf/models/ExoRT/source/experimental/src.n68equiv_exp/shr"
@@ -20,7 +28,7 @@ $EXORT_PATH/ExoRT/3dmodels/src.cam.n****** -chem none -microphys mg1"
 
 == set domain file from xml command ==
 xmlchange
-LND_DOMAIN_PATH=$EXOC_PATH/ExoCAM/cesm1.2.1/initial_files/cam4_land_fv
+LND_DOMAIN_PATH=$EXOC_PATH/ExoCAM/cesm1.2.1/initial_files/cam_land_fv
 xmlchange LND_DOMAIN_FILE=domain.lnd.fv4x5_landplanet.nc
 xmlchange RTM_MODE=NULL  ; turns off river routing
 xmlchange ROF_GRID=null  ; turns off river routing grid.  alternatively can

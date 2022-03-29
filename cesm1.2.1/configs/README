@@ -20,6 +20,11 @@
     --  continents + slab ocean, finite volume dycore, cam4 phys
     --  src.n28archean radiation included in SoureMods
 
+6)  experimental 
+    -- contains sub folders of experimental configurations
+    -- not for public consumption, unless you are interested in 
+    -- helping with development and testing 
+
 -- add ons --
 
 1)  carma 
