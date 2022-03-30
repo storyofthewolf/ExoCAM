@@ -2,7 +2,7 @@ pro mksrf_cesm
 ; This is my own code for manipulating the surface data types
 ;-------------------------------------------------------
 
-fname = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_land_fv/surfdata_4x5_dune_fmax0.5_sc5.nc'
+fname = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_land_fv/surfdata_4x5_sand_fmax0.5_sc5.nc'
 ncid = ncdf_open(fname,/nowrite)
 ncdf_varget,ncid,'PCT_GLACIER',PCT_GLACIER   ;percent glacier [lat, lon]
 ncdf_varget,ncid,'PCT_GLC_MEC',PCT_GLC_MEC   ;"percent for each glacier elevation class";
@@ -82,21 +82,23 @@ for x=0,71 do begin
     PCT_LAKE(x,y) = 0.0
     PCT_URBAN(x,y) = 0.0 
     SOIL_COLOR(x,y) = 21
-    print,i, PCT_GLACIER(x,y), Total(PCT_PFT(x,y,*)), PCT_URBAN(x,y), PCT_WETLAND(x,y), PCT_LAKE(x,y)
+    print,i, PCT_GLACIER(x,y), Total(PCT_PFT(x,y,*)), PCT_URBAN(x,y), PCT_WETLAND(x,y), PCT_LAKE(x,y), SOIL_COLOR(x,y)
   endfor
 endfor
 
-for y=3,43 do begin
-   PCT_PFT(*,y,0) = 0.
-   PFTDATA_MASK(*,y) = 0.
-   PCT_SAND(*,y,*) = 0.0
-   PCT_CLAY(*,y,*) = 0.0
-   PCT_GLACIER(*,y) = 0.0
-   PCT_WETLAND(*,y) = 0.0
-   PCT_LAKE(*,y) = 0.0
-   PCT_URBAN(*,y) = 0.0
-   SOIL_COLOR(*,y) = 0
-endfor
+
+; set by latitute bands
+;for y=3,43 do begin
+;   PCT_PFT(*,y,0) = 0.
+;   PFTDATA_MASK(*,y) = 0.
+;   PCT_SAND(*,y,*) = 0.0
+;   PCT_CLAY(*,y,*) = 0.0
+;   PCT_GLACIER(*,y) = 0.0
+;   PCT_WETLAND(*,y) = 0.0
+;   PCT_LAKE(*,y) = 0.0
+;   PCT_URBAN(*,y) = 0.0
+;   SOIL_COLOR(*,y) = 0
+;endfor
 
 
 PCT_GLC_MEC(*,*,*) = 0.0
@@ -105,7 +107,7 @@ THCK_GLC_MEC(*,*,*) = 0.0
 LANDFRAC_PFT(*,*) = 1.0
 
 file_out = 'surfdata_4x5_test.nc'
-spawn, 'cp /gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_land_fv/surfdata_4x5_dune_fmax0.5_sc5.nc surfdata_4x5_test.nc'
+spawn, 'cp /gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_land_fv/surfdata_4x5_sand_fmax0.5_sc5.nc surfdata_4x5_test.nc'
 ncid = ncdf_open(file_out, /write)
 ncdf_varput, ncid, 'LANDFRAC_PFT',LANDFRAC_PFT
 ncdf_varput, ncid, 'PCT_CLAY',PCT_CLAY

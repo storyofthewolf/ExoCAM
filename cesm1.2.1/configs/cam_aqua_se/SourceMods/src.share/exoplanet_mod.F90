@@ -21,18 +21,19 @@ module exoplanet_mod
   logical, public, parameter :: do_exo_rt = .true.              !! .true. = use correlated-k "exoplanet" RT
   	   	   	     		    		        !! .false. = use CAM4 RT, refer elsewhere for operating
                                                                 !! (currently only works for true.  delete option?)
-  logical, public, parameter :: do_exo_synchronous = .true.    !! Toggle to synchronous rotation mode
+  logical, public, parameter :: do_exo_synchronous = .false.    !! Toggle to synchronous rotation mode
                                                                 !! Eventually replace with better orbital computer
   logical, public, parameter :: do_exo_rt_clearsky = .false.    !! Do parallel clearsky radiative calculation for exo rt
                                                                 !! Slow, use sparingly
   logical, public, parameter :: do_exo_rt_spectral = .false.    !! collect and output spectrally resolved radiative fluxes
                                                                 !! 
-  integer, public, parameter :: exo_rad_step = 3                !! freq. of radiation calc in time steps (positive)
+  integer, public, parameter :: exo_rad_step = 2                !! freq. of radiation calc in time steps (positive)
                                                                 !! or hours (negative).
   logical, public, parameter :: do_carma_exort = .false.        !! Set to true only if running with the CARMA microphyiscs package
                                                                 !! and linking aerosol absorption to ExoRT  
-  logical, public, parameter :: do_exo_gw = .false.             !! flag to turn on gravity waves.  Note, present gw wave parameterization
-                                                                !! does not work for low pressure atmospheres.                
+  logical, public, parameter :: do_exo_gw = .false.             !! flag to turn on gravity waves.  Note, present gw wave parameterization    
+                                                                !! does not work for low pressure atmospheres.                  
+
   !! ==============  planet parameters ============== !!
   !! It is the responsibility of the USER to set do_exo_synchronous, exo_ndays
   !! exo_sdays, exo_scon, and exo_solar_file in a self-consistent manner.  It
@@ -57,43 +58,43 @@ module exoplanet_mod
   !!
   !! See examples below.   
   
-  !! Pretend planet
-  real(r8), public, parameter :: exo_planet_radius   = 1.5*6.37122e6_R8 !! radius ~ m
-  real(r8), public, parameter :: exo_surface_gravity = 21.77_R8          !! gravity ~ m/s^2            
-  real(r8), public, parameter :: exo_ndays  = 37.0_R8                    !! scaler to number of Earth days.
+  !! Generic
+  real(r8), public, parameter :: exo_planet_radius   = 6.37122e6_R8 !! radius ~ m
+  real(r8), public, parameter :: exo_surface_gravity = 9.80616_R8          !! gravity ~ m/s^2            
+  real(r8), public, parameter :: exo_ndays  = 1.0_R8                    !! scaler to number of Earth days.
   real(r8), public, parameter :: exo_porb = 365.                        !! orbital period, for obliquity cycle, and optionally for exo_sday
-  !!real(r8), public, parameter :: exo_sday = 86164.0_r8                !! sidereal period Earth
-  real(r8), public, parameter :: exo_sday = 86400.0_r8 * exo_ndays    !! sidereal period, for synchronous rotator
-  !!real(r8), public, parameter :: exo_sday = 86400.0_r8 * exo_ndays / (1._r8 + exo_ndays/exo_porb)  !! sidereal period [sec]
+  !real(r8), public, parameter :: exo_sday = 86164.0_r8                !! sidereal period Earth
+  !real(r8), public, parameter :: exo_sday = 86400.0_r8 * exo_ndays    !! sidereal period, for synchronous rotator
+  real(r8), public, parameter :: exo_sday = 86400.0_r8 * exo_ndays / (1._r8 + exo_ndays/exo_porb)  !! sidereal period [sec]
 
   !! Examples
   !! Earth
-  !!real(r8), public, parameter :: exo_planet_radius   = 6.37122e6_R8     !! radius ~ m
-  !!real(r8), public, parameter :: exo_surface_gravity = 9.80616_R8       !! gravity ~ m/s^2
-  !!real(r8), public, parameter :: exo_ndays  = 1.0_R8                    !! scaler to number of Earth days.
-  !!real(r8), public, parameter :: exo_porb = 365.0_R8
-  !!real(r8), public, parameter :: exo_sday = 86164.0_R8                  !! sidereal period [sec], for Earth value = 86164.0 
+  !real(r8), public, parameter :: exo_planet_radius   = 6.37122e6_R8     !! radius ~ m
+  !real(r8), public, parameter :: exo_surface_gravity = 9.80616_R8       !! gravity ~ m/s^2
+  !real(r8), public, parameter :: exo_ndays  = 1.0_R8                    !! scaler to number of Earth days.
+  !real(r8), public, parameter :: exo_porb = 365.0_R8
+  !real(r8), public, parameter :: exo_sday = 86164.0_R8                  !! sidereal period [sec], for Earth value = 86164.0 
 
   !! Earth - slow asynchronous rotator
-  !!real(r8), public, parameter :: exo_planet_radius   = 6.37122e6_R8      !! radius ~ m
-  !!real(r8), public, parameter :: exo_surface_gravity = 9.80616_R8        !! gravity ~ m/s^2
-  !!real(r8), public, parameter :: exo_ndays  = 10.0_R8                    !! scaler to number of Earth days.
-  !!real(r8), public, parameter :: exo_porb = 365.0_R8                     !! orbital period 
-  !!real(r8), public, parameter :: exo_sday = 86400.0_r8 * exo_ndays / (1._r8 + exo_ndays/exo_porb)  !! sidereal period [sec]
+  !real(r8), public, parameter :: exo_planet_radius   = 6.37122e6_R8      !! radius ~ m
+  !real(r8), public, parameter :: exo_surface_gravity = 9.80616_R8        !! gravity ~ m/s^2
+  !real(r8), public, parameter :: exo_ndays  = 10.0_R8                    !! scaler to number of Earth days.
+  !real(r8), public, parameter :: exo_porb = 365.0_R8                     !! orbital period 
+  !real(r8), public, parameter :: exo_sday = 86400.0_r8 * exo_ndays / (1._r8 + exo_ndays/exo_porb)  !! sidereal period [sec]
 
   !! Trappist-1e  (Gillon et al. 2017)  --  synchronous rotator
-  !!real(r8), public, parameter :: exo_planet_radius    = 5.84878e6_R8    !! radius ~ m
-  !!real(r8), public, parameter :: exo_surface_gravity  = 7.22925_R8      !! gravity ~ m/s^2
-  !!real(r8), public, parameter :: exo_ndays  = 6.099615_r8               !! scaler to number of Earth days.   
-  !!real(r8), public, parameter :: exo_porb = exo_ndays                   !! orbital period 
-  !!real(r8), public, parameter :: exo_sday = 86400.0_r8 * exo_ndays      !! sidereal period, synchronous rotator
+  !real(r8), public, parameter :: exo_planet_radius    = 5.84878e6_R8    !! radius ~ m
+  !real(r8), public, parameter :: exo_surface_gravity  = 7.22925_R8      !! gravity ~ m/s^2
+  !real(r8), public, parameter :: exo_ndays  = 6.099615_r8               !! scaler to number of Earth days.   
+  !real(r8), public, parameter :: exo_porb = exo_ndays                   !! orbital period 
+  !real(r8), public, parameter :: exo_sday = 86400.0_r8 * exo_ndays      !! sidereal period, synchronous rotator
 
   !! Trappist-1f  (Gillon et al. 2017)  --  synchronous rotator
-  !!real(r8), public, parameter :: exo_planet_radius    = 6.65792e6_R8    !! radius ~ m
-  !!real(r8), public, parameter :: exo_surface_gravity  = 6.11876_R8      !! gravity ~ m/s^2
-  !!real(r8), public, parameter :: exo_ndays  = 9.206690_r8               !! scaler to number of Earth days.
-  !!real(r8), public, parameter :: exo_porb = exo_ndays                   !! orbital period 
-  !!real(r8), public, parameter :: exo_sday = 86400.0_r8 * exo_ndays      !! sidereal period, synchronous rotator
+  !real(r8), public, parameter :: exo_planet_radius    = 6.65792e6_R8    !! radius ~ m
+  !real(r8), public, parameter :: exo_surface_gravity  = 6.11876_R8      !! gravity ~ m/s^2
+  !real(r8), public, parameter :: exo_ndays  = 9.206690_r8               !! scaler to number of Earth days.
+  !real(r8), public, parameter :: exo_porb = exo_ndays                   !! orbital period 
+  !real(r8), public, parameter :: exo_sday = 86400.0_r8 * exo_ndays      !! sidereal period, synchronous rotator
 
   !! if set user_nl_cpl::orb_iyear = -1
   real(r8), public, parameter :: exo_eccen = 0.0_r8   ! eccentricity
@@ -103,25 +104,35 @@ module exoplanet_mod
     
   !! ============== STELLAR OPTIONS ============== !!
   !! SOLAR CONSTANT
-  real(r8), public, parameter :: exo_scon = 1180._r8         ! Solar constant (W m-2)
+  real(r8), public, parameter :: exo_scon = 1360._r8         ! Solar constant (W m-2)
 
   ! SOLAR SPECTRAL FILE
   !! Make sure solar file matches spectral intervals for selected RT configuration !!
-  character(len=256), public, parameter :: exo_solar_file = '/gpfsm/dnb53/etwolf/models/ExoRT/data/solar/BT_Settl_3500K_n28.nc'
+  character(len=256), public, parameter :: exo_solar_file = '/gpfsm/dnb53/etwolf/models/ExoRT/data/solar/G2V_SUN_n68.nc'
 
 
   !! ============== ATMOSPHERIC CONSTITUENT PARAMETERS ============== !!
   !! Activated only if (do_exo_atmconst = .true.) 
   !! Must create matching initial conditions file (ncdata) !!
-  real(r8), public, parameter :: exo_n2bar = 0.0_r8                ! N2 inventory (bar)
-  real(r8), public, parameter :: exo_h2bar = 1.0_r8                ! H2 inventory (bar)
-  real(r8), public, parameter :: exo_co2bar = 9.0_r8               ! CO2 inventory (bar)
-  real(r8), public, parameter :: exo_ch4bar = 0.0_r8               ! CH4 inventory (bar)
+  real(r8), public, parameter :: exo_n2bar = 0.999598_r8                ! N2 inventory (bar)
+  real(r8), public, parameter :: exo_h2bar = 0.0_r8                ! H2 inventory (bar)
+  real(r8), public, parameter :: exo_co2bar = 0.0004_r8               ! CO2 inventory (bar)
+  real(r8), public, parameter :: exo_ch4bar = 1.7e-6_r8               ! CH4 inventory (bar)
   real(r8), public, parameter :: exo_pstd = (exo_n2bar + exo_h2bar + exo_co2bar + exo_ch4bar)*1.0e5  ! total pressure (Pascals)
+
 
   !! ============== OCEAN ALBEDO CONSTANTS ============== !!
   real(r8), public, parameter :: exo_albdif = 0.06 ! 60 deg reference albedo, diffuse (default = 0.06)
   real(r8), public, parameter :: exo_albdir = 0.06 ! 60 deg reference albedo, direct  (default = 0.07)
+
+
+  !! ============== LAND ALBEDO CONSTANTS ============== !!
+  !! Used for soil_color = 21 in the land model (if active)
+  !! The input surface data set (fsurdat) contains the soil_colors
+  real(r8), public, parameter :: exo_lnd_albvis_dry = 0.30    ! land albedo, visible, dry soil
+  real(r8), public, parameter :: exo_lnd_albifr_dry = 0.30    ! land albedo, infrared, dry soil
+  real(r8), public, parameter :: exo_lnd_albvis_sat = 0.30    ! land albedo, visible, saturated soil
+  real(r8), public, parameter :: exo_lnd_albifr_sat = 0.30    ! land albedo, infrared, saturated soil
 
 
   !! ============== FUNDAMENTAL CONSTANTS NEEDED USED BELOW ============== !!

@@ -154,6 +154,14 @@ module exoplanet_mod
   real(r8), public, parameter :: exo_albdif = 0.06 ! 60 deg reference albedo, diffuse (default = 0.06)
   real(r8), public, parameter :: exo_albdir = 0.06 ! 60 deg reference albedo, direct  (default = 0.07)
 
+  !! ============== LAND ALBEDO CONSTANTS ============== !!
+  !! Used for soil_color = 21 in the land model (if active)
+  !! The input surface data set (fsurdat) contains the soil_colors
+  real(r8), public, parameter :: exo_lnd_albvis_dry = 0.30    ! land albedo, visible, dry soil
+  real(r8), public, parameter :: exo_lnd_albifr_dry = 0.30    ! land albedo, infrared, dry soil
+  real(r8), public, parameter :: exo_lnd_albvis_sat = 0.30    ! land albedo, visible, saturated soil
+  real(r8), public, parameter :: exo_lnd_albifr_sat = 0.30    ! land albedo, infrared, saturated soil
+
 
   !! ============== FUNDAMENTAL CONSTANTS NEEDED USED BELOW ============== !!
   !! note there is some duplication with physconst.F90, keep private

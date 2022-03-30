@@ -46,6 +46,7 @@ subroutine iniTimeConst
   use SNICARMod       , only : SnowAge_init, SnowOptics_init
   use shr_scam_mod    , only : shr_scam_getCloseLatLon
   use ncdio_pio       
+  use exoplanet_mod   , only : exo_lnd_albvis_sat, exo_lnd_albifr_sat, exo_lnd_albvis_dry, exo_lnd_albifr_dry
 
 !
 ! !ARGUMENTS:
@@ -389,6 +390,19 @@ subroutine iniTimeConst
      albsat(1:12,2) = (/0.24, 0.22, 0.20, 0.18, 0.16, 0.14, 0.12, 0.10, 0.26, 0.28, 0.30, 0.32/)
      albdry(1:12,1) = (/0.24, 0.22, 0.20, 0.18, 0.16, 0.14, 0.12, 0.10, 0.26, 0.28, 0.30, 0.32/)
      albdry(1:12,2) = (/0.24, 0.22, 0.20, 0.18, 0.16, 0.14, 0.12, 0.10, 0.26, 0.28, 0.30, 0.32/)
+  else if (mxsoil_color == 21) then
+     albsat(1:21,1) = (/0.25_r8,0.23_r8,0.21_r8,0.20_r8,0.19_r8,0.18_r8,0.17_r8,0.16_r8,&
+                        0.15_r8,0.14_r8,0.13_r8,0.12_r8,0.11_r8,0.10_r8,0.09_r8,0.08_r8,0.07_r8,0.06_r8,0.05_r8,0.04_r8,&
+                        exo_lnd_albvis_sat/)
+     albsat(1:21,2) = (/0.50_r8,0.46_r8,0.42_r8,0.40_r8,0.38_r8,0.36_r8,0.34_r8,0.32_r8,&
+                        0.30_r8,0.28_r8,0.26_r8,0.24_r8,0.22_r8,0.20_r8,0.18_r8,0.16_r8,0.14_r8,0.12_r8,0.10_r8,0.08_r8,&
+                        exo_lnd_albifr_sat/)
+     albdry(1:21,1) = (/0.36_r8,0.34_r8,0.32_r8,0.31_r8,0.30_r8,0.29_r8,0.28_r8,0.27_r8,&
+                        0.26_r8,0.25_r8,0.24_r8,0.23_r8,0.22_r8,0.20_r8,0.18_r8,0.16_r8,0.14_r8,0.12_r8,0.10_r8,0.08_r8,&
+                        exo_lnd_albvis_dry/)
+     albdry(1:21,2) = (/0.61_r8,0.57_r8,0.53_r8,0.51_r8,0.49_r8,0.48_r8,0.45_r8,0.43_r8,&
+                        0.41_r8,0.39_r8,0.37_r8,0.35_r8,0.33_r8,0.31_r8,0.29_r8,0.27_r8,0.25_r8,0.23_r8,0.21_r8,0.16_r8,&
+                        exo_lnd_albifr_sat/)
   else
      write(iulog,*)'maximum color class = ',mxsoil_color,' is not supported'
      call endrun
