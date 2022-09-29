@@ -1,4 +1,5 @@
-general_instructions.txt   -- a standard set of building and running instructions
-other_resources.txt        -- a list of GoogleDoc resources, covering how-to-model,
-                              and troublshooting common errors (coming later in 2022)
-supported_planet_mods.txt  -- supported planetary configurations and modifications
+general_instructions.txt        -- a standard set of building and running instructions
+other_resources.txt             -- a list of GoogleDoc resources, covering how-to-model,
+                                   and troublshooting common errors (coming later in 2022)
+supported_planet_mods.txt       -- supported planetary configurations and modifications
+computecanada_instructions.txt  -- additional notes for set up on Compute Canada
