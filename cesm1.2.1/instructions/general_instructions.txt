@@ -74,7 +74,7 @@ STEP 3:  Create a new case
   Create a new case.  Refer to ../ExoCAM/cesm1.2.1/configs/README and 
   also README files in configs/* directories for build configurations and 
   specific instructions.  For an example, for an aquaplanet model with the FV
-  dynamical core, go to ../ExoCAM/cesm1_2_1/scripts/, and issue command
+  dynamical core, go to ../cesm1_2_1/scripts/, and issue command
 
   create_newcase -case $my_aquaplanet_case -res f45_f45 -mach hyak -compset E2000C4AQI
 
@@ -86,7 +86,8 @@ STEP 4:  Link ExoRT radiative transfer model and set configure options
 
   xmlchange CAM_CONFIG_OPTS="-nlev 40 -phys cam4 -usr_src $EXORT_PATH/ExoRT/3dmodels/src.cam.n******"
   
-  Where $EXORT_PATH is the path to where your ExoRT has been checked out.
+  Where $EXORT_PATH is the path to where your ExoRT has been checked out, 
+  and "n******" represents the spectra you want to use (e.g., replace with "n68equiv"). 
   Radiative transfer models, ready for linking with CESM in 3D are located at
   ../ExoRT/3dmodels 
 
@@ -116,6 +117,9 @@ STEP 5:  Copy SourceMods and namelist files to your case
 
   open the namelist files (user_*) and change the paths to initial files to
   match the location of your ExoCAM distribution.
+
+  Also, open SourceMods/src.shar/exoplanet_mod.F90 and edit the path of 
+  'exo_solar_file' to match the ExoRT path.
 
   Optional: if you wish to make modifications to the radiative transfer
   modules, copy the RT folder $EXORT_PATH/ExoRT/3dmodels/src.cam.n****** into your

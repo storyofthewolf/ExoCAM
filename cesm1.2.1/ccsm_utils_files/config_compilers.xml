@@ -743,7 +743,10 @@ for mct, etc.
   <ADD_SLIBS></ADD_SLIBS>
 </compiler>
 
-
-
+<compiler COMPILER="intel" MACH="computecanada">
+  <NETCDF_PATH> ${EBROOTNETCDF}</NETCDF_PATH>
+  <PNETCDF_PATH>${EBROOTPNETCDF}</PNETCDF_PATH>
+  <SLIBS> -L$(NETCDF_PATH)/lib -lnetcdf -lnetcdff  </SLIBS>
+</compiler>
 
 </config_compilers>
