@@ -121,6 +121,9 @@ STEP 5:  Copy SourceMods and namelist files to your case
   Also, open SourceMods/src.shar/exoplanet_mod.F90 and edit the path of 
   'exo_solar_file' to match the ExoRT path.
 
+  Edit or verify the correct path for exort_rootdir in the file 
+  ExoRT/3dmodels/src.cam.n******/sys_rootdir.F90
+
   Optional: if you wish to make modifications to the radiative transfer
   modules, copy the RT folder $EXORT_PATH/ExoRT/3dmodels/src.cam.n****** into your
   $CASEROOT/SourceMods directory, and change -usr_src config opt approriately.
