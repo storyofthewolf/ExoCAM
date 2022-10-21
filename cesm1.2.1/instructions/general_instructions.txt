@@ -112,13 +112,13 @@ STEP 5:  Copy SourceMods and namelist files to your case
   Copy SourceMods directory from ../ExoCAM/cesm1.2.1/configs/$model_config to
   your case directory ($CASEROOT)
 
-  Copy namelist files from ../ExoCAM/cesm1.2.1/configs/namelist_files/* to
+  Copy namelist files from ../ExoCAM/cesm1.2.1/configs/$model_config/namelist_files/* to
   your case directory ($CASEROOT)
 
   open the namelist files (user_*) and change the paths to initial files to
   match the location of your ExoCAM distribution.
 
-  Also, open SourceMods/src.shar/exoplanet_mod.F90 and edit the path of 
+  Also, open SourceMods/src.share/exoplanet_mod.F90 and edit the path of 
   'exo_solar_file' to match the ExoRT path.
 
   Edit or verify the correct path for exort_rootdir in the file 
