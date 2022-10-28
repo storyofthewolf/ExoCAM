@@ -31,7 +31,7 @@ def hybrid2pressure(nlon,nlat,nlev,PS,P0,hyam,hybm,hyai,hybi):
   ---------------------------------------------------------------
   """
 
-  lev_P = hyam[None,None,:]*P0 + hybm[None,None,:]*PS[:,:,None]
-  ilev_P = hyam[None,None,:]*P0 + hybm[None,None,:]*PS[:,:,None]
+  lev_P = hyam[:,None,None]*P0 + hybm[:,None,None]*PS[None,:,:]
+  ilev_P = hyam[:,None,None]*P0 + hybm[:,None,None]*PS[None,:,:]
 
   return (lev_P, ilev_P)
