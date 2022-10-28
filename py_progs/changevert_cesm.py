@@ -34,7 +34,7 @@ args = parser.parse_args()
 #=======  name of new file ======
 #================================
 fname_out = args.fname_out[0]
-nlev_out = args.num_lev[0]
+nlev_out = int(args.num_lev[0])
 nilev_out = nlev_out + 1
 
 
@@ -394,5 +394,5 @@ if not pathlib.Path(fname_out).exists() or args.overwrite:
   varid119.units = "Meridional wind staggered"
   varid119[:] = VS_out
 
-id.close()
+  id.close()
 
