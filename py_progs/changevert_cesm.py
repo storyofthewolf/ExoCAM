@@ -18,12 +18,21 @@ import argparse
 import pathlib
 import exocampy_tools as exo
 
-exocam_path = '/home/deitrr/ExoCAM/'
-ccsm_inputdata_path = '/home/deitrr/scratch/ccsm/inputdata/atm/cam/inic/fv/'
+#user needs to edit these!
+exocam_path = '/home/deitrr/projects/def-czg/deitrr/ExoCAM/'
+ccsm_inputdata = '/home/deitrr/projects/def-czg/deitrr/ccsm/inputdata/'
+
+ccsm_inputdata_paths = [ccsm_inputdata + 'atm/cam/inic/fv/',
+                        ccsm_inputdata + 'atm/waccm/ic/',
+			exocam_path + '/cesm1.2.1/initial_files/cam_aqua_fv/',
+                        exocam_path + '/cesm1.2.1/initial_files/cam_aqua_se/',
+                        exocam_path + '/cesm1.2.1/initial_files/cam_land_fv/',
+                        exocam_path + '/cesm1.2.1/initial_files/cam_mixed_fv/',
+                        exocam_path + '/cesm1.2.1/initial_files/mars/atm/']
 
 parser = argparse.ArgumentParser()
 parser.add_argument('fname_out',nargs=1,help='Name of new IC file')
-parser.add_argument('-n','--num_lev', nargs=1, default=[36], help='Number of levels in new IC file')
+parser.add_argument('-n','--num_lev', nargs=1, default=[40], help='Number of levels in new IC file')
 parser.add_argument('-ic','--input_IC_file', nargs=1, default=['cami-mam3_0000-01-01_1.9x2.5_L30_c090306.nc'],
                      help='input climate file')
 parser.add_argument('-w','--overwrite', action='store_true', help = 'force overwrite of output files')
@@ -61,7 +70,15 @@ nlon_new = len(lon_new)
 #=======  name file with climate data ======
 #===========================================
 clim_fname_in = args.input_IC_file[0]
-ncid = nc.Dataset(ccsm_inputdata_path + clim_fname_in, 'r')
+
+filefound = False
+for fdir in ccsm_inputdata_paths:
+  if pathlib.Path(fdir+clim_fname_in).exists():
+    ncid = nc.Dataset(fdir + clim_fname_in, 'r')
+    filefound = True
+    break
+if filefound == False:
+  raise IOError('File %s not found!'%clim_fname_in)
 
 lev_old = ncid['lev'][:]
 ilev_old = ncid['ilev'][:]
@@ -157,7 +174,6 @@ for x in np.arange(nlon):
     if y < nslat:
       US_out[:,y,x] = interp1d(lev_P_old[:,y,x].data, US_old[0,:,y,x].data, fill_value='extrapolate')(lev_P_new[n:,y,x].data)
 
-
 for i in np.arange(nilev_out-1,-1,-1):
   j = nilev_new - nilev_out + i
   hyai_out[i] = hyai_new[j]
@@ -169,6 +185,7 @@ for i in np.arange(0,nlev_out):
   hyam_out[i] = hyam_new[j]
   hybm_out[i] = hybi_new[j]
   lev_out[i] = lev_new[j]
+
 
 if not pathlib.Path(fname_out).exists() or args.overwrite:
   print("Creating file '%s'..."%fname_out)
@@ -237,7 +254,7 @@ if not pathlib.Path(fname_out).exists() or args.overwrite:
 
   varid13 = id.createVariable("time_bnds","f8",(dim11.name,))
   varid13.long_name = "time interval endpoints"
-  varid13[:] = time_bnds
+  varid13[:] = time_bnds[:2]
 
   varid14 = id.createVariable("date_written","S1",(dim10.name,dim12.name))
   varid14[:] = date_written
