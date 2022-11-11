@@ -634,7 +634,7 @@ for mct, etc.
 
 <compiler MACH="pleiades-wes">
   <NETCDF_PATH> /nasa/netcdf/4.0-i10.1</NETCDF_PATH>
-  <MPI_PATH>/nasa/sgi/mpt/2.08r7<MPI_PATH>
+  <MPI_PATH>/nasa/sgi/mpt/2.08r7</MPI_PATH>
   <MPI_LIB_NAME>mpi</MPI_LIB_NAME>
   <MPICC>icc</MPICC>
   <ADD_FFLAGS DEBUG="FALSE"> -O2 -axAVX -xSSE4.1 </ADD_FFLAGS>
@@ -743,7 +743,10 @@ for mct, etc.
   <ADD_SLIBS></ADD_SLIBS>
 </compiler>
 
-
-
+<compiler COMPILER="intel" MACH="computecanada">
+  <NETCDF_PATH> ${EBROOTNETCDF}</NETCDF_PATH>
+  <PNETCDF_PATH>${EBROOTPNETCDF}</PNETCDF_PATH>
+  <SLIBS> -L$(NETCDF_PATH)/lib -lnetcdf -lnetcdff  </SLIBS>
+</compiler>
 
 </config_compilers>

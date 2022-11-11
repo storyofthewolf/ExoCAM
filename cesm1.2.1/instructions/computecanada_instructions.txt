@@ -1,0 +1,89 @@
+##############################################################
+#  Additional notes for setting up ExoCAM on Compute Canada  #
+#           Russell Deitrick / 2022                          #
+##############################################################
+
+Downloading CESM:
+$ svn co --username guestuser --password friendly https://svn-ccsm-models.cgd.ucar.edu/cesm1/release_tags/cesm1_2_1 cesm1_2_1
+
+May have to re-enter credentials up to three times
+
+
+Fixing repository issues:
+
+1. GoogleCode repository no longer used
+Had to set the following in ./SVN_EXTERNAL_DIRECTORIES:
+   models/utils/pio                   https://github.com/NCAR/ParallelIO.git/tags/pio1_7_2/pio
+then run $ svn propset svn:externals -F SVN_EXTERNAL_DIRECTORIES .
+then $ svn update
+
+2. Hiccups in fetching repository can cause files to become locked.
+cice folder got locked, perhaps because of issue when fetching repository. Ran this to fix
+$ svn cleanup .
+$ svn cleanup models/ice/cice
+$ svn update
+
+3. GoogleCode repository no longer used, round 2
+Still seem to have missing external directory issue with tools/cprnc (bad googlecode url). 
+Fixed by editing tools/cprnc/SVN_EXTERNAL_DIRECTORIES:
+  genf90 http://github.com/PARALLELIO/genf90/tags/genf90_130402
+then running the same commands as in 1. but in tools/cprnc 
+
+
+Patches:
+1. ./scripts/ccsm_utils/Case.template/ConfigCase.pm:
+@448: qw call must be in parentheses:
+      foreach my $model (qw(...)) {
+@1180: added backslash after ENV (not sure if this matters or not...):
+       if($text =~/^(.*)\$ENV\{(.*)}(.*)$/){
+
+2. ./scripts/ccsm_utils/Tools/cesm_setup
+@252: qw call must be in parentheses:
+      foreach my $model (qw(...)) {
+
+3. ./models/drv/bld/build-namelist:
+@305: add the following lines:
+  # Note - $USER is not in the config_defintion.xml file - it is only in the environment
+  $xmlvars{'USER'} = $ENV{'USER'};
+  unshift @INC, "$CASEROOT/Tools";
+  require XML::Lite;
+  require SetupTools;
+  my %xmlvars = ();
+  SetupTools::getxmlvars($CASEROOT, \%xmlvars);
+  foreach my $attr (keys %xmlvars) {
+       $xmlvars{$attr} = SetupTools::expand_env_var($xmlvars{$attr}, \%xmlvars);
+  }
+@320 (after adding lines above): *remove* lines after '# Note - $USER ...', including foreach loop:
+  # Note - $USER is not in the config_defintion.xml file - it is only in the environment 
+  $xmlvars{'USER'} = $ENV{'USER'};
+  foreach my $attr (keys %xmlvars) {
+      if ( $xmlvars{$attr} =~ m/\$/ ) {$xmlvars{$attr} = expand_env_xml($xmlvars{$attr});}
+      if ( $xmlvars{$attr} =~ m/\$/ ) {$xmlvars{$attr} = expand_env_xml($xmlvars{$attr});}
+      if ( $xmlvars{$attr} =~ m/\$/ ) {$xmlvars{$attr} = expand_env_xml($xmlvars{$attr});}
+  }
+
+4. ./model/drv/bld/build-namelist:
+@784: qw call must be in parenthesis:
+      foreach my $model (qw(...)) {
+
+5. Apply RRTMG patches (in /cvmfs/soft.computecanada.ca/easybuild/easyconfigs/c/cesm/). Read those files and modify
+the files at the lines mentioned.
+
+
+ComputeCanada specifications:
+1. From the directory /cvmfs/soft.computecanada.ca/easybuild/software/2017/Core/cesm/1_2_2/scripts/ccsm_utils/Machines/
+copy the files config_machines.xml (or copy from ExoCAM), config_compilers.xml (or copy from ExoCAM),
+env_mach_specific.computecanada, and mkbatch.computecanada into the direcotry ./scripts/ccsm_utils/Machines/
+
+2. In the file config_compilers.xml, comment out or delete the line referring to <CESMSCRATCHROOT>, line 577 
+
+
+ExoCAM patches:
+0. See ExoCAM/instructions/general_instructions.txt 
+
+1. If you didn't copy config_machines.xml and config_compilers.xml from CESM 1.2.2 source (above),
+copy these from ExoCAM/cesm1.2.1/ccsm_utils_files into cesm1_2_1/scripts/ccsm_utils/Machines/
+
+2. From ExoCAM directory, replace cesm1_2_1/scripts/ccsm_utils/Case.template/config_compsets.xml
+
+3. From ExoCAM directory, replace cesm1_2_1/models/atm/cam/bld/namelist_files/namelist_definition.xml
