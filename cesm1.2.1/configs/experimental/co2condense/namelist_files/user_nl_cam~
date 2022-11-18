@@ -1,0 +1,51 @@
+!! Mars
+
+
+
+!! Summit Root
+
+!! Discover Root
+!ncdata   = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_land_fv/control_L40_dry.cam.i.nc'
+!ncdata   = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/ic_P0.1bar_L40_dry_ic.nc'
+!!ncdata   = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_fv/ic_P0.25bar_L40_ic.nc'
+!ncdata = '/gpfsm/dnb53/etwolf/cesm_scratch/archive/mars_dev2/rest/0001-01-31-00000/mars_dev2.cam.i.0001-01-31-00000.nc'
+
+! testing summer 2021
+!ncdata = '/gpfsm/dnb53/etwolf/cesm_scratch/rundir/mars_dev2/run/mars_dev2.cam.i.0001-01-09-00000.nc'
+ncdata = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/mars/atm/paleo_mars_2.0bar_dry.cam.i.0021-01-01-00000.nc'
+!ncdata = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/mars/atm/mars_dev2_adjusted.cam.i.0001-01-09-00000.nc'
+!ncdata = '/gpfsm/dnb53/etwolf/cesm_scratch/archive/mars_dev2/rest/0001-03-01-00000/mars_dev2.cam.i.0001-03-01-00000.nc'
+
+!bnd_topo =  '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/mars/lnd/mars_topo_4x5.nc'
+!bnd_topo = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/mars/lnd/mars_topo_4x5_lmd.nc'
+!bnd_topo = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/mars/lnd/mars_topo_4x5_lmd_10kmtop.nc'
+!bnd_topo = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/mars/lnd/mars_topo_4x5_lmd_8kmtop.nc'
+bnd_topo = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/mars/lnd/mars_TPW_topo_4x5.nc'
+!bnd_topo = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_land_fv/topo_landplanet_4x5.nc'
+
+!! miscellaneous
+rad_data_output = .false.
+eddy_scheme='HB'
+kv_top_pressure=0.0   !Pa (mb)  ! set to zero to turn off
+kv_top_scale=0.5
+trop_cloud_top_press = 1.
+
+gw_drag_file = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/other/newmfspectra40_dc25.nc'
+
+
+!! dynamical core options
+dtime=900.
+div24del2flag=42
+nspltvrm = 4
+nspltrac = 4
+nsplit = 32
+substep_t = .true.
+substep_uv = .true.
+
+!! history file options
+empty_htapes=.false.
+inithist = 'MONTHLY'
+avgflag_pertape = 'A'
+nhtfrq = 0
+mfilt = 1
+fincl1='T','TS','PS','ALDIR','ALDIF','ASDIR','ASDIF','FUL','FUS','FDL','FDS','QRS','QRL','Q','m_CO2_c','m_Q_c','m_CH4_c','CMFSL','CMFLQ','CMFDQ','CMFDQR','CMFDT','CMFMC','CMFMCDZM','FICE','FREQSH','FREQZM','ICLDIWP','ICLDTWP','PBLH','PCONVB','PCONVT','PRECL','PRECSC','PRECSH','PRECSL','PRECT','PSL','FULC','FDLC','FUSC','FDSC','QRSC','QRLC','TROP_T','TROP_Z','TROP_P','CLDTOT','CAPE','CIN','TGCLDIWP','TGCLDLWP','VQ','VT','VU','CBMF','CNVCLD','CONCLD','DTCOND','DTCORE','DQP','DQSED','ENGYCORR','EVAPPREC','EVAPQCM','EVAPQZM','PDELDRY','PTTEND','PTTEND_RESID','QC','SST','TEINP','TEOUT','U','V','OMEGA','ZMDQ','ZMDT','TTEND','REI','REL','LANDFRAC','SOLS','SOLL','SOLSD','SOLLD','LS','CO2DP','CO2DPz','CO2MASSCHANGE','CLDICE_CO2','REI_CO2','CLDICE_CO2_RHO','CO2_SNOWFALL_RATE','CLDICE_CO2_COND_TEND','CLDICE_CO2_SED_TEND','CLDICE_CO2_TEMP_TEND','CLDICE_CO2_PVEL','CLDICE_CO2_VFALL','TGCLDIWP_CO2','SRF_EMISS','CLDICE_CO2_HEAT_TEND','CLDICE_CO2_POT_TEND','CLDICE_CO2_TEND','CO2_LHFLX'
