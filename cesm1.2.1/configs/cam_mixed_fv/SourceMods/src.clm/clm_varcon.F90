@@ -101,7 +101,7 @@ module clm_varcon
   real(r8) :: ac_wasteheat_factor = 1.0_r8/ac_efficiency_factor  !wasteheat factor for urban air conditioning (-)
   real(r8) :: wasteheat_limit = 100._r8  !limit on wasteheat (W/m2)
   
-  real(r8), parameter :: h2osno_max = 1000._r8    ! max allowed snow thickness (mm H2O)
+  real(r8), parameter :: h2osno_max = 1000000._r8    ! max allowed snow thickness (mm H2O)
   real(r8), parameter :: lapse_glcmec = 0.006_r8  ! surface temperature lapse rate (deg m-1)
                                                   ! Pritchard et al. (GRL, 35, 2008) use 0.006  
 
