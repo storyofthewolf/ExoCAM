@@ -38,7 +38,8 @@
          gravit    = SHR_CONST_G     ,&! gravitational acceleration (m/s^2)
          secday    = SHR_CONST_CDAY  ,&! seconds in calendar day
          omega     = SHR_CONST_OMEGA ,&! angular velocity of earth (rad/sec)
-         radius    = SHR_CONST_REARTH,&! earth radius (m)
+         radius    = SHR_CONST_REARTH,&! planet radius (m)  ! exo mod, E.T.Wolf
+         earth_radius = 6.37122e6,    &! earth radius (m)   ! exo mod, E.T.Wolf
          rhos      = 330.0_dbl_kind  ,&! density of snow (kg/m^3)
          rhoi      = SHR_CONST_RHOICE,&! density of ice (kg/m^3)
          rhow      = SHR_CONST_RHOSW ,&! density of seawater (kg/m^3)
@@ -49,7 +50,7 @@
          cp_wv     = SHR_CONST_CPWV  ,&! specific heat of water vapor (J/kg/K)
          ! (Briegleb JGR 97 11475-11485  July 1992)
 !         emissivity = 0.95_dbl_kind  ,&! emissivity of snow and ice
-         emissivity = 1.0_dbl_kind  ,&! emissivity of snow and ice, !Wolf, changed to match radiation code
+         emissivity = 1.0_dbl_kind  ,&! emissivity of snow and ice, ! exo mod, E.T.Wolf,  changed to match radiation code
          stefan_boltzmann = SHR_CONST_STEBOL,&!  W/m^2/K^4
          Tffresh   = SHR_CONST_TKFRZ ,&! freezing temp of fresh ice (K)
          cp_ice    = SHR_CONST_CPICE ,&! specific heat of fresh ice (J/kg/K)
