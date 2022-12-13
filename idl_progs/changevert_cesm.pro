@@ -6,25 +6,27 @@ pro changevert_cesm
 ;====================================================================
 ; Change number of vertical levels in a CAM initial condition file.
 ; This is achieved starting with a 66 level WACCM initial condition
-; file and cutting it down to size. 
+; file and cutting it down to size.  Climate data is imported from 
+; separate file.
+;
+;
+; 
 ;====================================================================
 
-do_write_file=1
+do_write_file = 1
+do_print_diagnostic = 1
 
 ;================================
 ;=======  name of new file ======
 ;================================
-;fname_out = '/projects/btoon/wolfet/exofiles/atm/control_L60.cam.i.0048-01-01-00000.nc'
-;fname_out = '/projects/btoon/wolfet/exofiles/atm/ic_1bar_L40_0.47x0.63d.nc'
-;fname_out = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/ic_1bar_hab2_L45_ic.nc'
-fname_out = '/gpfsm/dnb05/projects/p54/users/etwolf/samosa/icfiles/ic_P0.16bar_L31_ic.nc'
+;fname_out = '/gpfsm/dnb05/projects/p54/users/etwolf/samosa/icfiles/ic_P0.16bar_L31_ic.nc'
+fname_out = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/mars/atm/test.nc'
+diagnostic_out = fname_out
 
+nlev_out = 40
+nilev_out = nlev_out + 1
 
-nlev_out = 31
-nilev_out = 32
-
-
-;read in appropriate lev, hyai for N>26
+;read in appropriate grid coordinates from WACCM 66 level grid 
 lev_fname_new = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/other/oxygen_CE.cam2.avg.nc'
 
 ncid=ncdf_open(lev_fname_new, /nowrite)
@@ -48,11 +50,9 @@ nlon_new = n_elements(lon_new)
 ;===========================================
 ;=======  name file with climate data ======
 ;===========================================
-;clim_fname_in ='/projects/btoon/wolfet/exofiles/atm/ic_1barN2_0.1barCO2_0.02barCH4_L48_ic.nc'
-;clim_fname_in ="/gpfs/summit/datasets/CESM/inputdata/atm/cam/inic/fv/cami_0000-09-01_0.47x0.63_L26_c061106.nc"
 ;clim_fname_in ="/gpfsm/dnb53/etwolf/cesm_scratch/archive/ExoCAM_thai_hab2_L51_n68equiv/rest/0197-01-01-00000/ExoCAM_thai_hab2_L51_n68equiv.cam.i.0197-01-01-00000.nc" 
-clim_fname_in = "/gpfsm/dnb53/etwolf/cesm_scratch/rundir/samosa5/run/samosa5.cam.i.0004-01-01-00000.nc"
-
+;clim_fname_in = "/gpfsm/dnb53/etwolf/cesm_scratch/rundir/samosa5/run/samosa5.cam.i.0004-01-01-00000.nc"
+clim_fname_in = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/ic_1bar_L51_ic.nc" 
 
 ncid=ncdf_open(clim_fname_in, /nowrite)
 ncdf_varget,ncid,'lev',lev_old
@@ -384,5 +384,46 @@ if (do_write_file eq 1) then begin
   ncdf_close, id
 
 endif
+
+if (do_print_diagnostic eq 1) then begin
+
+  ncid=ncdf_open(diagnostic_out, /nowrite)
+  ncdf_varget,ncid,'lev',lev
+  ncdf_varget,ncid,'ilev',ilev
+  ncdf_varget,ncid,'lat',lat
+  ncdf_varget,ncid,'lon',lon
+  ncdf_varget,ncid,'hyai',hyai
+  ncdf_varget,ncid,'hybi',hybi
+  ncdf_varget,ncid,'hyam',hyam
+  ncdf_varget,ncid,'hybm',hybm
+  ncdf_varget,ncid,'PS',PS
+  ncdf_varget,ncid,'P0',P0
+  ncdf_varget,ncid,'T',T
+  ncdf_varget,ncid,'Q',Q
+
+  nlon=n_elements(lon)
+  nlat=n_elements(lat)
+  nlev=n_elements(lev)
+  nilev=n_elements(ilev)
+
+  lev_P=fltarr(nlon,nlat,nlev)
+  ilev_P=fltarr(nlon,nlat,nilev)
+  hybrid2pressure,nlon,nlat,nlev,PS,P0,hyam,hybm,hyai,hybi,lev_P,ilev_P
+  lev_P(*,*,*) = lev_P(*,*,*)/100.0
+
+  PLEV = fltarr(nlev)
+  TLEV = fltarr(nlev)
+  QLEV = fltarr(nlev)
+  print, "PavgZ, TavgZ, QavgZ"
+  for z=0, nlev-1 do begin
+     area_weighted_avg_gen, lon, lat, lev_P(*,*,z), PavgZ        &   PLEV(z) = PavgZ
+     area_weighted_avg_gen, lon, lat, T(*,*,z), TavgZ            &   TLEV(z) = TavgZ
+     area_weighted_avg_gen, lon, lat, Q(*,*,z), QavgZ            &   QLEV(z) = QavgZ
+     print, z, PavgZ, TavgZ, QavgZ
+  endfor
+
+endif
+
+
 
 end

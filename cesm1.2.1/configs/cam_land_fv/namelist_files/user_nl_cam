@@ -48,8 +48,6 @@ trop_cloud_top_press = 1.
 !!--------------------------------------------
 !! settings for output variables and timings
 !!
-!! additional MG cloud variables, add to end of fincl1 below
-! 'EFFLIQ','EFFICE','IWC','LWC','ICWNC','ICINC'
 
 !! standard outputs, monthly means
 nhtfrq = 0
@@ -57,3 +55,5 @@ mfilt = 1
 avgflag_pertape = 'A'
 fincl1 = 'T','TS','PS','ALDIR','ALDIF','ASDIR','ASDIF','FUL','FUS','FDL','FDS','QRS','QRL','Q','m_CO2_c','m_Q_c','m_CH4_c','CMFSL','CMFLQ','CMFDQ','CMFDQR','CMFDT','CMFMC','CMFMCDZM','FICE','FREQSH','FREQZM','ICLDIWP','ICLDTWP','PBLH','PCONVB','PCONVT','PRECL','PRECSC','PRECSH','PRECSL','PRECT','PSL','FULC','FDLC','FUSC','FDSC','QRSC','QRLC','TROP_T','TROP_Z','TROP_P','CLDTOT','CAPE','CIN','TGCLDIWP','TGCLDLWP','VQ','VT','VU','CBMF','CNVCLD','CONCLD','DTCOND','DTCORE','DQP','DQSED','ENGYCORR','EVAPPREC','EVAPQCM','EVAPQZM','PDELDRY','PTTEND','PTTEND_RESID','QC','SST','TEINP','TEOUT','U','V','OMEGA','ZMDQ','ZMDT','TTEND','REI','REL','LANDFRAC','SOLS','SOLL','SOLSD','SOLLD'
  
+!! MG cloud variables, add to end of fincl1
+!! 'EFFLIQ','EFFICE','IWC','LWC','ICWNC','ICINC'

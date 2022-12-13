@@ -488,9 +488,11 @@ subroutine diag_init()
        call add_default ('SRF_EMISS', 1, ' ')
        call add_default ('SNOWHLND', 1, ' ')
        call add_default ('SNOWHICE', 1, ' ')
-       call add_default ('CO2DP', 1, ' ')
-       call add_default ('CO2MASSCHANGE', 1, ' ')
-       call add_default ('CO2_LHFLX', 1, ' ')
+       if (do_exo_condense_co2) then 
+         call add_default ('CO2DP', 1, ' ')
+         call add_default ('CO2MASSCHANGE', 1, ' ')
+         call add_default ('CO2_LHFLX', 1, ' ')
+      endif
     endif
 
    ! outfld calls in diag_phys_tend_writeout

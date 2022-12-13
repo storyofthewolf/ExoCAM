@@ -264,7 +264,7 @@ subroutine phys_register
     end if
 
     ! register other cloud condensables
-    if (do_exo_condense_co2) call exo_condense_register()
+    call exo_condense_register()
 
     ! Register diagnostics PBUF
     call diag_register()
@@ -790,7 +790,7 @@ subroutine phys_init( phys_state, phys_tend, pbuf2d, cam_out )
       call radiation_init
     endif
 
-    if (do_exo_condense_co2) call exo_condense_init
+    call exo_condense_init
 
     call rad_solar_var_init()
 
@@ -2155,9 +2155,6 @@ subroutine tphysbc (ztodt,               &
        call t_stopf ('exo_condense_tend')
        call physics_update(state, ptend, ztodt, tend)
        call check_energy_chng(state, tend, "exo_condense_tend", nstep, ztodt, zero, zero, zero, zero)
-!write(*,*) "physpkg, CLDICE_CO2, ptend", ptend%q(:ncol,:,1)
-!write(*,*) "physpkg, CLDICE_CO2, state", state%q(:ncol,:,1)
-!write(*,*) "before physiscs_state_check, exo_condense"
        call physics_state_check(state, name="exo_condense")
     endif
 
@@ -2181,7 +2178,7 @@ subroutine tphysbc (ztodt,               &
 
     call cloud_diagnostics_calc(state, pbuf)
 
-    if (do_exo_condense_co2) call exo_condense_diag_calc(state, pbuf)
+    call exo_condense_diag_calc(state, pbuf)
 
     call t_stopf('bc_cld_diag_history_write')
 

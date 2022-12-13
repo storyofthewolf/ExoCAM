@@ -110,12 +110,15 @@ subroutine exo_condense_register
   ! Start Code
   !
 
-  if (do_exo_condense_co2) then
-    call cnst_add('CLDICE_CO2', mwdry, cpair, 0._r8, ixcldice_co2, &
-                   longname='Grid box averaged CO2 ice cloud', is_convtran1=.true.)
-    call pbuf_add_field('REI_CO2',       'physpkg', dtype_r8, (/pcols,pver/), rei_co2_idx) 
-    call pbuf_add_field('CICEWP_CO2', 'physpkg', dtype_r8,(/pcols,pver/), cicewp_co2_idx)
-  endif
+  ! Must be added to the physics buffer even if do_exo_condense_co2 = .false.
+  call pbuf_add_field('REI_CO2',       'physpkg', dtype_r8, (/pcols,pver/), rei_co2_idx) 
+  call pbuf_add_field('CICEWP_CO2', 'physpkg', dtype_r8,(/pcols,pver/), cicewp_co2_idx)
+
+  if (.not. do_exo_condense_co2) return
+
+  call cnst_add('CLDICE_CO2', mwdry, cpair, 0._r8, ixcldice_co2, &
+                 longname='Grid box averaged CO2 ice cloud', is_convtran1=.true.)
+
 
 end subroutine exo_condense_register
 
@@ -134,6 +137,8 @@ subroutine exo_condense_init
   !
   ! Start Code
   !
+
+  if (.not. do_exo_condense_co2) return
 
   !! checking module options selections
   option_count = 0
@@ -229,7 +234,6 @@ subroutine exo_condense_init_cnst(name, q, gcid)
   ! Start Code
   !
   if ( name == cnst_names(1) ) then 
-     write(*,*) "set to zero"
      q = 0.0_r8
   endif
 
@@ -256,6 +260,7 @@ subroutine exo_condense_diag_calc(state, pbuf)
   integer :: i,k
   integer :: ncol, lchnk
 
+  if (.not. do_exo_condense_co2) return
 
   ! Start code
   lchnk = state%lchnk
@@ -726,12 +731,9 @@ subroutine exo_cloud_sediment_vel(ncol, ext_tmid, ext_pmid, ext_pdel, ext_cld, e
         a = 0.707*SHR_CONST_RGAS/(4.*SHR_CONST_PI*molrad**2*SHR_CONST_AVOGAD)
         vfall = b*ext_reff(i,k)**2 * (1. + 1.333 * (a*ext_tmid(i,k)/ext_pmid(i,k))/ext_reff(i,k)) 
 
-
-
+        ! set fall velocity output array
         vfall_out(i,k) = vfall
         cld_pvel_out(i,k+1) = vfall * rho(i,k)*SHR_CONST_G        ! meters/sec to pascals/sec                        
-
-
 
       endif
     end do

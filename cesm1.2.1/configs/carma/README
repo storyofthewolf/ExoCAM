@@ -28,7 +28,7 @@ These provide a linkage with ExoRT, bypassing the native framework for link with
 
 A basic template for a generic fractal haze carma model is included.
 
-xmlchange CAM_CONFIG_OPTS="-phys cam4 -nlev 51 -usr_src $PATH/ExoRT/3dmodels/src.cam.n28archean.haze -carma -nadv 43"
+xmlchange CAM_CONFIG_OPTS="-phys cam4 -nlev 51 -usr_src $PATH/ExoRT/3dmodels/src.cam.n28archean.haze -carma meteor_smoke -nadv 43"
 This loads basic smoke model, but this is overwritten by SourceMods files for generic fractal haze
 	-nadv = number of advected constituents = (H2O water, H2O ice, H2O liquid, + N CARMA bins)
 	-nlev = number of vertical levels (need higher model top for stratospheric haze

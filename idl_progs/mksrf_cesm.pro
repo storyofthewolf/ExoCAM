@@ -1,7 +1,22 @@
 pro mksrf_cesm 
-; This is my own code for manipulating the surface data types
-;-------------------------------------------------------
+;------------------------------------------------------------
+; Wolf, E.T.  
+; Last updated: April 7th, 2022
+;------------------------------------------------------------
+; Purpose: Code for manipulating the surface data types, surfdata
+;------------------------------------------------------------
+; NOTES: The easiest way to start is to copy over a surfdata file
+; that most closely matches your desired new configuration.
+;
+;------------------------------------------------------------
 
+; set longitude latitude, 
+;4x5
+nlon=72
+nlat=46
+
+
+; Read in Data from existing surfdata file
 fname = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_land_fv/surfdata_4x5_sand_fmax0.5_sc5.nc'
 ncid = ncdf_open(fname,/nowrite)
 ncdf_varget,ncid,'PCT_GLACIER',PCT_GLACIER   ;percent glacier [lat, lon]
@@ -23,7 +38,7 @@ ncdf_varget,ncid,'PFTDATA_MASK',PFTDATA_MASK ;land mask from pft dataset, indica
 
 ncdf_varget,ncid,'EF1_BTR',EF1_BTR    & EF1_BTR(*,*) = 0.0
 ncdf_varget,ncid,'EF1_FET',EF1_FET    & EF1_FET(*,*) = 0.0
-ncdf_varget, ncid,'EF1_FDT',EF1_FDT    & EF1_FDT(*,*) = 0.0 
+ncdf_varget,ncid,'EF1_FDT',EF1_FDT    & EF1_FDT(*,*) = 0.0 
 ncdf_varget,ncid,'EF1_SHR',EF1_SHR    & EF1_SHR(*,*) = 0.0
 ncdf_varget,ncid,'EF1_GRS', EF1_GRS   & EF1_GRS(*,*) = 0.0
 ncdf_varget,ncid,'EF1_CRP', EF1_CRP   & EF1_CRP(*,*) = 0.0
@@ -57,7 +72,12 @@ ncdf_varget,ncid,'MONTHLY_LAI',MONTHLY_LAI & MONTHLY_LAI(*,*,*,*) = 0.0
 ncdf_varget,ncid,'MONTHLY_SAI',MONTHLY_SAI & MONTHLY_SAI(*,*,*,*) = 0.0
 ncdf_varget,ncid,'MONTHLY_HEIGHT_TOP',MONTHLY_HEIGHT_TOP & MONTHLY_HEIGHT_TOP(*,*,*,*) = 0.0
 ncdf_varget,ncid,'MONTHLY_HEIGHT_BOT',MONTHLY_HEIGHT_BOT & MONTHLY_HEIGHT_BOT(*,*,*,*) = 0.0
-ncdf_close, ncid
+ncdf_close,ncid
+
+
+; toggle to modify polar caps
+do_northpolar_band = 0
+do_southpolar_band = 0
 
 
 ; set number soil colors to 21.  This includes the 20 standard colors already
@@ -67,9 +87,10 @@ mxsoil_color = 21
 ;clear PCT_PFT
 PCT_PFT(*,*,*) = 0.0
 
+;--- Set gridcell fractions of primary land and soil types
 i=0
-for x=0,71 do begin
-  for y=0,45 do begin
+for x=0,nlon-1 do begin
+  for y=0,nlat-1 do begin
     i=i+1
     ;print,i, PCT_GLACIER(x,y), Total(PCT_PFT(x,y,*)), PCT_SAND(x,y,0), PCT_CLAY(x,y,0), PCT_WETLAND(x,y)
     ;PCT_PFT(x,y,0) = total(PCT_PFT(x,y,0))+PCT_GLACIER(x,y)
@@ -82,33 +103,111 @@ for x=0,71 do begin
     PCT_LAKE(x,y) = 0.0
     PCT_URBAN(x,y) = 0.0 
     SOIL_COLOR(x,y) = 21
-    print,i, PCT_GLACIER(x,y), Total(PCT_PFT(x,y,*)), PCT_URBAN(x,y), PCT_WETLAND(x,y), PCT_LAKE(x,y), SOIL_COLOR(x,y)
   endfor
 endfor
 
 
+if (do_northpolar_band eq 1) then begin
 ; set by latitute bands
-;for y=3,43 do begin
-;   PCT_PFT(*,y,0) = 0.
-;   PFTDATA_MASK(*,y) = 0.
-;   PCT_SAND(*,y,*) = 0.0
-;   PCT_CLAY(*,y,*) = 0.0
-;   PCT_GLACIER(*,y) = 0.0
-;   PCT_WETLAND(*,y) = 0.0
-;   PCT_LAKE(*,y) = 0.0
-;   PCT_URBAN(*,y) = 0.0
-;   SOIL_COLOR(*,y) = 0
-;endfor
+; north pole
+  for y=41,45 do begin
+    PCT_PFT(*,y,0) = 0.
+    PFTDATA_MASK(*,y) = 0.
+    PCT_SAND(*,y,*) = 0.0
+    PCT_CLAY(*,y,*) = 0.0
+    PCT_GLACIER(*,y) = 100.0
+    PCT_WETLAND(*,y) = 0.0
+    PCT_LAKE(*,y) = 0.0
+    PCT_URBAN(*,y) = 0.0
+    SOIL_COLOR(*,y) = 0
+  endfor
+endif
 
+if (do_southpolar_band eq 1) then begin
+;south pole
+  for y=0,4 do begin
+    PCT_PFT(*,y,0) = 0.
+    PFTDATA_MASK(*,y) = 0.
+    PCT_SAND(*,y,*) = 0.0
+    PCT_CLAY(*,y,*) = 0.0
+    PCT_GLACIER(*,y) = 100.0
+    PCT_WETLAND(*,y) = 0.0
+    PCT_LAKE(*,y) = 0.0
+    PCT_URBAN(*,y) = 0.0
+    SOIL_COLOR(*,y) = 0
+  endfor
+endif
+; print land types
+print,"i,x,y PCT_GLACIER(x,y), Total(PCT_PFT(x,y,*)), PCT_URBAN(x,y), PCT_WETLAND(x,y), PCT_LAKE(x,y), SOIL_COLOR(x,y)"
+i=0
+for x=0,71 do begin
+  for y=0,45 do begin
+    i=i+1
+    print,i,x,y,PCT_GLACIER(x,y), Total(PCT_PFT(x,y,*)), PCT_URBAN(x,y), PCT_WETLAND(x,y), PCT_LAKE(x,y), SOIL_COLOR(x,y)
+  endfor
+endfor
 
 PCT_GLC_MEC(*,*,*) = 0.0
 TOPO_GLC_MEC(*,*,*) = 0.0
 THCK_GLC_MEC(*,*,*) = 0.0
 LANDFRAC_PFT(*,*) = 1.0
 
+; set up thermal inertia (if needed)
+THM_INERTIA_OUT=fltarr(nlon, nlat)
+for ilon=0, nlon-1 do begin
+   for ilat=0, nlat-1 do begin
+      ; set to constant value
+      THM_INERTIA_OUT(ilon,ilat) = 250.0
+   endfor
+endfor
+
+; set up roughness length (if needed)
+; open roughness file
+file_rough = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/mars/lnd/roughness_length.nc"      
+ncid=ncdf_open(file_rough, /nowrite)
+ncdf_varget,ncid,'lat',lat_rough    & help,lat_rough
+ncdf_varget,ncid,'lon',lon_rough      & help, lon_rough
+ncdf_varget,ncid,'z0m',z0m      & help, z0m
+ncdf_close,ncid
+nlatr = n_elements(lat_rough)
+nlonr = n_elements(lon_rough)
+; file not used at the moment
+
+ROUGHNESS_OUT=fltarr(nlon, nlat)
+for ilon=0, nlon-1 do begin
+   for ilat=0, nlat-1 do begin
+      ; set to constant value
+      ROUGHNESS_OUT(ilon,ilat) = 0.01
+   endfor
+endfor
+
+
+;----------------------------------------------------
+; Set up output file.
 file_out = 'surfdata_4x5_test.nc'
 spawn, 'cp /gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_land_fv/surfdata_4x5_sand_fmax0.5_sc5.nc surfdata_4x5_test.nc'
 ncid = ncdf_open(file_out, /write)
+
+
+;Block for adding new inputs to surfdata
+; thermal inertia and roughness are expected in the mars configuration
+NCDF_CONTROL, ncid, /REDEF
+lon_id=ncdf_dimid(ncid,'lsmlon')
+lat_id=ncdf_dimid(ncid,'lsmlat')
+; add thermal inertia surfdata file
+var1=ncdf_vardef(ncid, 'THM_INERTIA',[lon_id,lat_id],/float)
+NCDF_ATTPUT, ncid, var1, "title", "Thermal Inertia of Ground"
+NCDF_ATTPUT, ncid, var1, "units", "J m-2 K-1 s-1/2"
+; add roughness to surfdata file
+var2=ncdf_vardef(ncid, 'ROUGHNESS',[lon_id,lat_id],/float)
+NCDF_ATTPUT, ncid, var2, "title", "Roughness Length"
+NCDF_ATTPUT, ncid, var2, "units", "m"
+NCDF_CONTROL, ncid, /ENDEF
+
+
+
+ncdf_varput, ncid, 'THM_INERTIA',THM_INERTIA_OUT
+ncdf_varput, ncid, 'ROUGHNESS', ROUGHNESS_OUT
 ncdf_varput, ncid, 'LANDFRAC_PFT',LANDFRAC_PFT
 ncdf_varput, ncid, 'PCT_CLAY',PCT_CLAY
 ncdf_varput, ncid, 'PCT_SAND',PCT_SAND

@@ -109,6 +109,7 @@ contains
     real(r8), pointer :: watsat(:,:)       ! volumetric soil water at saturation (porosity)
     real(r8), pointer :: frac_sno(:)       ! fraction of ground covered by snow (0 to 1)
     real(r8), pointer :: soilbeta(:)       ! soil wetness relative to field capacity
+    real(r8), pointer :: co2dp(:)          ! co2 mass kg/m2  ! mars 
 !
 ! local pointers to implicit inout arguments
 !
@@ -251,6 +252,7 @@ contains
     h2osoi_liq     => cws%h2osoi_liq
     frac_sno       => cps%frac_sno
     soilbeta       => cws%soilbeta
+    co2dp          => cps%co2dp  ! mars 
 
     ! Assign local pointers to derived type members (pft-level)
 
@@ -448,9 +450,9 @@ contains
         endif
 
         ! Mars ETW
+        co2z = co2dp(c) / SHR_CONST_DENSITYCO2FR
         if (co2z > SHR_CONST_CO2ICE_THICK) then
-          ! if CO2 ice is present in sufficient thickness
-          ! water evaporation/sublimation prevented
+          ! if CO2 ice is present in sufficient thickness, prevent water evaporation/sublimation
           qflx_evap_soi(p) = 0.0
         endif
 

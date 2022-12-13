@@ -13,8 +13,7 @@ xmlchange CAM_CONFIG_OPTS="-phys cam4 -nlev 40 -usr_src
 
 
 == create the case ==
-create_newcase -case $my_landplanet_case -res f45_f45 -mach discover -compset
-L2000
+create_newcase -case $my_landplanet_case -res f45_f45 -mach discover -compset L2000
 
 
 == set levels, physics, and the ExoRT radiative transfer package ==

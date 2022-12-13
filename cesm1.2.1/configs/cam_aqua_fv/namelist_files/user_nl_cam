@@ -46,9 +46,6 @@ trop_cloud_top_press = 1.
 !!--------------------------------------------
 !! settings for output variables and timings
 !!
-!! additional MG cloud variables, add to end of fincl1 
-! 'EFFLIQ','EFFICE','IWC','LWC','ICWNC','ICINC'
-
 
 !! standard outputs, monthly means
 nhtfrq = 0
@@ -62,6 +59,9 @@ fincl1 = 'T','TS','PS','ALDIR','ALDIF','ASDIR','ASDIF','FUL','FUS','FDL','FDS','
 !avgflag_pertape = 'I'
 !empty_htapes=.true.
 !fincl1='FLNT','FSNT','TS','TMQ','TGCLDIWP','TGCLDLWP','T','Q','CLOUD','CLDICE','CLDLIQ','PS','REL','REI','CLDTOT'
+
+!! additional MG cloud variables, add to fincl
+! 'EFFLIQ','EFFICE','IWC','LWC','ICWNC','ICINC'
 
 !! output for spectral output n68
 !! use for F**_toa_int## variables to output binned fluxes, do_exo_rt_spectral = .true.

@@ -38,7 +38,7 @@ module exoplanet_mod
   logical, public, parameter :: do_exo_condense_co2 = .true.    !! flag to condense co2 on surface and in atmosphere 
                                                                 !! Must add an advected constituent at build 
                                                                 !! -nadv 4 (Q, CLDLIQ, CLDICE, CLDCO2)
-  logical, public, parameter :: do_exo_co2cloud_rad = .true.   !! include CO2 cloud in radiative transfer calculation
+  logical, public, parameter :: do_exo_co2cld_rad = .true.      !! include CO2 cloud in radiative transfer calculation
                                                                 !! false implies transparent clouds
   logical, public, parameter :: do_exo_soilcp = .true.          !! use soil heat capacity and bulk density set here
   

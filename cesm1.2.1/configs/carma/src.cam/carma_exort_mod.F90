@@ -30,7 +30,7 @@ module carma_exort_mod
   ! Optical constants for CARMA aerosols
   character(len=256), parameter :: dircarma = 'data/aerosol/'
   character(len=256), parameter :: cname = 'Khare.haze.fractal_n28_nbin40.nc'
-  real(r8), public               :: qcarma(NELEM, NBIN, ntot_wavlnrng)   ! carma constituent mass extinction coefficient (cm2 g-1) ???
+  real(r8), public               :: qcarma(NELEM, NBIN, ntot_wavlnrng)   ! carma constituent mass extinction coefficient
   real(r8), public               :: wcarma(NELEM, NBIN, ntot_wavlnrng)   ! carma constituent single scattering albedo                             
   real(r8), public               :: gcarma(NELEM, NBIN, ntot_wavlnrng)   ! carma constituent asymmetry parameter    
 

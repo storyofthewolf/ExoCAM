@@ -330,7 +330,7 @@ contains
                 fmelt    = (snowbd/100.)**1.
                 ! 100 is the assumed fresh snow density; 1 is a melting factor that could be
                 ! reconsidered, optimal value of 1.5 in Niu et al., 2007
-            !    frac_sno(c) = tanh( snowdp(c) /(2.5 * zlnd * fmelt) )
+                !frac_sno(c) = tanh( snowdp(c) /(2.5 * zlnd * fmelt) )
                 frac_sno(c) = snowdp(c)/(10.*z0m_ini(c) + snowdp(c) + co2dp(c)/SHR_CONST_DENSITYCO2FR)  ! mars
              endif
           end if

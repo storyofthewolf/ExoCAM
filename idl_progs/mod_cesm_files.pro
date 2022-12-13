@@ -113,9 +113,10 @@ file_pop_frc = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_mi
 file_pop_frc_out = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/pop_frc.gx3v7.110128_zmean.nc"
 
 ;--- ncdata files in/oout --
-file_ncdata = '/gpfsm/dnb53/etwolf/cesm_scratch/rundir/mars_dev2/run/mars_dev2.cam.i.0001-01-09-00000.nc'
-file_ncdata_out = '/gpfsm/dnb53/etwolf/models/CESM_Mars/marsfiles/atm/mars_dev2_adjusted.cam.i.0001-01-09-00000.nc'
-
+;file_ncdata = '/gpfsm/dnb53/etwolf/cesm_scratch/rundir/mars_dev2/run/mars_dev2.cam.i.0001-01-09-00000.nc'
+;file_ncdata_out = '/gpfsm/dnb53/etwolf/models/CESM_Mars/marsfiles/atm/mars_dev2_adjusted.cam.i.0001-01-09-00000.nc'
+file_ncdata = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/ic_1bar_L51_ic.nc' 
+file_ncdata_out = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/ic_1bar_L51_300Kiso_Q0.01_ic.nc'
 
 ;-- new file names --
 ;file_domfile_out = '/projects/btoon/wolfet/exofiles/ocn/aquaplanet/pop_frc.gx3v7.110128.nc_0OHT.nc'
@@ -323,20 +324,32 @@ if (make_ncdata eq 1) then begin
   US_OUT = fltarr(nlon,nslat,nlev)
 
   ;set variables fo constants
-;  P0_OUT=1.e5
-;  PS_OUT(*,*) =1.e5
+  P0_OUT=1.e5
+  PS_OUT(*,*) =1.e5
 ;  TSICE_OUT(*,*)=0.0   ;273.15
 ;  ICEFRAC_OUT(*,*)=0.0
 ;  SICTHK_OUT(*,*)=0.0
 ;  SNOWHICE_OUT(*,*)=0.0
-;  T_OUT(*,*,*) = 300.0
-;  TS1_OUT(*,*) = 300.0
-;  TS2_OUT(*,*) = 300.0
-;  TS3_OUT(*,*) = 300.0
-;  TS4_OUT(*,*) = 300.0
-  Q_OUT(*,*,*) = 0.0
+  T_OUT(*,*,*) = 300.0
+;  T_OUT(*,*,10:nlev-1) = 300.0
+;   T_OUT(*,*,9) = 290.0
+;   T_OUT(*,*,8) = 280.0
+;   T_OUT(*,*,7) = 270.0
+;   T_OUT(*,*,6) = 260.0
+;   T_OUT(*,*,0:5) = 250.0
+  TS_OUT(*,*,*) = 300.0
+  TS1_OUT(*,*) = 300.0
+  TS2_OUT(*,*) = 300.0
+  TS3_OUT(*,*) = 300.0
+  TS4_OUT(*,*) = 300.0
+;  Q_OUT(*,*,*) = double(0.01)
+  Q_OUT(*,*,10:nlev-1) = double(0.01)
+   Q_OUT(*,*,8:9) = 1.0e-4
+   Q_OUT(*,*,6:7) = 1.0e-6
+   Q_OUT(*,*,4:5) = 1.0e-8
+   Q_OUT(*,*,0:3) = 1.0e-10
   CLDICE_OUT(*,*,*) = 0.0
-  CLDICE_CO2_OUT(*,*,*) = 0.0
+;  CLDICE_CO2_OUT(*,*,*) = 0.0
   CLDLIQ_OUT(*,*,*) = 0.0
 ;  VS_OUT(*,*,*) = 0.0
 ;  US_OUT(*,*,*) = 0.0
@@ -372,23 +385,23 @@ if (make_ncdata eq 1) then begin
 
   ;---- update ncdata file ----
   ncid = ncdf_open(file_ncdata_out, /WRITE)
-  print, "updatinf ncdata file"
-  print, file_ncdata_out
-;  ncdf_varput, ncid, 'P0',P0_OUT
-;  ncdf_varput, ncid, 'PS',PS_OUT
+  print, "updating ncdata file"
+ print, file_ncdata_out
+  ncdf_varput, ncid, 'P0',P0_OUT
+  ncdf_varput, ncid, 'PS',PS_OUT
  ; ncdf_varput, ncid, 'TSICE',TSICE_OUT
 ;  ncdf_varput, ncid, 'SICTHK',SICTHK_OUT
 ;  ncdf_varput, ncid, 'SICTHK',SICTHK_OUT
 ; ncdf_varput, ncid, 'TS',TS_OUT
-;  ncdf_varput, ncid, 'TS1',TS1_OUT
-;  ncdf_varput, ncid, 'TS2',TS2_OUT
-;  ncdf_varput, ncid, 'TS3',TS3_OUT
-;  ncdf_varput, ncid, 'TS4',TS4_OUT
+  ncdf_varput, ncid, 'TS1',TS1_OUT
+  ncdf_varput, ncid, 'TS2',TS2_OUT
+  ncdf_varput, ncid, 'TS3',TS3_OUT
+  ncdf_varput, ncid, 'TS4',TS4_OUT
   ncdf_varput, ncid, 'CLDICE',CLDICE_OUT
-  ncdf_varput, ncid, 'CLDICE_CO2',CLDICE_CO2_OUT
+;  ncdf_varput, ncid, 'CLDICE_CO2',CLDICE_CO2_OUT
   ncdf_varput, ncid, 'CLDLIQ',CLDLIQ_OUT
   ncdf_varput, ncid, 'Q',Q_OUT
-;  ncdf_varput, ncid, 'T',T_OUT
+  ncdf_varput, ncid, 'T',T_OUT
 ;  ncdf_varput, ncid, 'VS',VS_OUT
 ;  ncdf_varput, ncid, 'US',US_OUT
   ncdf_close, ncid

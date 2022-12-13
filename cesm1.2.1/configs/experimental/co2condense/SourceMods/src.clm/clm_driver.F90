@@ -689,6 +689,7 @@ subroutine clm_drv(doalb, nextsw_cday, declinp1, declin, rstwr, nlend, rdate)
      ! ============================================================================
 
      if (doalb) then
+        dtime = get_step_size()
         call t_startf('surfalb')
         call get_curr_calday_rotation(frac_day, frac_year,offset=int(dtime))
         ! Albedos for non-urban columns
