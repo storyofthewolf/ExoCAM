@@ -151,7 +151,7 @@ subroutine phys_register
     ! ***** N.B. ***** This must be the first call to cnst_add so that
     !                  water vapor is constituent 1.
     if (moist_physics) then
-       call cnst_add('Q', mwh2o, cpwv, 1.E-12_r8, mm, &
+       call cnst_add('Q', mwh2o, cpwv, 0.0_r8, mm, &               ! exo mod, E.T. Wolf, was 1.0e-12
             longname='Specific humidity', readiv=.true., is_convtran1=.true.)
     else
        call cnst_add('Q', mwh2o, cpwv, 0.0_r8, mm, &
@@ -1506,7 +1506,7 @@ subroutine tphysac (ztodt,   cam_in,  &
       call check_energy_chng(state, tend, "gwdrag", nstep, ztodt, zero, zero, zero, zero)
       call t_stopf('gw_intr')
     endif
-
+  
 #if ( defined WACCM_PHYS )
 
     ! QBO relaxation
