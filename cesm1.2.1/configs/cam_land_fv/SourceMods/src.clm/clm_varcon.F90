@@ -66,8 +66,8 @@ module clm_varcon
   real(r8) :: bdsno = 250._r8       !bulk density snow (kg/m**3)
   real(r8) :: alpha_aero = 1.0_r8   !constant for aerodynamic parameter weighting
   real(r8) :: tlsai_crit = 2.0_r8   !critical value of elai+esai for which aerodynamic parameters are maximum
-  real(r8) :: watmin = 0.01_r8      !minimum soil moisture (mm)   ! WOLF, note model crash if set to 0.0
-  !real(r8) :: watmin = 1.0e-10_r8      !minimum soil moisture (mm)
+  !real(r8) :: watmin = 0.01_r8      !minimum soil moisture (mm)   
+  real(r8) :: watmin = 1.0e-15_r8      !minimum soil moisture (mm) ! WOLF, exo_mod, model crash if set to 0.0
 
   real(r8) :: re = SHR_CONST_REARTH*0.001_r8 !radius of earth (km)
 
