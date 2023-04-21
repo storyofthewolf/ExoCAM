@@ -342,11 +342,12 @@ subroutine pcond (lchnk   ,ncol    , &
 !
 ! Local workspace
 !
-   real(r8) :: precab(pcols)        ! rate of precipitation (kg / (m**2 * s))
-   integer i                 ! work variable
-   integer iter              ! #iterations for precipitation calculation
-   integer k                 ! work variable
-   integer l                 ! work variable
+   integer, parameter :: iter_max = 64          ! maximum #iterations for precipitation calculation
+   real(r8) :: precab(pcols)                    ! rate of precipitation (kg / (m**2 * s))
+   integer i                                    ! work variable
+   integer iter                                 ! #iterations for precipitation calculation
+   integer k                                    ! work variable
+   integer l                                    ! work variable
 
    real(r8) cldm(pcols)          ! mean cloud fraction over the time step
    real(r8) cldmax(pcols)        ! max cloud fraction above
@@ -403,9 +404,9 @@ subroutine pcond (lchnk   ,ncol    , &
    real(r8) clrh2o               ! Ratio of latvap to water vapor gas const
    real(r8) ice(pcols,pver)    ! ice mixing ratio
    real(r8) liq(pcols,pver)    ! liquid mixing ratio
-   real(r8) rcwn(pcols,2,pver), rliq(pcols,2,pver), rice(pcols,2,pver)
-   real(r8) cwnsave(pcols,2,pver), cmesave(pcols,2,pver)
-   real(r8) prodprecsave(pcols,2,pver)
+   real(r8) rcwn(pcols,iter_max,pver), rliq(pcols,iter_max,pver), rice(pcols,iter_max,pver)
+   real(r8) cwnsave(pcols,iter_max,pver), cmesave(pcols,iter_max,pver)
+   real(r8) prodprecsave(pcols,iter_max,pver)
    logical error_found
 !
 !------------------------------------------------------------
@@ -416,7 +417,7 @@ subroutine pcond (lchnk   ,ncol    , &
    iter = 1   ! number of times to iterate the precipitation calculation
 #else
    mincld = 1.e-4_r8
-   iter = 64
+   iter = iter_max
 #endif
 !   omsm = 0.99999
    cpohl = cpair/latvap
