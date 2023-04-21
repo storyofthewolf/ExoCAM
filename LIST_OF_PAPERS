@@ -2,7 +2,7 @@ LIST OF PAPERS
 
 In the beginning, there was CAM.  ExoCAM and its radiative transfer package
 ExoRT arose from the ashes of Eric T. Wolf's graduate work on the Archean
-Earth, and the faint young Sun paradox.  Over the years E.T. Wolf developed
+Earth and the faint young Sun paradox.  Over the years E.T. Wolf developed
 CAM to use for paleoclimate and exoplanetary atmospheres.  ExoCAM and ExoRT
 were formalized on Github for public use in the summer of 2019.  Below is a
 list of papers published that directly use ExoCAM, ExoRT, and their ancestral
@@ -14,8 +14,8 @@ eric.wolf@colorado.edu.
 
 
 
-Total Number published (43)
-submitted/in revision (1)
+Total Number published (44)
+submitted/in revision (2)
 
 Number by year
 2022 (10)
@@ -30,6 +30,12 @@ Number by year
 2013 (1)
 
 ======================= submitted/in revision/in press ========================
+(46) "The CARMENES search for exoplanets around M dwarfs, Wolf 1069 b:
+       Earth-mass planet in the habitable zone of a nearby, very low-mass star"
+      Kossakowski, D., Kurster, M., Trifonov, T, Henning, Th, Kemmer, J., 
+      Caballero, J.A., Burn, R., Sabotta, S., Crouse, J.S, et al.
+      
+
 (45) "Terminator Habitability: the Case for Limited Water Availability on
        M-dwarf Planets."
       Lobo, A.H., Shields, A.L., Palubski, I.Z., and Wolf, E.T.
@@ -78,9 +84,9 @@ Number by year
 
 (38) "The TRAPPIST-1 Habitable Atmosphere Intercomparison (THAI). 
        Part III: Simulated Observables – The return of the spectrum"
-      Sergeev, D.E., Fauchez, T.J., Turbet, M., Boutle, I.A., Tsigaridis, K., Way,
-      M.J., Wolf, E.T., Domagal-Goldman, S.D., Forget, F., Haqq-Misra, J.,
-      Kopparapu, R.K., Lambert, F.H., Manners, J., and Mayne, N.J.
+      Fauchez, T.J., Villanueva, G., Sergeev, D.E., Turbet, M., Boutle, I.A., 
+      Tsigaridis, K., Way, M.J., Wolf, E.T., Domagal-Goldman, S.D., Forget, F.,
+      Haqq-Misra, J., Kopparapu, R.K., Lambert, F.H., Manners, J., and Mayne, N.J.
       The Planetary Science Journal, 3:213 (17pp), 2022
       doi.org/10.3847/PSJ/ac6cf1
 
