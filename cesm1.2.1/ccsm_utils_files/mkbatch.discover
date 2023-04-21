@@ -39,7 +39,7 @@ cat >! $file << EOF1
 #SBATCH --mem=20gb
 #SBATCH -N ${mppnodes}                            
 #SBATCH --ntasks-per-node ${MAX_TASKS_PER_NODE}   
-#SBATCH --constraint=hasw
+#SBATCH --constraint=sky
 #SBATCH -o run.out          
 limit stacksize unlimited
 
