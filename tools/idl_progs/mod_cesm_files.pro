@@ -115,8 +115,10 @@ file_pop_frc_out = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/ca
 ;--- ncdata files in/oout --
 ;file_ncdata = '/gpfsm/dnb53/etwolf/cesm_scratch/rundir/mars_dev2/run/mars_dev2.cam.i.0001-01-09-00000.nc'
 ;file_ncdata_out = '/gpfsm/dnb53/etwolf/models/CESM_Mars/marsfiles/atm/mars_dev2_adjusted.cam.i.0001-01-09-00000.nc'
-file_ncdata = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/ic_1bar_L51_ic.nc' 
-file_ncdata_out = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/ic_1bar_L51_300Kiso_Q0.01_ic.nc'
+;file_ncdata = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/ic_0.1bar_L46_300Kiso_dry_ic.nc'
+;file_ncdata_out = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/ic_0.1bar_L46_300Kiso_Q0.01_ic.nc'
+file_ncdata = '/gpfsm/dnb53/etwolf/cesm_scratch/archive/wolf1069b_modern_granite_fixed/rest/0117-01-01-00000/wolf1069b_modern_granite_fixed.cam.i.0117-01-01-00000.nc'
+file_ncdata_out = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/wolf1069_land_planet.i.nc'
 
 ;-- new file names --
 ;file_domfile_out = '/projects/btoon/wolfet/exofiles/ocn/aquaplanet/pop_frc.gx3v7.110128.nc_0OHT.nc'
@@ -132,7 +134,10 @@ file_ncdata_out = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam
 ;file_ocn_master_out = '/projects/btoon/wolfet/exofiles/ocn/aquaplanet/pop_frc.1x1d.090130_aquaplanet.nc'
 ;file_ocn_master_out = '/projects/btoon/wolfet/exofiles/ocn/aquaplanet/pop_frc.4x5d_warm_aqua_300K_1barN2.nc'
 
-;========== BND_TOPO =====================
+;===============================================
+;= BND_TOPO ====================================
+;= topography file =============================
+;===============================================
 if (make_bndtopo eq 1) then begin
 
   oprstr="cp -r " + file_bndtopo + " " + file_bndtopo_out
@@ -179,6 +184,11 @@ if (make_bndtopo eq 1) then begin
 
 endif
 
+
+;===============================================
+;= POP_FRC =====================================
+;= slab ocean ic file ==========================
+;===============================================
 if (make_popfrc eq 1) then begin
   oprstr="cp -r " + file_pop_frc + " " + file_pop_frc_out
   spawn, oprstr
@@ -271,7 +281,12 @@ if (make_popfrc eq 1) then begin
 
 endif
 
+;===============================================
+;= NCDATA ======================================
+;= atmosphere ic file ==========================
+;===============================================
 if (make_ncdata eq 1) then begin
+  print, "<<<:::>>>  updating ncdata file  <<<:::>>>"
   oprstr="cp -r " + file_ncdata + " " + file_ncdata_out
   spawn, oprstr
 
@@ -324,8 +339,8 @@ if (make_ncdata eq 1) then begin
   US_OUT = fltarr(nlon,nslat,nlev)
 
   ;set variables fo constants
-  P0_OUT=1.e5
-  PS_OUT(*,*) =1.e5
+;  P0_OUT=1.e5
+;  PS_OUT(*,*) =1.e5
 ;  TSICE_OUT(*,*)=0.0   ;273.15
 ;  ICEFRAC_OUT(*,*)=0.0
 ;  SICTHK_OUT(*,*)=0.0
@@ -337,17 +352,17 @@ if (make_ncdata eq 1) then begin
 ;   T_OUT(*,*,7) = 270.0
 ;   T_OUT(*,*,6) = 260.0
 ;   T_OUT(*,*,0:5) = 250.0
-  TS_OUT(*,*,*) = 300.0
+  TS_OUT(*,*) = 300.0
   TS1_OUT(*,*) = 300.0
   TS2_OUT(*,*) = 300.0
   TS3_OUT(*,*) = 300.0
   TS4_OUT(*,*) = 300.0
-;  Q_OUT(*,*,*) = double(0.01)
-  Q_OUT(*,*,10:nlev-1) = double(0.01)
-   Q_OUT(*,*,8:9) = 1.0e-4
-   Q_OUT(*,*,6:7) = 1.0e-6
-   Q_OUT(*,*,4:5) = 1.0e-8
-   Q_OUT(*,*,0:3) = 1.0e-10
+  Q_OUT(*,*,*) = double(0.01)
+;  Q_OUT(*,*,10:nlev-1) = double(0.01)
+;   Q_OUT(*,*,8:9) = 1.0e-4
+;   Q_OUT(*,*,6:7) = 1.0e-6
+;   Q_OUT(*,*,4:5) = 1.0e-8
+;   Q_OUT(*,*,0:3) = 1.0e-10
   CLDICE_OUT(*,*,*) = 0.0
 ;  CLDICE_CO2_OUT(*,*,*) = 0.0
   CLDLIQ_OUT(*,*,*) = 0.0
@@ -387,23 +402,22 @@ if (make_ncdata eq 1) then begin
   ncid = ncdf_open(file_ncdata_out, /WRITE)
   print, "updating ncdata file"
  print, file_ncdata_out
-  ncdf_varput, ncid, 'P0',P0_OUT
-  ncdf_varput, ncid, 'PS',PS_OUT
- ; ncdf_varput, ncid, 'TSICE',TSICE_OUT
-;  ncdf_varput, ncid, 'SICTHK',SICTHK_OUT
-;  ncdf_varput, ncid, 'SICTHK',SICTHK_OUT
-; ncdf_varput, ncid, 'TS',TS_OUT
-  ncdf_varput, ncid, 'TS1',TS1_OUT
-  ncdf_varput, ncid, 'TS2',TS2_OUT
-  ncdf_varput, ncid, 'TS3',TS3_OUT
-  ncdf_varput, ncid, 'TS4',TS4_OUT
-  ncdf_varput, ncid, 'CLDICE',CLDICE_OUT
-;  ncdf_varput, ncid, 'CLDICE_CO2',CLDICE_CO2_OUT
-  ncdf_varput, ncid, 'CLDLIQ',CLDLIQ_OUT
-  ncdf_varput, ncid, 'Q',Q_OUT
-  ncdf_varput, ncid, 'T',T_OUT
-;  ncdf_varput, ncid, 'VS',VS_OUT
-;  ncdf_varput, ncid, 'US',US_OUT
+;  ncdf_varput, ncid, 'P0',P0_OUT                  &  print, "updated P0"
+;  ncdf_varput, ncid, 'PS',PS_OUT                  &  print, "updated PS"
+;  ncdf_varput, ncid, 'TSICE',TSICE_OUT            &  print, "updated TSICE"
+;  ncdf_varput, ncid, 'SICTHK',SICTHK_OUT          &  print, "updated SICTHK"
+;  ncdf_varput, ncid, 'TS',TS_OUT                   &  print, "updated TS"
+;  ncdf_varput, ncid, 'TS1',TS1_OUT                &  print, "updated TS1_OUT"
+;  ncdf_varput, ncid, 'TS2',TS2_OUT                &  print, "updated TS2_OUT"
+;  ncdf_varput, ncid, 'TS3',TS3_OUT                &  print, "updated TS3_OUT"
+;  ncdf_varput, ncid, 'TS4',TS4_OUT                &  print, "updated TS4_OUT"
+  ncdf_varput, ncid, 'CLDICE',CLDICE_OUT           &  print, "updated CLDICE"
+;  ncdf_varput, ncid, 'CLDICE_CO2',CLDICE_CO2_OUT  &  print, "updated PS"
+  ncdf_varput, ncid, 'CLDLIQ',CLDLIQ_OUT           &  print, "updated CLDLIQ"
+  ncdf_varput, ncid, 'Q',Q_OUT                     &  print, "updated Q"
+;  ncdf_varput, ncid, 'T',T_OUT                    &  print, "updated T"
+;  ncdf_varput, ncid, 'VS',VS_OUT                  &  print, "updated VS"
+;  ncdf_varput, ncid, 'US',US_OUT                  &  print, "updated US"
   ncdf_close, ncid
 
 
@@ -411,6 +425,11 @@ if (make_ncdata eq 1) then begin
 
 endif
 
+
+;=================================================
+;= LND_DOMAIN ====================================
+;= land model domain file ========================
+;=================================================
 if (make_lnd_domain eq 1) then begin
 
   oprstr="cp -r " + file_lnd_domain + " " + file_lnd_domain_out
@@ -454,6 +473,10 @@ if (make_lnd_domain eq 1) then begin
 endif
 
 
+;=================================================
+;= OCN_DOMAIN ====================================
+;= slab ocean model domain file ==================
+;=================================================
 if (make_ocn_domain eq 1) then begin
 
   oprstr="cp -r " + file_ocn_domain + " " + file_ocn_domain_out

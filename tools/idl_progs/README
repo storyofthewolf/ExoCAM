@@ -1,0 +1,15 @@
+/idl_progs
+
+Contains a variety of useful idl scripts for use with ExoCAM.  Note that my
+original analysis langauge was IDL. But starting in spring 2023 I am migrating
+to python to improve accessibility and engagement with scripts.
+
+-------------------------------------------------------------------------
+hybrid2pressure.pro       -- change hyrbid sigma coords to pressure
+area_weighted_avg_gen.pro -- calculate area weighed average
+changepress_cesm.pro      -- change the surface pressure in CAM .i. files
+changevert_cesm.pro       -- change the numnber of vertical levels in CAM .i. files
+mod_cesm_files.pro        -- modify/customize a smorgasboard 
+landplanet_cesm_files.pro -- manipulate land planet initial files
+haze_emission.pro         -- create carma haze emission file
+carma_optics.pro          -- create carma optics files

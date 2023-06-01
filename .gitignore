@@ -1,8 +1,13 @@
 #gitignore file
 
-# dynamic ocean stuff that's not ready for sharing
-idl_progs/topobathy.pro
-idl_progs/*.nc
+
+
+
+# 
+tools/py_progs/__pycache__
+tools/idl_progs/topobathy.pro
+tools/idl_progs/*.nc
+tools/idl_progs/*~
 cesm1.2.1/configs/cam4_aqua_dynocn_fv
 /gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/mars
 /gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/configs/extras

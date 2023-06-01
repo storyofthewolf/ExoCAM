@@ -1,0 +1,16 @@
+A collection of toolkits and scripts.
+
+Originally started written in IDL but has expanded into python as well to
+increase accessibility and utility as python is free and more popular.
+
+add the following to your IDL and PYTHONPATHs accordingly
+ExoCAM/tools/idl_progs
+ExoCAM/tools/py_progs
+
+
+contains
+-----------------------------------------------------------------------------
+trend      -- python program for time-series analysis of ExoCAM runs with 
+	      standard monthly mean output cadences
+py_progs   -- collection of general python scripts
+idl_progs  -- collection of general idl scripts 

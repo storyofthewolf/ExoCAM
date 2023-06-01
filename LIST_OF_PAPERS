@@ -1,23 +1,24 @@
 LIST OF PAPERS
 
 In the beginning, there was CAM.  ExoCAM and its radiative transfer package
-ExoRT arose from the ashes of Eric T. Wolf's graduate work on the Archean
-Earth and the faint young Sun paradox.  Over the years E.T. Wolf developed
-CAM to use for paleoclimate and exoplanetary atmospheres.  ExoCAM and ExoRT
-were formalized on Github for public use in the summer of 2019.  Below is a
-list of papers published that directly use ExoCAM, ExoRT, and their ancestral
-versions to conduct 3D climate simulations.  I do not include papers that used
-CESM/CAM/WACCM, etc that do not formally use the ExoCAM package.
+ExoRT arose from  Eric T. Wolf's graduate work on the Archean Earth and the 
+faint young Sun paradox.  Over the years E.T. Wolf developed CAM to use for 
+paleoclimate and exoplanetary atmospheres.  ExoCAM and ExoRT were formalized 
+on Github for public use in the summer of 2019.  Below is a list of papers 
+published that directly use ExoCAM, ExoRT, and/or its ancestral versions to 
+conduct 3D climate simulations, or makes priniciple use of publicly available 
+ExoCAM outputs for significant data analysis.
 
 If you have a paper that you think belongs on this list, please contact me at
 eric.wolf@colorado.edu.
 
 
 
-Total Number published (44)
-submitted/in revision (2)
+Total Number published (47)
+submitted/in revision (?)
 
 Number by year
+2023 (3)
 2022 (10)
 2021 (4) 
 2020 (10)
@@ -30,16 +31,28 @@ Number by year
 2013 (1)
 
 ======================= submitted/in revision/in press ========================
+
+
+================================== 2023 =======================================
+(47) "Lorenz Energy Cycle: Another Way to Understand the Atmospheric
+       Circulation on Tidally Locked Terrestrial Planets.
+      Wang, S. and Yang, J.
+      The Planetary Science Journal, 4(5) 84. 
+      DOI 10.3847/PSJ/accf11
+
 (46) "The CARMENES search for exoplanets around M dwarfs, Wolf 1069 b:
        Earth-mass planet in the habitable zone of a nearby, very low-mass star"
       Kossakowski, D., Kurster, M., Trifonov, T, Henning, Th, Kemmer, J., 
       Caballero, J.A., Burn, R., Sabotta, S., Crouse, J.S, et al.
-      
+      A&A 670, A84 (2023)
+      https://doi.org/10.1051/0004-6361/202245322
 
 (45) "Terminator Habitability: the Case for Limited Water Availability on
        M-dwarf Planets."
       Lobo, A.H., Shields, A.L., Palubski, I.Z., and Wolf, E.T.
-      Accepted at The Astrophysical Journal
+      The Astrophysical Journal, 945:161 (13pp), 2023 March 10 
+      https://doi.org/10.3847/1538-4357/aca970
+      
 
 ================================== 2022 =======================================
 (44) "General Circulation Model Constraints on the Detectability of the 

@@ -1,0 +1,5 @@
+py_progs
+a variety of useful python scripts for use with ExoCAM
+
+changevert_cesm.py       -- change the numnber of vertical levels in CAM .i. files
+
