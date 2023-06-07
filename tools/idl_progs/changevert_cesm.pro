@@ -20,7 +20,7 @@ do_dry = 0
 ;================================
 ;=======  name of new file ======
 ;================================
-;fname_out = '/gpfsm/dnb05/projects/p54/users/etwolf/samosa/icfiles/ic_P0.16bar_L31_ic.nc'
+;fname_out = '/gpfsm/dnb05/projects/p54/users/etwolf/samosa/icfiles/ic_0.16bar_L31_ic.nc'
 fname_out = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/wolf1069_titan.i.L55.nc'
 diagnostic_out = fname_out
 
