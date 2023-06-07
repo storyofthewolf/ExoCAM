@@ -109,16 +109,15 @@ file_lnd_domain_out =  "test_domain.nc"
 ;file_pop_frc = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/pop_frc.4x5d.090130_aquaplanet_300Kiso.nc"
 ;file_pop_frc_out = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/pop_frc.4x5d.090130_aquaplanet_200Kiso.nc"
 
-file_pop_frc = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_mixed_fv/pop_frc.gx3v7.110128_annual_mean.nc"
-file_pop_frc_out = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/pop_frc.gx3v7.110128_zmean.nc"
+;file_pop_frc = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_mixed_fv/pop_frc.gx3v7.110128_annual_mean.nc"
+;file_pop_frc_out = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/pop_frc.gx3v7.110128_zmean.nc"
 
 ;--- ncdata files in/oout --
 ;file_ncdata = '/gpfsm/dnb53/etwolf/cesm_scratch/rundir/mars_dev2/run/mars_dev2.cam.i.0001-01-09-00000.nc'
 ;file_ncdata_out = '/gpfsm/dnb53/etwolf/models/CESM_Mars/marsfiles/atm/mars_dev2_adjusted.cam.i.0001-01-09-00000.nc'
-;file_ncdata = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/ic_0.1bar_L46_300Kiso_dry_ic.nc'
-;file_ncdata_out = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/ic_0.1bar_L46_300Kiso_Q0.01_ic.nc'
-file_ncdata = '/gpfsm/dnb53/etwolf/cesm_scratch/archive/wolf1069b_modern_granite_fixed/rest/0117-01-01-00000/wolf1069b_modern_granite_fixed.cam.i.0117-01-01-00000.nc'
-file_ncdata_out = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/wolf1069_land_planet.i.nc'
+file_ncdata = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/ic_1bar_L40_300Kiso_ic.nc'
+file_ncdata_out = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/ic_1bar_L40_300Kiso_dry_ic.nc'
+
 
 ;-- new file names --
 ;file_domfile_out = '/projects/btoon/wolfet/exofiles/ocn/aquaplanet/pop_frc.gx3v7.110128.nc_0OHT.nc'
@@ -357,7 +356,8 @@ if (make_ncdata eq 1) then begin
   TS2_OUT(*,*) = 300.0
   TS3_OUT(*,*) = 300.0
   TS4_OUT(*,*) = 300.0
-  Q_OUT(*,*,*) = double(0.01)
+  Q_OUT(*,*,*) = 0.0
+;  Q_OUT(*,*,*) = double(0.01)
 ;  Q_OUT(*,*,10:nlev-1) = double(0.01)
 ;   Q_OUT(*,*,8:9) = 1.0e-4
 ;   Q_OUT(*,*,6:7) = 1.0e-6
