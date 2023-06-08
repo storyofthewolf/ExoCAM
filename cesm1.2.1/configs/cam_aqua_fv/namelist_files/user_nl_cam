@@ -6,7 +6,7 @@
 !!
 
 !! atmosphere initial condition file 
-ncdata = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/ic_P1bar_L40_zmean_ic.nc'
+ncdata = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/ic_1bar_L40_zmean_ic.nc'
 
 !! topography file
 bnd_topo = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/USGS-gtopo_aquaplanet_4x5.nc'
