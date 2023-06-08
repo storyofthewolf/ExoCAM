@@ -115,8 +115,8 @@ file_lnd_domain_out =  "test_domain.nc"
 ;--- ncdata files in/oout --
 ;file_ncdata = '/gpfsm/dnb53/etwolf/cesm_scratch/rundir/mars_dev2/run/mars_dev2.cam.i.0001-01-09-00000.nc'
 ;file_ncdata_out = '/gpfsm/dnb53/etwolf/models/CESM_Mars/marsfiles/atm/mars_dev2_adjusted.cam.i.0001-01-09-00000.nc'
-file_ncdata = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/ic_1bar_L40_300Kiso_ic.nc'
-file_ncdata_out = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/ic_1bar_L40_300Kiso_dry_ic.nc'
+file_ncdata = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/ic_1bar_L51_300Kiso_ic.nc'
+file_ncdata_out = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/ic_1bar_L51_300Kiso_dry_ic.nc'
 
 
 ;-- new file names --
