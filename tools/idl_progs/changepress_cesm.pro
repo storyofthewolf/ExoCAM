@@ -58,19 +58,19 @@ new_PS_mean = 1.5   ; [bars]
 ;---  assorted template initial files ---
 ;ncdata_in = '/discover/nobackup/etwolf/models/CESM_Mars/marsfiles/atm/mars.cam.i.0002-01-01-00000.nc'
 ncdata_in = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/wolf1069_land_planet.i.L46.nc'
-;ncdata_in = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/ic_P0.25bar_L40_ic.nc'
+;ncdata_in = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/ic_0.25bar_L40_ic.nc'
 ;ncdata_in = '/gpfsm/dnb53/etwolf/cesm_scratch/rundir/mars_2barCO2/run/mars_2barCO2.cam.i.0012-02-01-00000.nc'
-;ncdata_in = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/ic_P0.1bar_L40_dry_ic.nc'
+;ncdata_in = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/ic_0.1bar_L40_dry_ic.nc'
 ;ncdata_in = '/gpfsm/dnb53/etwolf/cesm_scratch/archive/mars_0.1barCO2/rest/0031-01-01-00000/mars_0.1barCO2.cam.i.0031-01-01-00000.nc'
 ;ncdata_in = '/gpfsm/dnb53/etwolf/cesm_scratch/archive/mars_dev2/rest/0001-01-21-00000/mars_dev2.cam.i.0001-01-21-00000.nc'
 ;ncdata_in = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/mars/atm/paleo_mars_6.0bar_dry.cam.i.0021-01-01-00000.nc'
 
 ;--- assorted output file names ---
 ;file_out = 'ic_100bar_L51_iso300_ic.nc'   ; writes to local directory
-;file_out =  '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_land_fv/ic_P1.5bar_L51_ic.nc'
-;file_out =  '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/ic_P0.01bar_L40_ic.nc'
+;file_out =  '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_land_fv/ic_1.5bar_L51_ic.nc'
+;file_out =  '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/ic_0.01bar_L40_ic.nc'
 ;file_out =  '/discover/nobackup/etwolf/models/CESM_Mars/marsfiles/atm/mars_4bar.cami.4x5.dry.nc'
-;file_out =  '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/ic_P8bar_L40_dry_ic.nc'
+;file_out =  '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/ic_8bar_L40_dry_ic.nc'
 ;file_out =  '/gpfsm/dnb53/etwolf/models/CESM_Mars/marsfiles/atm/mars_dev2_0.01bar.cam.i.0001-01-21-00000.nc'
 ;file_out = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_se/cami_0000-01-01_ne16np4_L48_10bar_c120525_aquaplanet.nc'
 ;file_out = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/mars/atm/paleo_mars_10.0bar_dry.cam.i.0021-01-01-00000.nc'
