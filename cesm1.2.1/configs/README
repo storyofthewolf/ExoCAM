@@ -31,6 +31,17 @@
      --  hook up for CARMA for cloud and aerosol treatments
      --  currently works with ../ExoRT/3dmodels/src.cam.n28archean.haze
 
-  
+NOTES: 
+"aqua" models contain src.cice and src.docn SourceMods files, used for
+modifying component sea ice and slab ocean models.  Land files are omitted.
+
+"land" models contain src.clm SourceMods files, used for modifying land
+component model.  Ocean and sea ice files are omitted.
+
+"fv" models use the finite volume dynamical core and src.cam directory
+contains modified files specfic to this scheme.
+
+"se" models use the spectral element dynamical core on a cubed sphere grid,
+and  src.cam directory contains modified files specfic to this scheme.  
 
 

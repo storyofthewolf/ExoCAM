@@ -16,3 +16,21 @@ carma_model_flags_mod.F90
 carma_intr.F90
 -- CAM-CARMA main interface routine
 -- contains changes for fractal aggregates
+
+
+-- files required to enable fractal aggregate microphysics for haze particles
+-- note, these files and changes do not come standard with CESM1.2.1
+adgaquad_mod.F90
+adgaquad_types_mod.F90
+fractal_meanfield_mod.F90
+carma_mod.F90
+carma_enums_mod.F90
+carma_globaer.h
+carmagroup_mod.F90
+carma_types_mod.F90
+mie.F90
+setupbins.F90
+setupvf_std.F90
+setupckern.F90
+setupbdif.F90
+lusolvec_mod.F90

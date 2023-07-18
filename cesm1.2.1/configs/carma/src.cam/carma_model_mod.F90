@@ -32,6 +32,7 @@ module carma_model_mod
   use physics_types,  only: physics_state, physics_ptend
   use ppgrid,         only: pcols, pver
   use physics_buffer, only: physics_buffer_desc
+  use phys_grid,      only: get_rlat_all_p, get_rlon_all_p
 
 #if ( defined SPMD )
   use mpishorthand
@@ -54,7 +55,7 @@ module carma_model_mod
   ! Declare public constants
   integer, public, parameter      :: NGROUP   = 1               !! Number of particle groups
   integer, public, parameter      :: NELEM    = 1               !! Number of particle elements
-  integer, public, parameter      :: NBIN     = 40               !! Number of particle bins
+  integer, public, parameter      :: NBIN     = 40              !! Number of particle bins
   integer, public, parameter      :: NSOLUTE  = 0               !! Number of particle solutes
   integer, public, parameter      :: NGAS     = 0               !! Number of gases
 
@@ -80,11 +81,19 @@ module carma_model_mod
   ! emission tendencies.
   integer                             :: carma_emis_nLevs        ! number of emission levels
   real(r8), allocatable, dimension(:) :: carma_emis_lev          ! emission levels (Pa)
-  real(r8), allocatable, dimension(:) :: carma_emis_rate         ! emission rate lookup table (# cm-3 s-1)
   integer                             :: carma_emis_ilev_min     ! index of minimum level in table 
   integer                             :: carma_emis_ilev_max     ! index of maximum level in table 
   integer                             :: carma_emis_ilev_incr    ! index increment to increase level 
   real(r8)                            :: carma_emis_expected     ! Expected emission rate per column (kg/m2/s)
+ 
+  integer                             :: carma_emis_nZens        ! number of zenith angles 
+  real(r8), allocatable, dimension(:) :: carma_emis_zen          ! zenith angles (degrees)
+  integer                             :: carma_emis_izen_min     ! index of minimum level in table 
+  integer                             :: carma_emis_izen_max     ! index of maximum level in table 
+  integer                             :: carma_emis_izen_incr    ! index increment to increase level 
+
+  !real(r8), allocatable, dimension(:) :: carma_emis_rate         ! emission rate lookup table (# cm-3 s-1)
+  real(r8), allocatable, dimension(:,:) :: carma_emis_rate         ! emission rate lookup table (g cm-3 s-1), zenith angle dependence
 
   integer                             :: carma_escale_nLats      ! number of emission scale latitudes
   integer                             :: carma_escale_nTimes     ! number of emission scale times
@@ -107,13 +116,13 @@ contains
     integer, intent(out)               :: rc        !! return code, negative indicates failure
     
     ! Local variables
-    real(kind=f), parameter            :: RHO_ORGHAZE = 0.64_f ! density of photochemical hazee particles (g/cm3 ) Trainer+ (2016)
-    real(kind=f), parameter            :: rmin     = 1e-7_f    ! minimum radius (cm)
-    real(kind=f), parameter            :: vmrat    = 2.5_f     ! volume/mass ratio
-    real(kind=f), parameter            :: rmon_in  = 50.e-7_f   ! monomer size
-    real(kind=f), parameter            :: falpha_in = 1.0      ! fractal packing coefficient
-    real(kind=f), allocatable   :: df_in(:)
-    real(kind=f), allocatable   :: nmon(:)
+    real(kind=f), parameter            :: RHO_ORGHAZE = 0.64_f ! density of photochemical haze particles (g/cm3 ) Trainer+ (2016)
+    real(kind=f), parameter            :: rmin        = 1e-7_f    ! minimum radius (cm)
+    real(kind=f), parameter            :: vmrat       = 2.5_f     ! volume/mass ratio
+    real(kind=f), parameter            :: rmon_in     = 50.e-7_f  ! monomer size
+    real(kind=f), parameter            :: falpha_in   = 1.0      ! fractal packing coefficient
+    real(kind=f), allocatable          :: df_in(:)
+    real(kind=f), allocatable          :: nmon(:)
 
     integer                            :: LUNOPRT               ! logical unit number for output
     logical                            :: do_print              ! do print output?
@@ -121,9 +130,8 @@ contains
     ! Default return code.
     rc = RC_OK
     
-    allocate(df_in(NBIN)) 
-    ! df_in(:) = 2.0_f   ! fractal dimension
-    df_in = (/ &   ! bin dependent fractal dimensions
+    allocate(df_in(NBIN))     ! 40 bin, from Wolf & Toon (2010)
+    df_in = (/ &              ! bin dependent fractal dimensions 
       3.00000,      3.00000,      3.00000,      3.00000,      3.00000, &
       3.00000,      3.00000,      3.00000,      3.00000,      3.00000, &
       3.00000,      3.00000,      3.00000,      1.50214,      1.50535, &
@@ -132,9 +140,6 @@ contains
       2.40000,      2.40000,      2.40000,      2.40000,      2.40000, &
       2.40000,      2.40000,      2.40000,      2.40000,      2.40000, &
       2.40000,      2.40000,      2.40000,      2.40000,      2.40000 /)
-
-
-    
 
     ! Report model specific namelist configuration parameters.
     if (masterproc) then
@@ -324,11 +329,13 @@ contains
     integer                            :: igroup                ! the index of the carma aerosol group
     integer                            :: k                     ! vertical index
     integer                            :: ilev                  ! level index in emissions data
+    integer                            :: izen                  ! zenith index in emissions data
     character(len=32)                  :: shortname             ! the shortname of the group
     real(r8)                           :: r(NBIN)               ! bin center
     real(r8)                           :: dr(NBIN)              ! bin width
     real(r8)                           :: rmass(NBIN)           ! bin mass
     real(r8)                           :: pressure              ! pressure (Pa)
+    real(r8)                           :: cosz                  ! cosine of the zenith angle
     real(r8)                           :: thickness             ! layer thickness (m)
     real(r8)                           :: rate                  ! emission rate (#/cm-3/s)
     real(r8)                           :: massflux              ! emission mass flux (kg/m2/s)
@@ -340,8 +347,20 @@ contains
     integer                            :: yr, mon, day, ncsec, doy
     integer                            :: ncdate
     real(r8)                           :: ltime                 ! local time
+    real(r8)                           :: clat(pcols)           ! current latitudes(radians)
+    real(r8)                           :: clon(pcols)           ! current longitudes(radians)
+    real(r8)                           :: coszrs(pcols)         ! Cosine solar zenith angle
 
-    
+
+
+    ! variables for bilinear interpolation
+    integer :: p_ref_index, p_ref_indexp1  ! pressure indices
+    integer :: z_ref_index, z_ref_indexp1  ! zenith angle indices
+    real(r8) :: press, onemp
+    real(r8) :: zen,   onemz
+    real(r8), dimension(4) :: vbi
+
+
     ! Default return code.
     rc = RC_OK
 
@@ -361,6 +380,11 @@ contains
     ! Determine the latitude and longitude of each column.
     lchnk = state%lchnk
     ncol = state%ncol
+
+    ! Cosine solar zenith angle for current time step
+    call get_rlat_all_p(lchnk, ncol, clat)
+    call get_rlon_all_p(lchnk, ncol, clon)
+    call zenith (calday, clat, clon, coszrs, ncol)
 
     ! Add any surface flux here.
     surfaceFlux(:ncol) = 0.0_r8
@@ -386,50 +410,86 @@ contains
       ! Set tendencies for any sources or sinks in the atmosphere.
       do k = 1, pver
         do icol = 1, ncol
-      
+
+
           pressure = state%pmid(icol, k)
-          
-          ! This is roughly a log-normal approximation to the production
-          ! rate, but only applies from about 70 to 110 km.
-          !
+          cosz = coszrs(icol)
+ 
           ! NOTE: Based upon US Standard Atmosphere 1976.
           if ((pressure >= carma_emis_lev(carma_emis_ilev_min)) .and. &
-              (pressure <= carma_emis_lev(carma_emis_ilev_max))) then
+              (pressure <= carma_emis_lev(carma_emis_ilev_max)) .and. &
+              (cosz > 0.0)) then
 
-            ! The rates are in terms of # cm-3 s-1, but were really derived
-            ! from the mass flux of meteoritic dust. Since we are using a
-            ! size different that 1.3 nm for the smallest bin, scale the
-            ! number appropriately.
+            ! The rates in are in terms of g cm-3 s-1, 
             !
             ! The values are in a lookup table, so find the two numbers
             ! surrounding the pressure and do a linear interpolation on the
             ! rate. This linear search is kind of expensive, particularly if
             ! there are a lot of points.
+            !
+            ! We turn this into a bilinear interpolation wtih zenith angle added
             ! 
             ! NOTE: The tendency is on a mass mixing ratio (kg/kg/s)
-            do ilev = carma_emis_ilev_min, (carma_emis_ilev_max - carma_emis_ilev_incr), carma_emis_ilev_incr
-              if ((pressure >= carma_emis_lev(ilev)) .and. (pressure <= carma_emis_lev(ilev+carma_emis_ilev_incr))) then
-                rate = carma_emis_rate(ilev)
-                
-                if (pressure > carma_emis_lev(ilev)) then
-                  rate = rate + &
-                    ((carma_emis_rate(ilev+carma_emis_ilev_incr) - carma_emis_rate(ilev)) / (carma_emis_lev(ilev+carma_emis_ilev_incr) - carma_emis_lev(ilev))) * &
-                    (pressure - carma_emis_lev(ilev))
-                end if
-                
-                rate = rate * (((1.3e-7_r8)**3) / (r(ibin)**3))
-                exit
-              end if
-            end do
-            
+
+             do ilev = carma_emis_ilev_min, (carma_emis_ilev_max - carma_emis_ilev_incr), carma_emis_ilev_incr 
+               if ((pressure >= carma_emis_lev(ilev)) .and. (pressure <= carma_emis_lev(ilev+carma_emis_ilev_incr))) then 
+                 p_ref_index = ilev 
+                 p_ref_indexp1 = p_ref_index + 1
+                 exit
+               endif
+             end do
+             if (p_ref_index .eq. carma_emis_ilev_max) then
+                p_ref_index = p_ref_index - 1
+                p_ref_indexp1 = p_ref_index + 1
+                press = (pressure - carma_emis_lev(p_ref_index)) / &
+                        (carma_emis_lev(p_ref_indexp1) - carma_emis_lev(p_ref_index))
+             else
+               press = (pressure - carma_emis_lev(p_ref_index)) / &
+                       (carma_emis_lev(p_ref_indexp1) - carma_emis_lev(p_ref_index))
+             endif
+
+             if (cosz < carma_emis_zen(carma_emis_izen_min)) cosz = carma_emis_zen(carma_emis_izen_min)
+             if (cosz > carma_emis_zen(carma_emis_izen_max)) cosz = carma_emis_zen(carma_emis_izen_max)
+             do izen = carma_emis_izen_min, (carma_emis_izen_max - carma_emis_izen_incr), carma_emis_izen_incr
+               if ((cosz >= carma_emis_zen(izen)) .and. (cosz <= carma_emis_zen(izen+carma_emis_izen_incr))) then 
+                 z_ref_index = izen
+                 z_ref_indexp1 = z_ref_index + 1
+                 exit
+               endif
+             end do
+             if (z_ref_index .eq. carma_emis_izen_max) then
+                z_ref_index = z_ref_index - 1
+                z_ref_indexp1 = z_ref_index + 1
+                zen = (cosz - carma_emis_zen(z_ref_index)) / &
+                        (carma_emis_zen(z_ref_indexp1) - carma_emis_zen(z_ref_index))
+             else
+                zen = (cosz - carma_emis_zen(z_ref_index)) / &
+                       (carma_emis_zen(z_ref_indexp1) - carma_emis_zen(z_ref_index))
+             endif
+
+             vbi(1) = carma_emis_rate(p_ref_index  ,  z_ref_index)       !kdata(imaj, igi, p_ref_index,   t_ref_index)
+             vbi(2) = carma_emis_rate(p_ref_index+1,  z_ref_index)       !kdata(imaj, igi, p_ref_indexp1, t_ref_index)
+             vbi(3) = carma_emis_rate(p_ref_index  ,  z_ref_index+1)     !kdata(imaj, igi, p_ref_index,   t_ref_indexp1)
+             vbi(4) = carma_emis_rate(p_ref_index+1,  z_ref_index+1)     !kdata(imaj, igi, p_ref_indexp1, t_ref_indexp1)
+
+             onemp = 1. - press
+             onemz = 1. - zen
+
+             rate    = vbi(1)*onemp*onemz &
+                     + vbi(2)*press*onemz &
+                     + vbi(3)*onemp*zen &
+                     + vbi(4)*press*zen
+  !========= end bilinear interpolation ============
+
+
             ! Calculate the mass flux in terms of kg/m3/s
-            massflux = (rate * rmass(ibin) * 1.0e-3_r8 * 1.0e6_r8)
-            
+!            massflux = (rate * rmass(ibin) * 1.0e-3_r8 * 1.0e6_r8)
+            massflux = rate * 1.0e-3_r8 * 1.0e6_r8  ! g cm-3 s-1 to kg/m3/s
+
             ! Calculate a scaling if appropriate.
             rfScale(icol) = 1.0_r8
              
             if (carma_do_escale) then
-            
               ! Global Scaling
               !
               ! Interpolate the global scale by latitude.
@@ -476,26 +536,35 @@ contains
                   exit
                 end if
               end do
-            endif
+            endif  ! carma_do_escale
             
             ! Convert the mass flux to a tendency on the mass mixing ratio.
             thickness = state%zi(icol, k) - state%zi(icol, k+1)
             tendency(icol, k) = (massflux * thickness) / (state%pdel(icol, k) / gravit)        
-          end if
+          end if ! if particle emission presssure and zentih criteria met
         enddo
       enddo
 
       ! Scale the columns to keep the total mass influx in the column a
       ! constant.
       do icol = 1, ncol
-        columnMass = sum(tendency(icol, :) * (state%pdel(icol, :) / gravit))
-        scale = carma_emis_expected / columnMass
-      
-        ! Also apply the relative flux scaling. This needs to be done after
-        ! the normalization
-        tendency(icol, :) = tendency(icol, :) * scale * rfScale(icol)
+        cosz = coszrs(icol)
+        if ( (cosz > 0.0)) then
+
+          columnMass = sum(tendency(icol, :) * (state%pdel(icol, :) / gravit))
+          scale = carma_emis_expected / columnMass
+ 
+          ! Also apply the relative flux scaling. This needs to be done after
+          ! the normalization
+          tendency(icol, :) = tendency(icol, :) * scale * rfScale(icol)
+        else
+
+           tendency(icol, :) = 0.0 
+           columnMass = 0.0
+        endif
+
       end do
-    end if
+    end if  ! if "HAZE" type
     
     return
   end subroutine CARMA_EmitParticle
@@ -520,7 +589,9 @@ contains
     integer                            :: ilev                  ! level index
     integer                            :: fid                   ! file id
     integer                            :: lev_did               ! level dimension id
+    integer                            :: zen_did               ! zenith dimension id
     integer                            :: lev_vid               ! level variable id
+    integer                            :: zen_vid               ! zenith variable id
     integer                            :: rate_vid              ! rate variable
     integer                            :: tmp
     integer                            :: lat_did               ! latitude dimension id
@@ -555,22 +626,42 @@ contains
         ! Alocate the table arrays
         call wrap_inq_dimid(fid, "lev", lev_did)
         call wrap_inq_dimlen(fid, lev_did, carma_emis_nLevs)
+
+        call wrap_inq_dimid(fid, "zenith", zen_did)
+        call wrap_inq_dimlen(fid, zen_did, carma_emis_nZens)
+
       endif
     
 #if ( defined SPMD )
       call mpibcast(carma_emis_nLevs, 1, mpiint, 0, mpicom)
+      call mpibcast(carma_emis_nZens, 1, mpiint, 0, mpicom)
 #endif
 
       allocate(carma_emis_lev(carma_emis_nLevs))
-      allocate(carma_emis_rate(carma_emis_nLevs))
+      allocate(carma_emis_zen(carma_emis_nZens))
+      allocate(carma_emis_rate(carma_emis_nLevs, carma_emis_nZens))
+!      allocate(carma_emis_rate(carma_emis_nZens, carma_emis_nLevs))
 
       if (masterproc) then
-        ! Read in the tables.
-        call wrap_inq_varid(fid, 'MHAZE', rate_vid)
-        call wrap_get_var_realx(fid, rate_vid, carma_emis_rate)
-
         call wrap_inq_varid(fid, 'lev', lev_vid)
         call wrap_get_var_realx(fid, lev_vid, carma_emis_lev)
+
+        call wrap_inq_varid(fid, 'cosz', zen_vid)
+        call wrap_get_var_realx(fid, zen_vid, carma_emis_zen)
+
+        write(*,*) "CARMA emis levs", carma_emis_lev
+        write(*,*) "CARMA emis zenith", carma_emis_zen
+
+        ! Read in the tables.
+        call wrap_inq_varid(fid, 'MHAZE', rate_vid)
+        !call wrap_get_var_realx(fid, rate_vid, carma_emis_rate)
+        tmp = nf90_get_var (fid, rate_vid, carma_emis_rate)
+        if (tmp/=NF90_NOERR) then
+           write(iulog,*) 'CARMA_InitializeModel: error reading varid =', rate_vid
+           call handle_error (tmp)
+        end if
+
+        write(*,*) "CARMA emis rate", carma_emis_rate
 
         ! Close the file.
         call wrap_close(fid)
@@ -579,22 +670,6 @@ contains
         ! the pressures levels are in.
         carma_emis_ilev_min = 1
         carma_emis_ilev_max = carma_emis_nLevs
-
-        do ilev = 1, carma_emis_nLevs
-          if (carma_emis_rate(ilev) <= 0.0) then
-            carma_emis_ilev_min  = ilev + 1
-          else
-            exit  
-          endif
-        end do
-
-        do ilev = carma_emis_nLevs, 1, -1
-          if (carma_emis_rate(ilev) <= 0.0) then
-            carma_emis_ilev_max  = ilev - 1
-          else
-            exit  
-          endif
-        end do
 
         if (carma_emis_lev(carma_emis_ilev_min) < carma_emis_lev(carma_emis_ilev_max)) then
           carma_emis_ilev_incr = 1
@@ -605,19 +680,39 @@ contains
           carma_emis_iLev_max = tmp 
         endif
 
-        if (do_print) write(LUNOPRT,*) ''
+        ! Find out where the bounds of the table are and in what order
+        ! the zenith angles are in.
+        carma_emis_izen_min = 1
+        carma_emis_izen_max = carma_emis_nZens
+
+        if (carma_emis_zen(carma_emis_izen_min) < carma_emis_zen(carma_emis_izen_max)) then
+          carma_emis_izen_incr = 1
+        else
+          carma_emis_izen_incr = -1
+          tmp = carma_emis_izen_min
+          carma_emis_izen_min = carma_emis_izen_max
+          carma_emis_izen_max = tmp 
+        endif
+
+        if (do_print) write(LUNOPRT,*) ' '
         if (do_print) write(LUNOPRT,*) 'carma_init(): carma_emis_nLevs     = ', carma_emis_nLevs
         if (do_print) write(LUNOPRT,*) 'carma_init(): carma_emis_ilev_min  = ', carma_emis_ilev_min 
         if (do_print) write(LUNOPRT,*) 'carma_init(): carma_emis_ilev_max  = ', carma_emis_ilev_max 
         if (do_print) write(LUNOPRT,*) 'carma_init(): carma_emis_ilev_incr = ', carma_emis_ilev_incr 
+
+        if (do_print) write(LUNOPRT,*) 'carma_init(): carma_emis_nZens     = ', carma_emis_nZens
+        if (do_print) write(LUNOPRT,*) 'carma_init(): carma_emis_izen_min  = ', carma_emis_izen_min 
+        if (do_print) write(LUNOPRT,*) 'carma_init(): carma_emis_izen_max  = ', carma_emis_izen_max 
+        if (do_print) write(LUNOPRT,*) 'carma_init(): carma_emis_izen_incr = ', carma_emis_izen_incr 
         if (do_print) write(LUNOPRT,*) ''
         
-        if (do_print) write(LUNOPRT,*) 'level, pressure (Pa), emission rate (# cm-3 sec-1)'
+        if (do_print) write(LUNOPRT,*) 'level, pressure (Pa), emission rate (g cm-3 sec-1)'
         do ilev = carma_emis_ilev_min, carma_emis_ilev_max, carma_emis_ilev_incr
-          if (do_print) write(LUNOPRT,*) ilev, carma_emis_lev(ilev), carma_emis_rate(ilev)
+          if (do_print) write(LUNOPRT,*) ilev, carma_emis_lev(ilev), carma_emis_rate(ilev, carma_emis_izen_min)
         enddo
         
         if (do_print) write(LUNOPRT, *) 'carma_init(): Total Emission = ', carma_emis_total, ' (kt/yr)'
+        ! expected smission rate per column (kg/m2/s)
         carma_emis_expected = ((carma_emis_total * 1e6_r8) / (3600.0_r8 * 24.0_r8 * 365.0_r8)) / (4.0_r8 * PI * ((REARTH / 100._r8) ** 2))
         if (do_print) write(LUNOPRT,*) 'carma_init(): Done with emission table.'
 
@@ -625,13 +720,19 @@ contains
 
 #if ( defined SPMD )
       call mpibcast(carma_emis_lev,  carma_emis_nLevs, mpir8, 0, mpicom)
-      call mpibcast(carma_emis_rate, carma_emis_nLevs, mpir8, 0, mpicom)
+      call mpibcast(carma_emis_zen,  carma_emis_nZens, mpir8, 0, mpicom)
+      !call mpibcast(carma_emis_rate, carma_emis_nLevs, mpir8, 0, mpicom)
+      call mpibcast(carma_emis_rate, carma_emis_nLevs*carma_emis_nZens, mpir8, 0, mpicom)
 
       call mpibcast(carma_emis_expected,  1, mpir8,  0, mpicom)
 
       call mpibcast(carma_emis_ilev_min,  1, mpiint, 0, mpicom)
       call mpibcast(carma_emis_ilev_max,  1, mpiint, 0, mpicom)
       call mpibcast(carma_emis_ilev_incr, 1, mpiint, 0, mpicom)
+
+      call mpibcast(carma_emis_izen_min,  1, mpiint, 0, mpicom)
+      call mpibcast(carma_emis_izen_max,  1, mpiint, 0, mpicom)
+      call mpibcast(carma_emis_izen_incr, 1, mpiint, 0, mpicom)
 #endif
 
     endif

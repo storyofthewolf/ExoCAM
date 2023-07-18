@@ -71,7 +71,7 @@ module carma_intr
   ! Particle Group Statistics
   
   ! Gridbox average
-  integer, parameter             :: NGPDIAGS         = 12         ! Number of particle diagnostics ...
+  integer, parameter             :: NGPDIAGS         = 14         ! Number of particle diagnostics ...
   integer, parameter             :: GPDIAGS_ND       = 1          ! Number density
   integer, parameter             :: GPDIAGS_AD       = 2          ! Surface area density
   integer, parameter             :: GPDIAGS_MD       = 3          ! Mass density
@@ -84,6 +84,8 @@ module carma_intr
   integer, parameter             :: GPDIAGS_VM       = 10         ! Mass Weighted Fall Velocity
   integer, parameter             :: GPDIAGS_PA       = 11         ! Projected Area
   integer, parameter             :: GPDIAGS_AR       = 12         ! Area Ratio
+  integer, parameter             :: GPDIAGS_RS       = 13         ! Equivalent Sphere Effective Radius
+  integer, parameter             :: GPDIAGS_RP       = 14         ! Mobility Effective Radius
 
   ! Particle Bin (Element) Statistics
   integer, parameter             :: NBNDIAGS         = 1          ! Number of bin surface diagnostics ...
@@ -369,7 +371,7 @@ contains
             write(btndname(igroup, ibin), '(A, I2.2)') trim(grp_short), ibin
 
             write(c_name, '(A, I2.2)') trim(shortname), ibin
-            write(c_longname, '(A, 2e10.4, A)') trim(name) // ', ', r(ibin)*1.e4_r8, r(ibin)*1.e4_r8*rrat(ibin), ' um'
+            write(c_longname, '(A, 2e12.4, A)') trim(name) // ', ', r(ibin)*1.e4_r8, r(ibin)*1.e4_r8*rrat(ibin), ' um'
              
             ! The molecular weight seems to be used for molecular diffusion, which
             ! doesn't make sense for particles. The CAM solvers are unstable if the 
@@ -600,6 +602,8 @@ contains
       call addfld(trim(sname)//'AD', 'um2/cm3 ', pver, 'A', trim(sname) // ' surface area density', phys_decomp)
       call addfld(trim(sname)//'MD', 'g/cm3   ', pver, 'A', trim(sname) // ' mass density', phys_decomp)
       call addfld(trim(sname)//'RE', 'um      ', pver, 'A', trim(sname) // ' effective radius', phys_decomp)
+      call addfld(trim(sname)//'RS', 'um      ', pver, 'A', trim(sname) // ' equivalen sphere radius', phys_decomp)
+      call addfld(trim(sname)//'RP', 'um      ', pver, 'A', trim(sname) // ' mobility sphere radius', phys_decomp)
       call addfld(trim(sname)//'RM', 'um      ', pver, 'A', trim(sname) // ' Mitchell effective radius', phys_decomp)
       call addfld(trim(sname)//'JN', '#/cm3/s ', pver, 'A', trim(sname) // ' nucleation rate', phys_decomp)
       call addfld(trim(sname)//'MR', 'kg/kg   ', pver, 'A', trim(sname) // ' mass mixing ratio', phys_decomp)
@@ -613,6 +617,8 @@ contains
       call add_default(trim(sname)//'AD', 1, ' ')
       call add_default(trim(sname)//'MD', 1, ' ')
       call add_default(trim(sname)//'RE', 1, ' ')
+      call add_default(trim(sname)//'RS', 1, ' ')
+      call add_default(trim(sname)//'RP', 1, ' ')
       call add_default(trim(sname)//'RM', 1, ' ')
       call add_default(trim(sname)//'MR', 1, ' ')
       call add_default(trim(sname)//'EX', 1, ' ')
@@ -620,6 +626,7 @@ contains
       call add_default(trim(sname)//'PA', 1, ' ')
       call add_default(trim(sname)//'AR', 1, ' ')
       call add_default(trim(sname)//'VM', 1, ' ')
+
       
       if (carma_do_grow) then
         call add_default(trim(sname)//'JN', 1, ' ')
@@ -912,6 +919,7 @@ contains
     real(r8)              :: r(NBIN)                                ! particle radius (cm)
     real(r8)              :: rmass(NBIN)                            ! particle mass (g)
     real(r8)              :: rrat(NBIN)                             ! particle maximum radius ratio ()
+    real(r8)              :: rprat(NBIN)                            ! particle mobility radius ratio ()
     real(r8)              :: arat(NBIN)                             ! particle area ration ()
     real(r8)              :: rhoelem                                ! element density (g)
     real(r8)              :: nd(pver)                               ! number density (cm-3)
@@ -920,10 +928,16 @@ contains
     real(r8)              :: mr(pver)                               ! mass mixing ratio (kg/kg)
     real(r8)              :: re(pver)                               ! effective radius (um)
     real(r8)              :: rm(pver)                               ! Mitchell effective radius (um)
+    real(r8)              :: rs(pver)                               ! equivalent sphere effective radius (um)
+    real(r8)              :: rp(pver)                               ! mobility effective radius (um)
     real(r8)              :: ex(pver)                               ! extinction (km-1)
     real(r8)              :: od(pver)                               ! optical depth
     real(r8)              :: re2(pver)                              ! N(r)*r^2 (cm2)
     real(r8)              :: re3(pver)                              ! N(r)*r^3 (cm3)
+    real(r8)              :: rs2(pver)                              ! N(r)*r^2 (cm2)
+    real(r8)              :: rs3(pver)                              ! N(r)*r^3 (cm3)
+    real(r8)              :: rp2(pver)                              ! N(r)*r^2 (cm2)
+    real(r8)              :: rp3(pver)                              ! N(r)*r^3 (cm3)
     real(r8)              :: pa(pver)                               ! Projected Area (cm2)
     real(r8)              :: ar(pver)                               ! Area Ratio 
     real(r8)              :: vm(pver)                               ! Massweighted fall velocity (cm2)
@@ -1343,7 +1357,7 @@ contains
         if (rc < 0) call endrun('carma_timestep_tend::CARMAELEMENT_Get failed.')
         
         call CARMAGROUP_Get(carma, igroup, rc, cnsttype=cnsttype, r=r, rmass=rmass, maxbin=maxbin, &
-               is_cloud=is_cloud, is_ice=is_ice, do_drydep=do_drydep, rrat=rrat, arat=arat)
+               is_cloud=is_cloud, is_ice=is_ice, do_drydep=do_drydep, rrat=rrat, arat=arat, rprat=rprat)
         if (rc < 0) call endrun('carma_timestep_tend::CARMAGROUP_Get failed.')
       
         ! Intialize the group totals
@@ -1352,11 +1366,17 @@ contains
         md(:)  = 0.0_r8
         mr(:)  = 0.0_r8
         re(:)  = 0.0_r8
+        rs(:)  = 0.0_r8
+        rp(:)  = 0.0_r8
         rm(:)  = 0.0_r8
         ex(:)  = 0.0_r8
         od(:)  = 0.0_r8
         re2(:) = 0.0_r8
         re3(:) = 0.0_r8
+        rs2(:) = 0.0_r8
+        rs3(:) = 0.0_r8
+        rp2(:) = 0.0_r8
+        rp3(:) = 0.0_r8
         jn(:)  = 0.0_r8
         pa(:)  = 0.0_r8
         vm(:)  = 0.0_r8
@@ -1392,6 +1412,10 @@ contains
             nd(:)  = nd(:)  + numberDensity(:)
             re2(:) = re2(:) + numberDensity(:) * ((r(ibin)*rrat(ibin))**2)
             re3(:) = re3(:) + numberDensity(:) * ((r(ibin)*rrat(ibin))**3)
+            rs2(:) = rs2(:) + numberDensity(:) * ((r(ibin))**2)
+            rs3(:) = rs3(:) + numberDensity(:) * ((r(ibin))**3)
+            rp2(:) = rp2(:) + numberDensity(:) * ((r(ibin)*rprat(ibin))**2)
+            rp3(:) = rp3(:) + numberDensity(:) * ((r(ibin)*rprat(ibin))**3)
             ad(:)  = ad(:)  + numberDensity(:) * 4.0_r8 * PI * (r(ibin)**2) * 1.0e8_r8
             md(:)  = md(:)  + numberDensity(:) * rmass(ibin)
             mr(:)  = mr(:)  + newstate(:)
@@ -1431,6 +1455,8 @@ contains
             re(:) = (re3(:) / re2(:)) * 1e4_r8
             rm(:) = (3._r8 / 4._r8) * (md(:)  / (0.917_r8 * pa(:))) * 1e4_r8
             ar(:) = pa(:) / PI / re2(:)
+            rs(:) = (rs3(:) / rs2(:)) * 1e4_r8
+            rp(:) = (rp3(:) / rp2(:)) * 1e4_r8
           end where
 
           where (md(:) > 0.0_r8)
@@ -1451,6 +1477,8 @@ contains
           gpdiags(icol, :, igroup, GPDIAGS_VM) = vm
           gpdiags(icol, :, igroup, GPDIAGS_PA) = pa
           gpdiags(icol, :, igroup, GPDIAGS_AR) = ar
+          gpdiags(icol, :, igroup, GPDIAGS_RS) = rs
+          gpdiags(icol, :, igroup, GPDIAGS_RP) = rp
                   
           if (nucleationRate(1) /= CAM_FILL) then
             gpdiags(icol, :, igroup, GPDIAGS_JN) = jn
@@ -1778,6 +1806,8 @@ contains
       call outfld(trim(sname)//'AD', gpdiags(:, :, igroup, GPDIAGS_AD), pcols, lchnk) 
       call outfld(trim(sname)//'MD', gpdiags(:, :, igroup, GPDIAGS_MD), pcols, lchnk) 
       call outfld(trim(sname)//'RE', gpdiags(:, :, igroup, GPDIAGS_RE), pcols, lchnk) 
+      call outfld(trim(sname)//'RS', gpdiags(:, :, igroup, GPDIAGS_RS), pcols, lchnk) 
+      call outfld(trim(sname)//'RP', gpdiags(:, :, igroup, GPDIAGS_RP), pcols, lchnk) 
       call outfld(trim(sname)//'RM', gpdiags(:, :, igroup, GPDIAGS_RM), pcols, lchnk) 
       call outfld(trim(sname)//'JN', gpdiags(:, :, igroup, GPDIAGS_JN), pcols, lchnk) 
       call outfld(trim(sname)//'MR', gpdiags(:, :, igroup, GPDIAGS_MR), pcols, lchnk) 
@@ -1881,7 +1911,7 @@ contains
           
             call CARMA_EmitParticle(carma, ielem, ibin, icnst, dt, state, cam_in, tendency, surfaceFlux, rc)
             if (rc < 0) call endrun('carma_emission_tend::CARMA_EmitParticle failed.')
-          
+
             ! Add any surface flux here.
             cam_in%cflx(:ncol, icnst) = surfaceFlux
             call outfld(trim(cnst_name(icnst))//'SF', cam_in%cflx(:ncol, icnst), ncol, lchnk)
@@ -1889,6 +1919,7 @@ contains
             ! For emissions into the atmosphere, put the emission here.
             ptend%q(:ncol, :pver, icnst) = tendency
             call outfld(trim(cnst_name(icnst))//'EM', ptend%q(:ncol, :, icnst), ncol, lchnk)
+
           end if
         enddo
       end if
