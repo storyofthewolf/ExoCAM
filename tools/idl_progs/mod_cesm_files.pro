@@ -115,8 +115,8 @@ file_lnd_domain_out =  "test_domain.nc"
 ;--- ncdata files in/oout --
 ;file_ncdata = '/gpfsm/dnb53/etwolf/cesm_scratch/rundir/mars_dev2/run/mars_dev2.cam.i.0001-01-09-00000.nc'
 ;file_ncdata_out = '/gpfsm/dnb53/etwolf/models/CESM_Mars/marsfiles/atm/mars_dev2_adjusted.cam.i.0001-01-09-00000.nc'
-file_ncdata = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/ic_1bar_L51_300Kiso_ic.nc'
-file_ncdata_out = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/ic_1bar_L51_300Kiso_dry_ic.nc'
+file_ncdata = '/gpfsm/dnb53/etwolf/cesm_scratch/archive/t1c_land_ch4/rest/0010-05-01-00000/t1c_land_ch4.cam.i.0010-05-01-00000.nc'
+file_ncdata_out = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/t1c_land_ch4_h2o.cam.i.0010-05-01-00000.nc'
 
 
 ;-- new file names --
@@ -344,31 +344,30 @@ if (make_ncdata eq 1) then begin
 ;  ICEFRAC_OUT(*,*)=0.0
 ;  SICTHK_OUT(*,*)=0.0
 ;  SNOWHICE_OUT(*,*)=0.0
-  T_OUT(*,*,*) = 300.0
+;  T_OUT(*,*,*) = 300.0
 ;  T_OUT(*,*,10:nlev-1) = 300.0
 ;   T_OUT(*,*,9) = 290.0
 ;   T_OUT(*,*,8) = 280.0
 ;   T_OUT(*,*,7) = 270.0
 ;   T_OUT(*,*,6) = 260.0
 ;   T_OUT(*,*,0:5) = 250.0
-  TS_OUT(*,*) = 300.0
-  TS1_OUT(*,*) = 300.0
-  TS2_OUT(*,*) = 300.0
-  TS3_OUT(*,*) = 300.0
-  TS4_OUT(*,*) = 300.0
-  Q_OUT(*,*,*) = 0.0
-;  Q_OUT(*,*,*) = double(0.01)
-;  Q_OUT(*,*,10:nlev-1) = double(0.01)
-;   Q_OUT(*,*,8:9) = 1.0e-4
-;   Q_OUT(*,*,6:7) = 1.0e-6
-;   Q_OUT(*,*,4:5) = 1.0e-8
-;   Q_OUT(*,*,0:3) = 1.0e-10
-  CLDICE_OUT(*,*,*) = 0.0
+;  TS_OUT(*,*) = 300.0
+;  TS1_OUT(*,*) = 300.0
+;  TS2_OUT(*,*) = 300.0
+;  TS3_OUT(*,*) = 300.0
+;  TS4_OUT(*,*) = 300.0
+
+   Q_OUT(*,*,*) = 0.01
+;   Q_OUT(*,*,30:nlev-1) = double(0.01)
+;   Q_OUT(*,*,20:29) = 1.0e-4
+;   Q_OUT(*,*,10:14) = 1.0e-6
+;   Q_OUT(*,*,5:9) = 1.0e-8
+;   Q_OUT(*,*,0:4) = 0.0
+;  CLDICE_OUT(*,*,*) = 0.0
 ;  CLDICE_CO2_OUT(*,*,*) = 0.0
-  CLDLIQ_OUT(*,*,*) = 0.0
+;  CLDLIQ_OUT(*,*,*) = 0.0
 ;  VS_OUT(*,*,*) = 0.0
 ;  US_OUT(*,*,*) = 0.0
-
 
 ;\zonal mean
 ;  iv=nlat
@@ -411,9 +410,9 @@ if (make_ncdata eq 1) then begin
 ;  ncdf_varput, ncid, 'TS2',TS2_OUT                &  print, "updated TS2_OUT"
 ;  ncdf_varput, ncid, 'TS3',TS3_OUT                &  print, "updated TS3_OUT"
 ;  ncdf_varput, ncid, 'TS4',TS4_OUT                &  print, "updated TS4_OUT"
-  ncdf_varput, ncid, 'CLDICE',CLDICE_OUT           &  print, "updated CLDICE"
+;  ncdf_varput, ncid, 'CLDICE',CLDICE_OUT           &  print, "updated CLDICE"
 ;  ncdf_varput, ncid, 'CLDICE_CO2',CLDICE_CO2_OUT  &  print, "updated PS"
-  ncdf_varput, ncid, 'CLDLIQ',CLDLIQ_OUT           &  print, "updated CLDLIQ"
+;  ncdf_varput, ncid, 'CLDLIQ',CLDLIQ_OUT           &  print, "updated CLDLIQ"
   ncdf_varput, ncid, 'Q',Q_OUT                     &  print, "updated Q"
 ;  ncdf_varput, ncid, 'T',T_OUT                    &  print, "updated T"
 ;  ncdf_varput, ncid, 'VS',VS_OUT                  &  print, "updated VS"

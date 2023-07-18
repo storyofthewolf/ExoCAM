@@ -2,7 +2,6 @@
 # Author: Eric T. Wolf
 # Translator: Russell Deitrick
 # Date:  some time long ago
-# needs fixing?
 #====================================================================
 # Change number of vertical levels in a CAM initial condition file.
 # This is achieved starting with a 66 level WACCM initial condition

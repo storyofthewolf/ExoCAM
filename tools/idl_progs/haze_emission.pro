@@ -2,6 +2,7 @@ pro haze_emission
 ;--------------------------------------------------------------------
 ;AUTHOR:  WOLF, E. T.
 ;
+
 ;PURPOSE:  Create production rate profile
 ;
 
@@ -10,31 +11,33 @@ do_write  = 1
 do_zenith = 1
 
 ;input files
-nfiles=18
+nfiles=20
 filenames=strarr(nfiles)
 
 nlev = 200
-nzen = 18
+nzen = 20
 path = "/gpfsm/dnb53/etwolf/atmos_haze_prod"
-folder = "/Wolf_hazmat_prox_mCO2_1e-2_mCH4_3.70E-03"
-filenames(17) = path + folder + "/hazmat_prox_mCH4_3.70E-03_zenith_015_haze_rate.dat"
-filenames(16) = path + folder + "/hazmat_prox_mCH4_3.70E-03_zenith_060_haze_rate.dat"
-filenames(15) = path + folder + "/hazmat_prox_mCH4_3.70E-03_zenith_105_haze_rate.dat"
-filenames(14) = path + folder + "/hazmat_prox_mCH4_3.70E-03_zenith_150_haze_rate.dat"
-filenames(13) = path + folder + "/hazmat_prox_mCH4_3.70E-03_zenith_195_haze_rate.dat"
-filenames(12) = path + folder + "/hazmat_prox_mCH4_3.70E-03_zenith_240_haze_rate.dat"
-filenames(11) = path + folder + "/hazmat_prox_mCH4_3.70E-03_zenith_285_haze_rate.dat"
-filenames(10) = path + folder + "/hazmat_prox_mCH4_3.70E-03_zenith_330_haze_rate.dat"
-filenames(9) = path + folder + "/hazmat_prox_mCH4_3.70E-03_zenith_420_haze_rate.dat"
-filenames(8) = path + folder + "/hazmat_prox_mCH4_3.70E-03_zenith_465_haze_rate.dat"
-filenames(7) = path + folder + "/hazmat_prox_mCH4_3.70E-03_zenith_510_haze_rate.dat"
-filenames(6) = path + folder + "/hazmat_prox_mCH4_3.70E-03_zenith_555_haze_rate.dat"
-filenames(5) = path + folder + "/hazmat_prox_mCH4_3.70E-03_zenith_600_haze_rate.dat"
-filenames(4) = path + folder + "/hazmat_prox_mCH4_3.70E-03_zenith_645_haze_rate.dat"
-filenames(3) = path + folder + "/hazmat_prox_mCH4_3.70E-03_zenith_690_haze_rate.dat"
-filenames(2) = path + folder + "/hazmat_prox_mCH4_3.70E-03_zenith_780_haze_rate.dat"
-filenames(1) = path + folder + "/hazmat_prox_mCH4_3.70E-03_zenith_825_haze_rate.dat"
-filenames(0) = path + folder + "/hazmat_prox_mCH4_3.70E-03_zenith_870_haze_rate.dat"
+folder = "/CHAMPS_zenith_GCM_26_mCO2_8.00E-2_mCH4_3.06E-02"
+filenames(19) = path + folder + "/zenith_GCM_26_mCO2_8.00E-2_mCH4_3.06E-02_zenith_015_haze_rate.dat"
+filenames(18) = path + folder + "/zenith_GCM_26_mCO2_8.00E-2_mCH4_3.06E-02_zenith_060_haze_rate.dat"
+filenames(17) = path + folder + "/zenith_GCM_26_mCO2_8.00E-2_mCH4_3.06E-02_zenith_105_haze_rate.dat"
+filenames(16) = path + folder + "/zenith_GCM_26_mCO2_8.00E-2_mCH4_3.06E-02_zenith_150_haze_rate.dat"
+filenames(15) = path + folder + "/zenith_GCM_26_mCO2_8.00E-2_mCH4_3.06E-02_zenith_195_haze_rate.dat"
+filenames(14) = path + folder + "/zenith_GCM_26_mCO2_8.00E-2_mCH4_3.06E-02_zenith_240_haze_rate.dat"
+filenames(13) = path + folder + "/zenith_GCM_26_mCO2_8.00E-2_mCH4_3.06E-02_zenith_285_haze_rate.dat"
+filenames(12) = path + folder + "/zenith_GCM_26_mCO2_8.00E-2_mCH4_3.06E-02_zenith_330_haze_rate.dat"
+filenames(11) = path + folder + "/zenith_GCM_26_mCO2_8.00E-2_mCH4_3.06E-02_zenith_375_haze_rate.dat"
+filenames(10) = path + folder + "/zenith_GCM_26_mCO2_8.00E-2_mCH4_3.06E-02_zenith_420_haze_rate.dat"
+filenames(9) = path + folder + "/zenith_GCM_26_mCO2_8.00E-2_mCH4_3.06E-02_zenith_465_haze_rate.dat"
+filenames(8) = path + folder + "/zenith_GCM_26_mCO2_8.00E-2_mCH4_3.06E-02_zenith_510_haze_rate.dat"
+filenames(7) = path + folder + "/zenith_GCM_26_mCO2_8.00E-2_mCH4_3.06E-02_zenith_555_haze_rate.dat"
+filenames(6) = path + folder + "/zenith_GCM_26_mCO2_8.00E-2_mCH4_3.06E-02_zenith_600_haze_rate.dat"
+filenames(5) = path + folder + "/zenith_GCM_26_mCO2_8.00E-2_mCH4_3.06E-02_zenith_645_haze_rate.dat"
+filenames(4) = path + folder + "/zenith_GCM_26_mCO2_8.00E-2_mCH4_3.06E-02_zenith_690_haze_rate.dat"
+filenames(3) = path + folder + "/zenith_GCM_26_mCO2_8.00E-2_mCH4_3.06E-02_zenith_735_haze_rate.dat"
+filenames(2) = path + folder + "/zenith_GCM_26_mCO2_8.00E-2_mCH4_3.06E-02_zenith_780_haze_rate.dat"
+filenames(1) = path + folder + "/zenith_GCM_26_mCO2_8.00E-2_mCH4_3.06E-02_zenith_825_haze_rate.dat"
+filenames(0) = path + folder + "/zenith_GCM_26_mCO2_8.00E-2_mCH4_3.06E-02_zenith_870_haze_rate.dat"
 
 
 pressure = fltarr(nlev, nfiles)
@@ -59,7 +62,7 @@ for z=0, nfiles-1 do begin
   pressure(*,z) = press_temp(*)
   prod(*,z)     = prod_temp(*)
 
-print, prod(*,z)
+  print, prod(*,z)
 
 endfor
 
@@ -96,7 +99,7 @@ endif
 print, "___________________WROTE_NETCDF____________________________"
 print, ""
 
-filename="early_earth_haze_zen_atmos.nc"
+filename="hazyCHAMPS_case26_hazeprod_zen.nc"
 
 id = NCDF_CREATE(filename, /CLOBBER)
 dim1 = NCDF_DIMDEF(id,'lev',nlev)
