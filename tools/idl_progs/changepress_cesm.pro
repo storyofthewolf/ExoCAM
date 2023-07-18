@@ -22,14 +22,14 @@ pro changepress_cesm
 
 
 do_write = 1  ; if 1 write output file
-do_dry = 0    ; remove water vapor
+do_dry = 1    ; remove water vapor
 
 ;choose one or the other
-do_flat_psfield = 0 ; write output pressures equal to sum of partial pressures
+do_flat_psfield = 1 ; write output pressures equal to sum of partial pressures
                                 ; pressure field is assumed flat across
                                 ; surface, regardless of topography
 
-do_scale_psfield = 1 ; write output pressures by scaling press field from 
+do_scale_psfield = 0 ; write output pressures by scaling press field from 
                                 ; the input file in being used (ncdata).
 
 if (do_flat_psfield eq 1 and do_scale_psfield eq 1) then begin
@@ -44,7 +44,7 @@ if (do_flat_psfield eq 1)  then print, "applying flat surface pressure field"
 ;++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ;------------------------------------------------------
 ;---  Choose your new mean surface pressure in BARS ---
-new_PS_mean = 0.1   ; [bars]
+new_PS_mean = 1.5   ; [bars]
 ;------------------------------------------------------
 ;++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -63,7 +63,6 @@ ncdata_in = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_
 ;ncdata_in = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/ic_P0.1bar_L40_dry_ic.nc'
 ;ncdata_in = '/gpfsm/dnb53/etwolf/cesm_scratch/archive/mars_0.1barCO2/rest/0031-01-01-00000/mars_0.1barCO2.cam.i.0031-01-01-00000.nc'
 ;ncdata_in = '/gpfsm/dnb53/etwolf/cesm_scratch/archive/mars_dev2/rest/0001-01-21-00000/mars_dev2.cam.i.0001-01-21-00000.nc'
-;ncdata_in = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam4_aqua_se/cami_0000-01-01_ne16np4_L48_c120525_aquaplanet.nc'
 ;ncdata_in = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/mars/atm/paleo_mars_6.0bar_dry.cam.i.0021-01-01-00000.nc'
 
 ;--- assorted output file names ---
@@ -76,7 +75,6 @@ ncdata_in = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_
 ;file_out = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_se/cami_0000-01-01_ne16np4_L48_10bar_c120525_aquaplanet.nc'
 ;file_out = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/mars/atm/paleo_mars_10.0bar_dry.cam.i.0021-01-01-00000.nc'
 file_out = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/wolf1069_land_planet.i.L46_0.1bar.nc'
-
 ;=======================================================================================================================
 ;=======================================================================================================================
 ;=======================================================================================================================

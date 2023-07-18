@@ -21,10 +21,10 @@ do_dry = 0
 ;=======  name of new file ======
 ;================================
 ;fname_out = '/gpfsm/dnb05/projects/p54/users/etwolf/samosa/icfiles/ic_P0.16bar_L31_ic.nc'
-fname_out = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/wolf1069_titan.i.L55.nc'
+fname_out = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/mars/atm/present_day_mars.cam.i.L30.nc'
 diagnostic_out = fname_out
 
-nlev_out = 55
+nlev_out = 30
 nilev_out = nlev_out + 1
 
 ;read in appropriate grid coordinates from WACCM 66 level grid 
@@ -55,7 +55,7 @@ nlon_new = n_elements(lon_new)
 ;clim_fname_in = "/gpfsm/dnb53/etwolf/cesm_scratch/rundir/samosa5/run/samosa5.cam.i.0004-01-01-00000.nc"
 ;clim_fname_in = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/ic_1bar_L51_zmean_ic.nc" 
 ;clim_fname_in = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/wolf1069_land_planet.i.nc"
- clim_fname_in = "/gpfsm/dnb53/etwolf/cesm_scratch/archive/wolf1069b_titan/rest/0110-01-01-00000/wolf1069b_titan.cam.i.0110-01-01-00000.nc"
+clim_fname_in = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/mars/atm/present_day_mars.cam.i.L40.nc"
 
 ncid=ncdf_open(clim_fname_in, /nowrite)
 ncdf_varget,ncid,'lev',lev_old
