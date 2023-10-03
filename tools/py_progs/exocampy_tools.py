@@ -1,18 +1,15 @@
 import numpy as np
+import math
 
 
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# // calculate pressure coordinates from hybrid-sigma levels
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 def hybrid2pressure(nlon,nlat,nlev,PS,P0,hyam,hybm,hyai,hybi):
   """
   AUTHOR WOLF E.T.
   7/11/2008
   Translated to Python by R. Deitrick, October 2022
-  -------------------------------------------------------------
-  PURPOSE:  Convert WACCM hybrid level coordinates to pressure coordinates
-
-  NOTES:  for implementation can change lon, lat, lev passing
-  parameters to nlon, nlat, nlev to improve speed.  This is meant to be
-  used as a function within larger data analysis packages
-
   -------------------------------------------------------------
   ARGUMENTS:
   nlon                => number of elements, longitude array
@@ -32,12 +29,82 @@ def hybrid2pressure(nlon,nlat,nlev,PS,P0,hyam,hybm,hyai,hybi):
   """
 
   lev_P = hyam[:,None,None]*P0 + hybm[:,None,None]*PS[None,:,:]
-  ilev_P = hyam[:,None,None]*P0 + hybm[:,None,None]*PS[None,:,:]
+  ilev_P = hyai[:,None,None]*P0 + hybi[:,None,None]*PS[None,:,:]
 
   return (lev_P, ilev_P)
 
 
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# // calculate height coordinates
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+def hybrid2height(nlon,nlat,nlev,PS,P0,hyam,hybm,hyai,hybi,T,G,R):
+  """
+  ;AUTHOR: WOLF, E.T.
+  ;7/14/2008
+  ; NOTES:
+  ; Needs incorporation of surface geopotential heigh from topography data
+  ; Currently surface is set to zero.
+  ;---------------------------------------------------------------------
+  ;ARGUMENTS:
+  ;nlon                => number of elements,  longitude array
+  ;nlat                => numbrt of elements, latitude array
+  ;nilev               => number of elements, hybrid vertical levels at interfaces
+  ;PS[lon,lat]         => surface pressure array at each grid point
+  ;P0                  => reference pressure
+  ;hyai                => hybrid A coefficient at layer interfaces
+  ;hybi                => hybrid B coefficient at layer interfaces
+  ;hyam                => hybrid A coefficient at midlayer
+  ;hybm                => hybrid B coefficient at midlayer
+  ;T                   => temperature field (x,y,z)
+  ;G                   => gravity of the planet ;[m s-2] acceleration due to gravity
+  ;R                   => gas constant [J kg-1 K-1]   gas constant for dry air
+  ;lev_Z[lon,lat,lev]  => returns mid layer height coordinate matrix in METERS,
+  ;                       must be defined with proper dimensions before being passed
+  ;ilev_Z[lon,lat,nilev]  => returns interface height coordinate matrix in METERS,
+  ;                       must be defined with proper dimensions before being passed
+  ;----------------------------------------------------------------------                      
+  """
 
+  # geopotential height of surace
+  # currently set to zero
+  # will need to make this an input argument to account
+  # for topography
+  PHIS   = np.zeros((nlon, nlat), dtype=float)
+  z_surf = np.zeros((nlon, nlat), dtype=float)
+  
+  # first calculate pressures
+  lev_P = hyam[:,None,None]*P0 + hybm[:,None,None]*PS[None,:,:]
+  ilev_P = hyai[:,None,None]*P0 + hybi[:,None,None]*PS[None,:,:]
+
+  # define dimensions from Temperature array
+  nlev = T.shape[0]
+  nlat = T.shape[1]
+  nlon = T.shape[2]
+  nilev = nlev+1
+
+
+  ilev_Z = np.zeros((nilev, nlat, nlon), dtype=float) 
+  lev_Z  = np.zeros((nlev, nlat, nlon), dtype=float) 
+  
+  z_surf[:,:]=PHIS[:,:]/G
+
+  for z in range(nlev,0,-1): 
+    for y in range(nlat):
+      for x in range(nlon):
+        zi=z-1
+        ptop = ilev_P[zi,y,x]
+        pbot = ilev_P[zi+1,y,x]
+        pmid = lev_P[zi,y,x] 
+        delta_Z = R*T[zi,y,x]/G*math.log(pbot/ptop)
+        ilev_Z[zi,y,x]=ilev_Z[zi+1,y,x]+delta_Z
+        Z_SCALE=-R*T[zi,y,x]/G*math.log(pmid/pbot)
+        lev_Z[zi,y,x]=ilev_Z[zi+1,y,x]+Z_SCALE
+
+  return (lev_Z, ilev_Z)
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# // calculate area weighted averaged of a longitude-latitude field
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 def area_weighted_avg(lon, lat, var):
   """
   AUTHOR: WOLF E.T.
