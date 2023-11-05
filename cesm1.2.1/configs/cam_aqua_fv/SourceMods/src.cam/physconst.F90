@@ -52,6 +52,7 @@ module physconst
    real(r8), public, parameter :: mwco2       =  44._r8             ! molecular weight co2
    real(r8), public, parameter :: mwn2o       =  44._r8             ! molecular weight n2o
    real(r8), public, parameter :: mwch4       =  16._r8             ! molecular weight ch4
+   real(r8), public, parameter :: mwc2h6      =  30._r8             ! molecular weight c2h6
    real(r8), public, parameter :: mwf11       = 136._r8             ! molecular weight cfc11
    real(r8), public, parameter :: mwf12       = 120._r8             ! molecular weight cfc12
    real(r8), public, parameter :: mwo2        =  32._r8             ! molecular weight O2
@@ -373,21 +374,23 @@ contains
         write(iulog,*) '***           ExoCAM: Atmosphere properties            ***'
         write(iulog,*) '******************************************************'
         write(iulog,*) 'SURFACE PRESSURE: ', SHR_CONST_PSTD
-        write(iulog,*) 'N2 BAR: ', exo_n2bar
-        write(iulog,*) 'H2 BAR: ', exo_h2bar
-        write(iulog,*) 'CO2 BAR: ', exo_co2bar
-        write(iulog,*) 'CH4 BAR: ', exo_ch4bar
-        write(iulog,*) 'N2 VMR, MMR: ', exo_n2vmr, exo_n2mmr
-        write(iulog,*) 'H2 VMR, MMR: ', exo_h2vmr, exo_h2mmr
-        write(iulog,*) 'CO2 VMR, MMR: ', exo_co2vmr, exo_co2mmr
-        write(iulog,*) 'CH4 VMR, MMR: ', exo_ch4vmr, exo_ch4mmr
-        write(iulog,*) 'CPDAIR: ', SHR_CONST_CPDAIR
-        write(iulog,*) 'MWDRY: ', SHR_CONST_MWDAIR
-        write(iulog,*) 'RWV: ', SHR_CONST_RWV
-        write(iulog,*) 'RAIR: ', SHR_CONST_RDAIR
+        write(iulog,*) 'N2   BAR: ', exo_n2bar
+        write(iulog,*) 'H2   BAR: ', exo_h2bar
+        write(iulog,*) 'CO2  BAR: ', exo_co2bar
+        write(iulog,*) 'CH4  BAR: ', exo_ch4bar
+        write(iulog,*) 'C2H6 BAR: ', exo_c2h6bar
+        write(iulog,*) 'N2   VMR, MMR: ', exo_n2vmr, exo_n2mmr
+        write(iulog,*) 'H2   VMR, MMR: ', exo_h2vmr, exo_h2mmr
+        write(iulog,*) 'CO2  VMR, MMR: ', exo_co2vmr, exo_co2mmr
+        write(iulog,*) 'CH4  VMR, MMR: ', exo_ch4vmr, exo_ch4mmr
+        write(iulog,*) 'C2H6 VMR, MMR: ', exo_c2h6vmr, exo_c2h6mmr     
+        write(iulog,*) 'CPDAIR:  ', SHR_CONST_CPDAIR
+        write(iulog,*) 'MWDRY:   ', SHR_CONST_MWDAIR
+        write(iulog,*) 'RWV:     ', SHR_CONST_RWV
+        write(iulog,*) 'RAIR:    ', SHR_CONST_RDAIR
         write(iulog,*) 'RHODAIR: ', SHR_CONST_RHODAIR
-        write(iulog,*) 'ZVIR: ', SHR_CONST_ZVIR
-        write(iulog,*) 'CPVIR: ', SHR_CONST_CPVIR
+        write(iulog,*) 'ZVIR:    ', SHR_CONST_ZVIR
+        write(iulog,*) 'CPVIR:   ', SHR_CONST_CPVIR
         write(iulog,*) '******************************************************'
         write(iulog,*) '******************************************************'
       end if
