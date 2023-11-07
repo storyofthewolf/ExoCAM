@@ -10,7 +10,11 @@ ExoCAM/tools/py_progs
 
 contains
 -----------------------------------------------------------------------------
-trend      -- python program for time-series analysis of ExoCAM runs with 
-	      standard monthly mean output cadences
-py_progs   -- collection of general python scripts
-idl_progs  -- collection of general idl scripts 
+trend            -- python program for time-series analysis of ExoCAM runs with 
+	            standard monthly mean output cadences 
+		    submodule(https://github.com/storyofthewolf/trend)
+py_progs         -- collection of general python scripts
+idl_progs        -- collection of general idl scripts 
+spectral_albedos -- contains spectral surface albedo files for use with	
+		    py_progs/broadband_albedo_calculator.py for computing SED 
+		    weighted two-channel surface albedos

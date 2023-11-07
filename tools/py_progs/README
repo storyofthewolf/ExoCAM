@@ -1,7 +1,7 @@
 py_progs
 a variety of useful python scripts for use with ExoCAM
 
-
+sys.in 	     	    	        -- contains system information (paths)
 exocampy_tools.py               -- a collection of standard tools for manipulating CAM files
 changevert_cesm.py              -- change the numnber of vertical levels in CAM .i. files
 broadband_albedo_calculator.py  -- script to produce SED weighted snow and ice

@@ -19,6 +19,7 @@ import sys
 import subprocess
 import argparse
 
+print(" ")
 print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
 print("~~~~~~~~~~~~~~~~~~~ difference ExoCAM ~~~~~~~~~~~~~~~~~~~")
 print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
@@ -139,37 +140,41 @@ print(" ")
 print("<<< <<< <<< <<< <<< <<< <<< src.cam >>> >>> >>> >>> >>> >>> >>>")
 if os.path.exists(case_cam_dir) and os.path.isdir(case_cam_dir):
     for filename in os.listdir(case_cam_dir):
-        print(filename)                
-        print("======================================================")
-        f = ['diff', case_cam_dir + '/' + filename, comp_cam_dir + '/' + filename]
-        subprocess.run(f)
+        if not filename.endswith("~"):
+            print(filename)                
+            print("======================================================")
+            f = ['diff', case_cam_dir + '/' + filename, comp_cam_dir + '/' + filename]
+            subprocess.run(f)
 
 print(" ")
 print("<<< <<< <<< <<< <<< <<< <<< src.share >>> >>> >>> >>> >>> >>> >>>")
 if os.path.exists(case_share_dir) and os.path.isdir(case_share_dir):
     for filename in os.listdir(case_share_dir):
-        print(filename)                
-        print("======================================================")
-        f = ['diff', case_share_dir + '/' + filename, comp_share_dir + '/' + filename]
-        subprocess.run(f)
+        if not filename.endswith("~"):
+            print(filename)                
+            print("======================================================")
+            f = ['diff', case_share_dir + '/' + filename, comp_share_dir + '/' + filename]
+            subprocess.run(f)
 
 print(" ")
 print("<<< <<< <<< <<< <<< <<< <<< src.drv >>> >>> >>> >>> >>> >>> >>>")
 if os.path.exists(case_drv_dir) and os.path.isdir(case_drv_dir):
     for filename in os.listdir(case_drv_dir):
-        print(filename)                
-        print("======================================================")
-        f = ['diff', case_drv_dir + '/' + filename, comp_drv_dir + '/' + filename]
-        subprocess.run(f)
+        if not filename.endswith("~"):
+            print(filename)                
+            print("======================================================")
+            f = ['diff', case_drv_dir + '/' + filename, comp_drv_dir + '/' + filename]
+            subprocess.run(f)
 
 print(" ")
 print("<<< <<< <<< <<< <<< <<< <<< src.clm >>> >>> >>> >>> >>> >>> >>>")
 if os.path.exists(case_clm_dir) and os.path.isdir(case_clm_dir):
     for filename in os.listdir(case_clm_dir):
-        print(filename)                
-        print("======================================================")
-        f = ['diff', case_clm_dir + '/' + filename, comp_clm_dir + '/' + filename]
-        subprocess.run(f)
+        if not filename.endswith("~"):
+            print(filename)                
+            print("======================================================")
+            f = ['diff', case_clm_dir + '/' + filename, comp_clm_dir + '/' + filename]
+            subprocess.run(f)
 else:
     print("No land model in $CASE")
 
@@ -177,15 +182,17 @@ print(" ")
 print("<<< <<< <<< <<< <<< <<< <<< src.cice >>> >>> >>> >>> >>> >>> >>>")
 if os.path.exists(case_cice_dir) and os.path.isdir(case_cice_dir):
     for filename in os.listdir(case_cice_dir):
-        print(filename)                
-        print("======================================================")
-        f = ['diff', case_cice_dir + '/' + filename, comp_cice_dir + '/' + filename]
-        subprocess.run(f)
+        if not filename.endswith("~"):
+            print(filename)                
+            print("======================================================")
+            f = ['diff', case_cice_dir + '/' + filename, comp_cice_dir + '/' + filename]
+            subprocess.run(f)
 else:
     print("No ice model in $CASE")
 
 
 print("... finished differencing")
+print(" ")
 sys.exit
 
 
