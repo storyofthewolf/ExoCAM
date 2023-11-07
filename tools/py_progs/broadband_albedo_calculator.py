@@ -24,17 +24,40 @@ import scipy.interpolate as ip
 import matplotlib.pyplot as plt
 import scipy.interpolate as interpol
 
+#Set number of lines of header information to ignore
+stel_nh = 2
+alb_nh = 0
+
+#Conversion factor
+#wavelengths must be converted to microns
+#check header information for given SED
+#1.0e-4 angstroms to microns
+stel_convert_wavl = 1.0e-4
+alb_convert_wavl = 1.0
+
 #Reading in the stellar file 
-with open('G_Kurucz_um_cm2.txt', 'r') as f:
-    line = f.readlines()
-    lamda= [float(line.split()[0]) for line in line]
-    flux= [float(line.split()[1]) for line in line] 
+stellar_file = "/gpfsm/dnb53/etwolf/models/ExoRT/data/solar/raw/TOI700_SED_HST.txt"
+with open(stellar_file, 'r') as f: 
+    lines = f.readlines()
+    header = lines[0:stel_nh]
+    lamda= [float(line.split()[0]) * stel_convert_wavl for line in lines[stel_nh:]]
+    flux= [float(line.split()[1]) for line in lines[stel_nh:]] 
     
 #Reading in the Albedo file for surface
-with open('50%Mixture.txt', 'r') as f:
-    line = f.readlines()
-    wave = [float(line.split()[0]) for line in line]
-    albedo = [float(line.split()[1]) for line in line]
+#albedo_file = "../spectral_albedos/50%Mixture.txt"
+#albedo_file = "../spectral_albedos/snow100um.txt"
+albedo_file = "../spectral_albedos/Bluemarineice.txt"
+with open(albedo_file, 'r') as f:
+    lines = f.readlines()
+    header = lines[0:alb_nh]
+    wave = [float(line.split()[0]) * alb_convert_wavl for line in lines[alb_nh:]]
+    albedo = [float(line.split()[1]) for line in lines[alb_nh:]]
+
+print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+print("Using stellar spectral file...")
+print("  ", stellar_file)
+print("Using albedo file...")
+print("  ", albedo_file)
     
 #find the minimum and maximum in both stellar and albedo files and match them for interpolation purpose
 a = np.min(wave)
@@ -75,9 +98,12 @@ total_new_flux_4 = sum(new_flux4 * dlamda)
 
 #Setting up cuts between IR and Vis
 #cutoff wavelengths in microns
-cutoff = 0.7
+cutoff = 0.76923 
 ind_v = np.where(wavelengthgrid[:]<cutoff)
 ind_i = np.where(wavelengthgrid[:]> cutoff )
+
+print("Using cuttoff wavelength (microns) ...")
+print("  ", cutoff)
 
 #use this to calculate bond albedo
 ind_w = np.where(wavelengthgrid[:]>0)
@@ -105,4 +131,4 @@ Bond_albedo = total_albedo_sed/total_sed
 print('Albedo Vis =', albedo_M_v)
 print('Albedo IR =', albedo_M_i)
 print('Broadband Albedo =', Bond_albedo)
-
+print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
