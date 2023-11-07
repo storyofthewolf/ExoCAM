@@ -1,0 +1,12 @@
+discover
+/gpfsm/dnb53/etwolf/cesm_scratch/cases
+/gpfsm/dnb53/etwolf/models
+/gpfsm/dnb53/etwolf/models
+/gpfsm/dnb53/etwolf/models
+
+########################################3
+machine name
+cases root directory ($CASEROOT)
+ExoCAM root directory
+ExoRT root directory
+CESM root directory
