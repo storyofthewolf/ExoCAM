@@ -33,7 +33,7 @@ MODULE shr_orb_mod
 
    real   (SHR_KIND_R8),parameter :: pi                 = SHR_CONST_PI
    real   (SHR_KIND_R8),parameter :: SHR_ORB_ECCEN_MIN  =   0.0_SHR_KIND_R8 ! min value for eccen
-   real   (SHR_KIND_R8),parameter :: SHR_ORB_ECCEN_MAX  =   0.1_SHR_KIND_R8 ! max value for eccen
+   real   (SHR_KIND_R8),parameter :: SHR_ORB_ECCEN_MAX  =  0.99_SHR_KIND_R8 ! max value for eccen
    real   (SHR_KIND_R8),parameter :: SHR_ORB_OBLIQ_MIN  = -90.0_SHR_KIND_R8 ! min value for obliq
    real   (SHR_KIND_R8),parameter :: SHR_ORB_OBLIQ_MAX  = +90.0_SHR_KIND_R8 ! max value for obliq
    real   (SHR_KIND_R8),parameter :: SHR_ORB_MVELP_MIN  =   0.0_SHR_KIND_R8 ! min value for mvelp
