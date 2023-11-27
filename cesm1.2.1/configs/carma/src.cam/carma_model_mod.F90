@@ -467,10 +467,10 @@ contains
                        (carma_emis_zen(z_ref_indexp1) - carma_emis_zen(z_ref_index))
              endif
 
-             vbi(1) = carma_emis_rate(p_ref_index  ,  z_ref_index)       !kdata(imaj, igi, p_ref_index,   t_ref_index)
-             vbi(2) = carma_emis_rate(p_ref_index+1,  z_ref_index)       !kdata(imaj, igi, p_ref_indexp1, t_ref_index)
-             vbi(3) = carma_emis_rate(p_ref_index  ,  z_ref_index+1)     !kdata(imaj, igi, p_ref_index,   t_ref_indexp1)
-             vbi(4) = carma_emis_rate(p_ref_index+1,  z_ref_index+1)     !kdata(imaj, igi, p_ref_indexp1, t_ref_indexp1)
+             vbi(1) = carma_emis_rate(p_ref_index  ,  z_ref_index)   
+             vbi(2) = carma_emis_rate(p_ref_index+1,  z_ref_index)   
+             vbi(3) = carma_emis_rate(p_ref_index  ,  z_ref_index+1) 
+             vbi(4) = carma_emis_rate(p_ref_index+1,  z_ref_index+1) 
 
              onemp = 1. - press
              onemz = 1. - zen
@@ -479,8 +479,6 @@ contains
                      + vbi(2)*press*onemz &
                      + vbi(3)*onemp*zen &
                      + vbi(4)*press*zen
-  !========= end bilinear interpolation ============
-
 
             ! Calculate the mass flux in terms of kg/m3/s
 !            massflux = (rate * rmass(ibin) * 1.0e-3_r8 * 1.0e6_r8)

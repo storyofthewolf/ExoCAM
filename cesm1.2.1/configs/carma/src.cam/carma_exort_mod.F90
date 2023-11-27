@@ -1,7 +1,6 @@
 !!  This module provides routines for coupling ExoRT with CARMA
 !!  This module does not conform with the style of the CESM/CARMA 
-!!  package, and its linkages to CAM3 RT, and rrtmg.  Frankly...
-!!  I don't care.
+!!  package, and its linkages to CAM3 RT, and rrtmg. 
 !!
 !!  @author  Eric T Wolf
 !!  2018
