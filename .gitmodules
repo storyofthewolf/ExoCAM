@@ -1,4 +1,0 @@
-[submodule "tools/trend"]
-	path = tools/trend
-	url = https://github.com/storyofthewolf/trend
-	branch = main

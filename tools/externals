@@ -1,0 +1,14 @@
+This is a list of external Github packages which are useful for ExoCAM
+
+
+-- compute time-series of ExoCAM quantities
+https://github.com/storyofthewolf/trend
+
+-- compute a variety of global quantities from ExoCAM outputs
+https://github.com/storyofthewolf/analysis
+
+-- ExoCAM docker 
+https://github.com/hannahwoodward/docker-exocam
+
+-- ExoCAM inverse modeling with CO2
+https://github.com/Yixiao-Zhang/evolving-CO2-in-ExoCAM
