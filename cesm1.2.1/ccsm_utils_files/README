@@ -26,5 +26,10 @@ place the follwing file in directory
   namelist_definition.xml
 
 
+place the following file in directory
+../cesm1_2_1/models/ocn/docn/bld/namelist_files
+
+namelist_definition_docn.xml
+
 for hyak only! replace the following file
   cesm_buildstart.hyak -> ../cesm1_2_1/scripts/ccsm_utils/Tools/cesm_buildstart    
