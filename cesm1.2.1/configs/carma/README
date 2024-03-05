@@ -1,4 +1,4 @@
-QuickStart Guide :: cam4_aqua_fv
+QuickStart Guide :: carma haze aerosol add on
 ---------------------------------------------------------------------------------
 description:        carma aerosol model add-on
 physics:            cam4
@@ -28,7 +28,7 @@ add-ons to the CARMA directorty, copy and unzip base.tar into
  Begin by creating a basic aquaplanet or landplanet case (i.e cam_aqua_fv, cam_land_fv)
 In addition to the build instructions for these configurations ...
 Copy src.cam folder files into /$CASENAME/SourceMods/src.cam, in addition to other
-SourceMods files from the base config (i.e. cam4_aqua_fv, cam4_land_fv,etc)
+SourceMods files from the base config (i.e. cam_aqua_fv, cam_land_fv,etc)
 These provide a linkage with ExoRT, bypassing the native framework for link with CAMRT and RRTMG.   
 
 A basic template for a generic fractal haze carma model is included.
