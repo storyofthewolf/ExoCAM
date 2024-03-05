@@ -39,10 +39,9 @@ module exoplanet_mod
   !! if .false. LW and SW streams computed over fill bandpasses
   !! if .true. LW and SW bandpasses reduced to fit SED and assumed Tmax 
   logical,  public, parameter :: do_exo_rt_optimize_bands = .true.
-  real(r8), public, parameter :: Tmax = 400.          !! Maximum expected temperature for thermal band optimization                                                  
-  real(r8), public, parameter :: swFluxLimit = 0.999  !! Fraction of stellar flux captured in bands, rescaled                                                        
-  real(r8), public, parameter :: lwFluxLimit = 0.999  !! Fraction of thermal flux captured in bands, not rescaled            
-
+  real(r8), public, parameter :: Tmax = 400.          !! Maximum expected temperature for thermal band optimization
+  real(r8), public, parameter :: swFluxLimit = 0.999  !! Fraction of stellar flux captured in bands, rescaled
+  real(r8), public, parameter :: lwFluxLimit = 0.999  !! Fraction of thermal flux captured in bands, not rescaled
 
   !! ==============  PLANET PARAMETERS  ============== !!
   !! It is the responsibility of the USER to set do_exo_synchronous, exo_ndays
