@@ -120,8 +120,9 @@ module exoplanet_mod
   real(r8), public, parameter :: exo_ch4bar  = 1.0e-3_r8                     ! CH4 inventory (bar)
   real(r8), public, parameter :: exo_c2h6bar = 0.0_r8                        ! C2H6 inventory (bar)
   real(r8), public, parameter :: exo_h2bar   = 0.0_r8                        ! H2 inventory (bar)
-  real(r8), public, parameter :: exo_n2bar   = 1.0 - exo_co2bar - exo_ch4bar - exo_c2h6bar    ! N2 inventory (bar)
-  real(r8), public, parameter :: exo_pstd    = (exo_n2bar + exo_h2bar + exo_co2bar + exo_ch4bar + exo_c2h6bar)*1.0e5  ! total pressure (Pascals)
+  real(r8), public, parameter :: exo_o2bar   = 0.0_r8                        ! O2 inventory (bar)
+  real(r8), public, parameter :: exo_n2bar   = 1.0 - exo_co2bar - exo_ch4bar - exo_c2h6bar - exo_o2bar   ! N2 inventory (bar)
+  real(r8), public, parameter :: exo_pstd    = (exo_n2bar + exo_o2bar + exo_h2bar + exo_co2bar + exo_ch4bar + exo_c2h6bar)*1.0e5  ! total pressure (Pascals)
 
 
   !! ============== OCEAN ALBEDO CONSTANTS ============== !!
@@ -148,11 +149,13 @@ module exoplanet_mod
   real(r8), parameter :: mwn2   = 28._r8
   real(r8), parameter :: mwh2   = 2._r8
   real(r8), parameter :: mwco2  = 44._r8
+  real(r8), parameter :: mwo2   = 32._r8
   real(r8), parameter :: mwch4  = 16._r8
   real(r8), parameter :: mwc2h6 = 30._r8
   real(r8), parameter :: cpn2   = 1.039e3_r8
   real(r8), parameter :: cph2   = 14.32e3_r8
   real(r8), parameter :: cpco2  = 0.846e3_r8
+  real(r8), parameter :: cpo2   = 0.918e3_r8
   real(r8), parameter :: cpch4  = 2.226e3
   real(r8), parameter :: cpc2h6 = 1.756e3
 
@@ -160,22 +163,24 @@ module exoplanet_mod
   !! automatically calculated from above inputs in bar
   ! dry volume mixing ratios  kg/kmole
   real(r8), public, parameter :: exo_n2vmr   = exo_n2bar   / (exo_pstd/1.0e5)  
+  real(r8), public, parameter :: exo_o2vmr   = exo_o2bar   / (exo_pstd/1.0e5)  
   real(r8), public, parameter :: exo_h2vmr   = exo_h2bar   / (exo_pstd/1.0e5)
   real(r8), public, parameter :: exo_co2vmr  = exo_co2bar  / (exo_pstd/1.0e5)
   real(r8), public, parameter :: exo_ch4vmr  = exo_ch4bar  / (exo_pstd/1.0e5)
   real(r8), public, parameter :: exo_c2h6vmr = exo_c2h6bar / (exo_pstd/1.0e5)
 
   real(r8), public, parameter :: &   ! molecular weight of dry air
-            exo_mwdair = exo_n2vmr*mwn2 + exo_h2vmr*mwh2 + exo_co2vmr*mwco2 + exo_ch4vmr*mwch4 + exo_c2h6vmr*mwc2h6
+            exo_mwdair = exo_n2vmr*mwn2 + exo_h2vmr*mwh2 + exo_co2vmr*mwco2 + exo_ch4vmr*mwch4 + exo_c2h6vmr*mwc2h6 + exo_o2vmr*mwo2
 
   !! dry mass mixing ratios
   real(r8), public, parameter :: exo_n2mmr   = exo_n2vmr   * mwn2/exo_mwdair
+  real(r8), public, parameter :: exo_o2mmr   = exo_o2vmr   * mwo2/exo_mwdair
   real(r8), public, parameter :: exo_h2mmr   = exo_h2vmr   * mwh2/exo_mwdair
   real(r8), public, parameter :: exo_co2mmr  = exo_co2vmr  * mwco2/exo_mwdair
   real(r8), public, parameter :: exo_ch4mmr  = exo_ch4vmr  * mwch4/exo_mwdair
   real(r8), public, parameter :: exo_c2h6mmr = exo_c2h6vmr * mwc2h6/exo_mwdair
 
   real(r8), public, parameter :: &   ! specific heat of dry, air J/kg/K
-            exo_cpdair = exo_n2mmr*cpn2 + exo_h2mmr*cph2 + exo_co2mmr*cpco2 + exo_ch4mmr*cpch4 + exo_c2h6mmr*cpc2h6
+            exo_cpdair = exo_n2mmr*cpn2 + exo_h2mmr*cph2 + exo_co2mmr*cpco2 + exo_ch4mmr*cpch4 + exo_c2h6mmr*cpc2h6 + exo_o2mmr*cpo2
 
 end module
