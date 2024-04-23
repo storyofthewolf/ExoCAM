@@ -1,5 +1,5 @@
-!! Users should add all user specific namelist changes below in the form of 
-!! namelist_var = new_namelist_value 
+!! Users should add all user specific namelist changes below in the form of
+!! namelist_var = new_namelist_value
 
 
 !!---------------------
@@ -16,9 +16,13 @@ ncdata ='/home/deitrr/projects/def-czg/deitrr/ExoCAM/cesm1.2.1/initial_files/cam
 gw_drag_file = '/home/deitrr/projects/def-czg/deitrr/ExoCAM/cesm1.2.1/initial_files/other/newmfspectra40_dc25.nc'
 
 !! ozone file 
-prescribed_ozone_datapath	= '/home/deitrr/projects/def-czg/deitrr/ccsm/inputdata/atm/cam/ozone'
-prescribed_ozone_file		= 'ozone_1.9x2.5_L26_2000clim_c091112.nc'
-
+&prescribed_ozone_nl
+ prescribed_ozone_cycle_yr		= 2000
+ prescribed_ozone_datapath	= '/home/deitrr/projects/def-czg/deitrr/ccsm/inputdata/atm/cam/ozone'
+ prescribed_ozone_file		= 'ozone_1.9x2.5_L26_2000clim_c091112.nc'
+ prescribed_ozone_name		= 'O3'
+ prescribed_ozone_type		= 'CYCLICAL'
+/
 
 !!---------------------
 !! options
@@ -59,12 +63,10 @@ nhtfrq = 0
 mfilt = 1
 avgflag_pertape = 'A'
 fincl1 = 'T','TS','PS','ALDIR','ALDIF','ASDIR','ASDIF','FUL','FUS','FDL','FDS','QRS','QRL','Q','m_CO2_c','m_Q_c','m_CH4_c','CMFSL','CMFLQ','CMFDQ','CMFDQR','CMFDT','CMFMC','CMFMCDZM','FICE','FREQSH','FREQZM','ICLDIWP','ICLDTWP','PBLH','PCONVB','PCONVT','PRECL','PRECSC','PRECSH','PRECSL','PRECT','PSL','FULC','FDLC','FUSC','FDSC','QRSC','QRLC','TROP_T','TROP_Z','TROP_P','CLDTOT','CAPE','CIN','TGCLDIWP','TGCLDLWP','VQ','VT','VU','CBMF','CNVCLD','CONCLD','DTCOND','DTCORE','DQP','DQSED','ENGYCORR','EVAPPREC','EVAPQCM','EVAPQZM','PDELDRY','PTTEND','PTTEND_RESID','QC','SST','TEINP','TEOUT','U','V','OMEGA','ZMDQ','ZMDT','TTEND','REI','REL','LANDFRAC'
- 
+
 !additional MG cloud variables, add to fincl1
 ! 'EFFLIQ','EFFICE','IWC','LWC','ICWNC','ICINC'
 
 !! output for spectral output n28
 !use for F**_int## variables to output binned fluxes, do_exo_rt_spectral = .true.
 !fincl1 = 'T','TS','PS','ALDIR','ALDIF','ASDIR','ASDIF','Q','FUL','FUS','FDL','FDS','QRS','QRL','FULC','FUSC','FDLC','FDSC','QRSC','QRLC','FUS_int01','FUS_int02','FUS_int03','FUS_int04','FUS_int05','FUS_int06','FUS_int07','FUS_int08','FUS_int09','FUS_int10','FUS_int11','FUS_int12','FUS_int13','FUS_int14','FUS_int15','FUS_int16','FUS_int17','FUS_int18','FUS_int19','FUS_int20','FUS_int21','FUS_int22','FUS_int23','FUS_int24','FUS_int25','FUS_int26','FUS_int27','FUS_int28','FDS_int01','FDS_int02','FDS_int03','FDS_int04','FDS_int05','FDS_int06','FDS_int07','FDS_int08','FDS_int09','FDS_int10','FDS_int11','FDS_int12','FDS_int13','FDS_int14','FDS_int15','FDS_int16','FDS_int17','FDS_int18','FDS_int19','FDS_int20','FDS_int21','FDS_int22','FDS_int23','FDS_int24','FDS_int25','FDS_int26','FDS_int27','FDS_int28','FUL_int01','FUL_int02','FUL_int03','FUL_int04','FUL_int05','FUL_int06','FUL_int07','FUL_int08','FUL_int09','FUL_int10','FUL_int11','FUL_int12','FUL_int13','FUL_int14','FUL_int15','FUL_int16','FUL_int17','FUL_int18','FUL_int19','FUL_int20','FUL_int21','FUL_int22','FUL_int23','FUL_int24','FUL_int25','FUL_int26','FUL_int27','FUL_int28','FDL_int01','FDL_int02','FDL_int03','FDL_int04','FDL_int05','FDL_int06','FDL_int07','FDL_int08','FDL_int09','FDL_int10','FDL_int11','FDL_int12','FDL_int13','FDL_int14','FDL_int15','FDL_int16','FDL_int17','FDL_int18','FDL_int19','FDL_int20','FDL_int21','FDL_int22','FDL_int23','FDL_int24','FDL_int25','FDL_int26','FDL_int27','FDL_int28'
-
-
