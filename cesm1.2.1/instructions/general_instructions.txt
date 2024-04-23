@@ -67,6 +67,7 @@ STEP 2:  Place new system files into CESM.
   ../cesm1_2_1/scripts/ccsm_utils/Machines/config_machines.xml
   ../cesm1_2_1/scripts/ccsm_utils/Case.template/config_compsets.xml
   ../cesm1_2_1/models/atm/cam/bld/namelist_files/namelist_definition.xml
+  ../cesm1_2_1/models/ocn/docn/bld/namelist_files/namelist_definition_docn.xml
 
 
 STEP 3:  Create a new case
