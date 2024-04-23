@@ -10,6 +10,7 @@
 !!
 !! @version Jan-2011
 !! @author  Chuck Bardeen 
+!! @modified by Eric T Wolf 2024
 module carma_model_mod
 
   use carma_precision_mod
@@ -92,16 +93,11 @@ module carma_model_mod
   integer                             :: carma_emis_izen_max     ! index of maximum level in table 
   integer                             :: carma_emis_izen_incr    ! index increment to increase level 
 
-  !real(r8), allocatable, dimension(:) :: carma_emis_rate         ! emission rate lookup table (# cm-3 s-1)
   real(r8), allocatable, dimension(:,:) :: carma_emis_rate         ! emission rate lookup table (g cm-3 s-1), zenith angle dependence
 
-  integer                             :: carma_escale_nLats      ! number of emission scale latitudes
-  integer                             :: carma_escale_nTimes     ! number of emission scale times
-  integer                             :: carma_escale_nLTimes    ! number of emission scale local times
-  real(r8), allocatable, dimension(:,:) :: carma_escale_grf      ! global relative flux
-  real(r8), allocatable, dimension(:) :: carma_escale_lat        ! global relative flux latitudes
-  real(r8), allocatable, dimension(:) :: carma_escale_lrf        ! locat time realtive flux
-  real(r8), allocatable, dimension(:) :: carma_escale_ltime      ! local time relative flux times
+  real(r8), parameter  :: illumFrac = 1.9250898                  ! illumination fraction, used for scaling photochemically driven aerosol mass
+                                                                 ! value of 1.9250898 scales mass when source only on daylight hemisphere
+                                                                 ! value is =/= 2.0 due to grid boxes at 90 deg zenith angles being removed
 
 contains
 
@@ -111,6 +107,7 @@ contains
   !!
   !!  @version May-2009 
   !!  @author  Chuck Bardeen 
+  !!  @modified Eric T Wolf 2024
   subroutine CARMA_DefineModel(carma, rc)
     type(carma_type), intent(inout)    :: carma     !! the carma object
     integer, intent(out)               :: rc        !! return code, negative indicates failure
@@ -341,7 +338,6 @@ contains
     real(r8)                           :: massflux              ! emission mass flux (kg/m2/s)
     real(r8)                           :: columnMass            ! mass of the total column (kg/m2/s)
     real(r8)                           :: scale                 ! scaling factor to conserve the expected mass
-    real(r8)                           :: rfScale(pcols)        ! scaling factor from global and local relative flux
 
     real(r8)                           :: calday                ! current calendar day
     integer                            :: yr, mon, day, ncsec, doy
@@ -350,7 +346,7 @@ contains
     real(r8)                           :: clat(pcols)           ! current latitudes(radians)
     real(r8)                           :: clon(pcols)           ! current longitudes(radians)
     real(r8)                           :: coszrs(pcols)         ! Cosine solar zenith angle
-
+    
 
 
     ! variables for bilinear interpolation
@@ -467,10 +463,10 @@ contains
                        (carma_emis_zen(z_ref_indexp1) - carma_emis_zen(z_ref_index))
              endif
 
-             vbi(1) = carma_emis_rate(p_ref_index  ,  z_ref_index)   
-             vbi(2) = carma_emis_rate(p_ref_index+1,  z_ref_index)   
-             vbi(3) = carma_emis_rate(p_ref_index  ,  z_ref_index+1) 
-             vbi(4) = carma_emis_rate(p_ref_index+1,  z_ref_index+1) 
+             vbi(1) = carma_emis_rate(p_ref_index  ,  z_ref_index)
+             vbi(2) = carma_emis_rate(p_ref_index+1,  z_ref_index)
+             vbi(3) = carma_emis_rate(p_ref_index  ,  z_ref_index+1)
+             vbi(4) = carma_emis_rate(p_ref_index+1,  z_ref_index+1)
 
              onemp = 1. - press
              onemz = 1. - zen
@@ -481,61 +477,8 @@ contains
                      + vbi(4)*press*zen
 
             ! Calculate the mass flux in terms of kg/m3/s
-!            massflux = (rate * rmass(ibin) * 1.0e-3_r8 * 1.0e6_r8)
             massflux = rate * 1.0e-3_r8 * 1.0e6_r8  ! g cm-3 s-1 to kg/m3/s
-
-            ! Calculate a scaling if appropriate.
-            rfScale(icol) = 1.0_r8
              
-            if (carma_do_escale) then
-              ! Global Scaling
-              !
-              ! Interpolate the global scale by latitude.
-              !
-              ! NOTE: It would be better to interpolate the  table once in init to the
-              ! latitude structure and just look up by index.
-              !
-              ! NOTE: The latitudes have some small significant digits at the end, which makes
-              ! exact comparisons to latitude values fail.
-              do ilat = 1, carma_escale_nLats
-                if ((state%lat(icol) / DEG2RAD) <= carma_escale_lat(ilat)) then
-                  if (abs((state%lat(icol) / DEG2RAD) - carma_escale_lat(ilat)) <= 0.00001_r8) then
-                    rfScale(icol) = carma_escale_grf(ilat, doy)
-                  else
-                    rfScale(icol) = carma_escale_grf(ilat-1, doy) + &
-                    (((state%lat(icol) / DEG2RAD) - carma_escale_lat(ilat-1)) / (carma_escale_lat(ilat) - carma_escale_lat(ilat-1))) * &
-                    (carma_escale_grf(ilat, doy) - carma_escale_grf(ilat-1, doy))
-                  endif
-                  exit
-                end if
-              end do
-
-              if (abs((state%lat(icol) / DEG2RAD) - 90.0) <= 0.00001_r8) then
-                 rfScale(icol) = carma_escale_grf(carma_escale_nLats, doy)
-              end if
-              
-              ! Local Time Scaling
-              !
-              ! Interpolate the local scale by local time.
-              ltime = abs((ncsec / 3600._r8) + (24._r8 * (state%lon(icol) / DEG2RAD) / 360._r8))
-              if (ltime > 24._r8) then
-                ltime = ltime - 24._r8
-              end if
-
-              do iltime = 1, carma_escale_nLTimes
-                if (ltime <= carma_escale_ltime(iltime)) then
-                  if (abs(ltime - carma_escale_ltime(iltime)) <= 0.00001_r8) then
-                    rfScale(icol) = rfScale(icol) * carma_escale_lrf(iltime)
-                  else
-                    rfScale(icol) = rfScale(icol) * (carma_escale_lrf(iltime-1) + &
-                    ((iltime - carma_escale_ltime(iltime-1)) / (carma_escale_ltime(iltime) - carma_escale_ltime(iltime-1))) * &
-                    (carma_escale_lrf(iltime) - carma_escale_lrf(iltime-1)))
-                  endif
-                  exit
-                end if
-              end do
-            endif  ! carma_do_escale
-            
             ! Convert the mass flux to a tendency on the mass mixing ratio.
             thickness = state%zi(icol, k) - state%zi(icol, k+1)
             tendency(icol, k) = (massflux * thickness) / (state%pdel(icol, k) / gravit)        
@@ -543,24 +486,26 @@ contains
         enddo
       enddo
 
-      ! Scale the columns to keep the total mass influx in the column a
-      ! constant.
+      ! Scale the columns to conserve mass emission rate, carma_emis_total
+      !
+      ! Presently this scales the haze mass to carma_emis_total by fixing
+      ! each column integrated emission rate to a constant value [kg/m2/s].
+      ! Naturally, grid cells near the equator have larger spatial areas 
+      ! and yield more total haze emission.  However, a future implementation should 
+      ! permit column densities to differ across the grid
       do icol = 1, ncol
         cosz = coszrs(icol)
-        if ( (cosz > 0.0)) then
-
+        if ( (cosz > 0.00001)) then
+          ! haze prodcution only on the night side
           columnMass = sum(tendency(icol, :) * (state%pdel(icol, :) / gravit))
-          scale = carma_emis_expected / columnMass
- 
-          ! Also apply the relative flux scaling. This needs to be done after
-          ! the normalization
-          tendency(icol, :) = tendency(icol, :) * scale * rfScale(icol)
+          scale = carma_emis_expected / columnMass     
+          tendency(icol, :) = tendency(icol, :) * scale 
         else
-
+           ! no photochemical haze production on the nightside  
            tendency(icol, :) = 0.0 
            columnMass = 0.0
         endif
-
+      
       end do
     end if  ! if "HAZE" type
     
@@ -638,7 +583,6 @@ contains
       allocate(carma_emis_lev(carma_emis_nLevs))
       allocate(carma_emis_zen(carma_emis_nZens))
       allocate(carma_emis_rate(carma_emis_nLevs, carma_emis_nZens))
-!      allocate(carma_emis_rate(carma_emis_nZens, carma_emis_nLevs))
 
       if (masterproc) then
         call wrap_inq_varid(fid, 'lev', lev_vid)
@@ -711,7 +655,7 @@ contains
         
         if (do_print) write(LUNOPRT, *) 'carma_init(): Total Emission = ', carma_emis_total, ' (kt/yr)'
         ! expected smission rate per column (kg/m2/s)
-        carma_emis_expected = ((carma_emis_total * 1e6_r8) / (3600.0_r8 * 24.0_r8 * 365.0_r8)) / (4.0_r8 * PI * ((REARTH / 100._r8) ** 2))
+        carma_emis_expected = ((carma_emis_total * 1e6_r8) / (3600.0_r8 * 24.0_r8 * 365.0_r8)) / (4.0_r8 * PI * ((REARTH / 100._r8) ** 2)) * illumFrac
         if (do_print) write(LUNOPRT,*) 'carma_init(): Done with emission table.'
 
       endif
@@ -719,15 +663,11 @@ contains
 #if ( defined SPMD )
       call mpibcast(carma_emis_lev,  carma_emis_nLevs, mpir8, 0, mpicom)
       call mpibcast(carma_emis_zen,  carma_emis_nZens, mpir8, 0, mpicom)
-      !call mpibcast(carma_emis_rate, carma_emis_nLevs, mpir8, 0, mpicom)
       call mpibcast(carma_emis_rate, carma_emis_nLevs*carma_emis_nZens, mpir8, 0, mpicom)
-
       call mpibcast(carma_emis_expected,  1, mpir8,  0, mpicom)
-
       call mpibcast(carma_emis_ilev_min,  1, mpiint, 0, mpicom)
       call mpibcast(carma_emis_ilev_max,  1, mpiint, 0, mpicom)
       call mpibcast(carma_emis_ilev_incr, 1, mpiint, 0, mpicom)
-
       call mpibcast(carma_emis_izen_min,  1, mpiint, 0, mpicom)
       call mpibcast(carma_emis_izen_max,  1, mpiint, 0, mpicom)
       call mpibcast(carma_emis_izen_incr, 1, mpiint, 0, mpicom)
@@ -735,84 +675,6 @@ contains
 
     endif
     
-
-    ! Initialize the emissions scaling table.
-    if (carma_do_escale) then 
-      if (masterproc) then
-
-        ! Open the netcdf file (read only)
-        call getfil(carma_escale_file, efile, fid)
-        if (do_print) write(LUNOPRT,*) 'carma_init(): Reading particle emission scaling from ', efile
-
-        call wrap_open(efile, 0, fid)
-
-        ! Alocate the table arrays
-        call wrap_inq_dimid(fid, "lat", lat_did)
-        call wrap_inq_dimlen(fid, lat_did, carma_escale_nLats)
-
-        call wrap_inq_dimid(fid, "time", time_did)
-        call wrap_inq_dimlen(fid, time_did, carma_escale_nTimes)
-        
-        ! There should be one time for each day of the year, so
-        ! quit if it isn't correct.
-        if (carma_escale_nTimes .ne. 365) then
-          call endrun("CARMA_InitializeModel: Emission scaling file should have entries for 365 days, but doesn't.")
-        endif
-        
-        call wrap_inq_dimid(fid, "ltime", ltime_did)
-        call wrap_inq_dimlen(fid, ltime_did, carma_escale_nLTimes)
-     endif
-    
-#if ( defined SPMD )
-      call mpibcast(carma_escale_nLats,   1, mpiint, 0, mpicom)
-      call mpibcast(carma_escale_nTimes,  1, mpiint, 0, mpicom)
-      call mpibcast(carma_escale_nLTimes, 1, mpiint, 0, mpicom)
-#endif
-
-      allocate(carma_escale_lat(carma_escale_nLats))
-      allocate(carma_escale_grf(carma_escale_nLats, carma_escale_nTimes))
-      allocate(carma_escale_ltime(carma_escale_nLTimes))
-      allocate(carma_escale_lrf(carma_escale_nLTimes))
-
-      if (masterproc) then
-        ! Read in the tables.
-        call wrap_inq_varid(fid, 'SGRF', grf_vid)
-        tmp = nf90_get_var (fid, grf_vid, carma_escale_grf)
-        if (tmp/=NF90_NOERR) then
-           write(iulog,*) 'CARMA_InitializeModel: error reading varid =', grf_vid
-           call handle_error (tmp)
-        end if
-
-        call wrap_inq_varid(fid, 'lat', lat_vid)
-        call wrap_get_var_realx(fid, lat_vid, carma_escale_lat)
-
-        call wrap_inq_varid(fid, 'SLRF', lrf_vid)
-        call wrap_get_var_realx(fid, lrf_vid, carma_escale_lrf)
-
-        call wrap_inq_varid(fid, 'ltime', ltime_vid)
-        call wrap_get_var_realx(fid, ltime_vid, carma_escale_ltime)
-        
-        ! Close the file.
-        call wrap_close(fid)
-
-        if (do_print) write(LUNOPRT,*) ''
-        if (do_print) write(LUNOPRT,*) 'carma_init(): carma_escale_nLats   = ', carma_escale_nLats
-        if (do_print) write(LUNOPRT,*) 'carma_init(): carma_escale_nTimes  = ', carma_escale_nTimes
-        if (do_print) write(LUNOPRT,*) 'carma_init(): carma_escale_nLTimes = ', carma_escale_nLTimes
-        if (do_print) write(LUNOPRT,*) ''
-        
-        if (do_print) write(LUNOPRT,*) 'carma_init(): Done with emission scaling tables.'
-
-      endif
-
-#if ( defined SPMD )
-      call mpibcast(carma_escale_lat,   carma_escale_nLats, mpir8, 0, mpicom)
-      call mpibcast(carma_escale_grf,   carma_escale_nLats*carma_escale_nTimes, mpir8, 0, mpicom)
-      call mpibcast(carma_escale_ltime, carma_escale_nLTimes, mpir8, 0, mpicom)
-      call mpibcast(carma_escale_lrf,   carma_escale_nLTimes, mpir8, 0, mpicom)
-#endif
-
-    endif
     
     return
   end subroutine CARMA_InitializeModel
