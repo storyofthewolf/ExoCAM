@@ -195,3 +195,17 @@ def area_weighted_avg(lon, lat, var):
 
   return weighted_avg
 
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# // calculate global mean profiles //
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+def calc_gmean_profiles(lon, lat, var):
+    nlev = var.shape[0]
+    var_gmean = np.zeros((nlev), dtype=float)
+
+    for z in range(nlev):
+        temp_in      = var[z,:,:] ; temp_in = np.squeeze(temp_in)
+        temp_out     =  exo.area_weighted_avg(lon, lat, temp_in)
+        var_gmean[z] = temp_out
+
+    return var_gmean

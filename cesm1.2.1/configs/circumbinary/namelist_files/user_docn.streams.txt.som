@@ -10,7 +10,7 @@
             mask    mask
          </variableNames>
          <filePath>
-            /gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_mixed_fv
+            /discover/nobackup/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_mixed_fv
          </filePath>
          <fileNames>
             pop_frc.gx3v7.110128_annual_mean.nc
@@ -28,7 +28,7 @@
             qdp   qbot
          </variableNames>
          <filePath>
-            /gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_mixed_fv
+            /discover/nobackup/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_mixed_fv
          </filePath>
          <fileNames>
             pop_frc.gx3v7.110128_annual_mean.nc

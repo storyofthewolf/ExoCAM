@@ -16,7 +16,7 @@ filenames=strarr(nfiles)
 
 nlev = 200
 nzen = 20
-path = "/gpfsm/dnb53/etwolf/atmos_haze_prod"
+path = "/discover/nobackup/etwolf/atmos_haze_prod"
 folder = "/CHAMPS_zenith_GCM_26_mCO2_8.00E-2_mCH4_3.06E-02"
 filenames(19) = path + folder + "/zenith_GCM_26_mCO2_8.00E-2_mCH4_3.06E-02_zenith_015_haze_rate.dat"
 filenames(18) = path + folder + "/zenith_GCM_26_mCO2_8.00E-2_mCH4_3.06E-02_zenith_060_haze_rate.dat"

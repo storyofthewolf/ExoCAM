@@ -15,7 +15,7 @@ pro mksrf_cesm_fv
 nlon=72
 nlat=46
 
-fname = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_land_fv/surfdata_4x5_sand_fmax0.5_sc21.nc'
+fname = '/discover/nobackup/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_land_fv/surfdata_4x5_sand_fmax0.5_sc21.nc'
 
 ; Read in Data from existing surfdata file
 ncid = ncdf_open(fname,/nowrite)
@@ -164,7 +164,7 @@ endfor
 
 ; set up roughness length (if needed)
 ; open roughness file
-file_rough = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/mars/lnd/roughness_length.nc"      
+file_rough = "/discover/nobackup/etwolf/models/ExoCAM/cesm1.2.1/initial_files/mars/lnd/roughness_length.nc"      
 ncid=ncdf_open(file_rough, /nowrite)
 ncdf_varget,ncid,'lat',lat_rough    & help,lat_rough
 ncdf_varget,ncid,'lon',lon_rough      & help, lon_rough
@@ -186,7 +186,7 @@ endfor
 ;----------------------------------------------------
 ; Set up output file.
 file_out = 'surfdata_4x5_test.nc'
-spawn, 'cp /gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_land_fv/surfdata_4x5_sand_fmax0.5_sc5.nc surfdata_4x5_test.nc'
+spawn, 'cp /discover/nobackup/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_land_fv/surfdata_4x5_sand_fmax0.5_sc5.nc surfdata_4x5_test.nc'
 ncid = ncdf_open(file_out, /write)
 
 

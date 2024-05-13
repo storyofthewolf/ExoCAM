@@ -524,11 +524,11 @@
          <COMPILERS>intel</COMPILERS>
          <MPILIBS>openmpi</MPILIBS>
          <OS>LINUX</OS>
-         <RUNDIR>/gpfsm/dnb53/$CCSMUSER/cesm_scratch/rundir/$CASE/run</RUNDIR>
-         <EXEROOT>/gpfsm/dnb53/$CCSMUSER/cesm_scratch/rundir/$CASE/bld</EXEROOT>
-         <DIN_LOC_ROOT>/gpfsm/dnb53/etwolf/cesm_scratch/inputdata</DIN_LOC_ROOT>
-         <DIN_LOC_ROOT_CLMFORC>/gpfsm/dnb53/etwolf/cesm_scratch/inputdata/atm/datm7</DIN_LOC_ROOT_CLMFORC>
-         <DOUT_S_ROOT>/gpfsm/dnb53/$CCSMUSER/cesm_scratch/archive/$CASE</DOUT_S_ROOT>
+         <RUNDIR>/discover/nobackup/$CCSMUSER/cesm_scratch/rundir/$CASE/run</RUNDIR>
+         <EXEROOT>/discover/nobackup/$CCSMUSER/cesm_scratch/rundir/$CASE/bld</EXEROOT>
+         <DIN_LOC_ROOT>/discover/nobackup/etwolf/cesm_scratch/inputdata</DIN_LOC_ROOT>
+         <DIN_LOC_ROOT_CLMFORC>/discover/nobackup/etwolf/cesm_scratch/inputdata/atm/datm7</DIN_LOC_ROOT_CLMFORC>
+         <DOUT_S_ROOT>/discover/nobackup/$CCSMUSER/cesm_scratch/archive/$CASE</DOUT_S_ROOT>
          <DOUT_L_MSROOT>UNDEFINED</DOUT_L_MSROOT>
          <CCSM_BASELINE>UNDEFINED</CCSM_BASELINE>
          <CCSM_CPRNC>UNDEFINED</CCSM_CPRNC>

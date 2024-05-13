@@ -36,7 +36,7 @@ stel_convert_wavl = 1.0e-4
 alb_convert_wavl = 1.0
 
 #Reading in the stellar file 
-stellar_file = "/gpfsm/dnb53/etwolf/models/ExoRT/data/solar/raw/TOI700_SED_HST.txt"
+stellar_file = "/discover/nobackup/etwolf/models/ExoRT/data/solar/raw/TOI700_SED_HST.txt"
 with open(stellar_file, 'r') as f: 
     lines = f.readlines()
     header = lines[0:stel_nh]

@@ -108,7 +108,7 @@ module exoplanet_mod
 
   !! SOLAR SPECTRAL FILE
   !! Make sure solar file matches spectral intervals for selected RT configuration !!
-  character(len=256), public, parameter :: exo_solar_file = '/gpfsm/dnb53/etwolf/models/ExoRT/data/solar/BT_Settl_5714K_n28.nc'
+  character(len=256), public, parameter :: exo_solar_file = '/discover/nobackup/etwolf/models/ExoRT/data/solar/BT_Settl_5714K_n28.nc'
 
   !! if (do_exo_circumbinary) 
   !! then exo_scon does not take effect
@@ -125,7 +125,7 @@ module exoplanet_mod
   real(r8), public, parameter :: cb_eccen = 0.0_r8        ! binary eccentricity
   real(r8), public, parameter, dimension(2) :: cb_semia = (/ cb_separation, cb_semiaxis /) ! binary and planet semimajor axis.
   real(r8), public, parameter, dimension(2) :: cb_man = (/ 0.0_r8, 0.0_r8 /)    ! initial mean longitudes   
-  character(len=256), public, parameter :: exo_solar_file_2 = '/gpfsm/dnb53/etwolf/models/ExoRT/data/solar/BT_Settl_3824K_n28.nc'
+  character(len=256), public, parameter :: exo_solar_file_2 = '/discover/nobackup/etwolf/models/ExoRT/data/solar/BT_Settl_3824K_n28.nc'
   logical, public, parameter :: cb_transit = .true.  
 
   ! Derived Arrays for Binary Star Calculations

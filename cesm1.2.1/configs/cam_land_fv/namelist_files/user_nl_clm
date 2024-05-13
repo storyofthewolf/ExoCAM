@@ -24,12 +24,12 @@
 !!
 
 !! land initial condition file
-finidat = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_land_fv/landplanet_q0_wt10.clm2.r.nc"
+finidat = "/discover/nobackup/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_land_fv/landplanet_q0_wt10.clm2.r.nc"
 
 !! surface data file
 !! defines land surface types, surface albedo (soil colors) and others.
 !! see SourceMods/src.clm/iniTimeConst.F90 for soil albedos
-fsurdat = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_land_fv/surfdata_4x5_sand_fmax0.5_sc21.nc"
+fsurdat = "/discover/nobackup/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_land_fv/surfdata_4x5_sand_fmax0.5_sc21.nc"
 
 !! output settings
 hist_nhtfrq = 0

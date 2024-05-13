@@ -9,7 +9,7 @@ DATE: 3/28/22
 
 
 xmlchange CAM_CONFIG_OPTS="-phys cam4 -nlev 40 -usr_src
-/gpfsm/dnb53/etwolf/models/ExoRT/source/experimental/src.n68equiv_exp/shr"
+/discover/nobackup/etwolf/models/ExoRT/source/experimental/src.n68equiv_exp/shr"
 
 
 == create the case ==

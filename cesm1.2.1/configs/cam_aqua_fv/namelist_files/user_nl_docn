@@ -15,7 +15,7 @@
 !------------------------------------------------------------------------
 
 !! ocean domain file
-domainfile = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/domain.ocn.4x5_100120_aquaplanet.nc'
+domainfile = '/discover/nobackup/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/domain.ocn.4x5_100120_aquaplanet.nc'
 
 !! force slab ocean model to read in docn.r file from rpointer.ocn
 force_restart = .false.  

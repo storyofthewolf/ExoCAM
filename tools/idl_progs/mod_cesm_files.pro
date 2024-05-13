@@ -87,7 +87,7 @@ file_aerosoldep_out = '/projects/btoon/wolfet/exofiles/ocn/aquaplanet/aerosoldep
 
 
 ;--- ocean domain files in/out ---
-file_lnd_domain = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_land_fv/domain.lnd.fv4x5_landplanet.nc'
+file_lnd_domain = '/discover/nobackup/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_land_fv/domain.lnd.fv4x5_landplanet.nc'
 file_lnd_domain_out =  "test_domain.nc"
 
 
@@ -106,17 +106,17 @@ file_lnd_domain_out =  "test_domain.nc"
 
 
 ;--- pop.frc files in/out ---
-;file_pop_frc = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/pop_frc.4x5d.090130_aquaplanet_300Kiso.nc"
-;file_pop_frc_out = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/pop_frc.4x5d.090130_aquaplanet_200Kiso.nc"
+;file_pop_frc = "/discover/nobackup/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/pop_frc.4x5d.090130_aquaplanet_300Kiso.nc"
+;file_pop_frc_out = "/discover/nobackup/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/pop_frc.4x5d.090130_aquaplanet_200Kiso.nc"
 
-;file_pop_frc = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_mixed_fv/pop_frc.gx3v7.110128_annual_mean.nc"
-;file_pop_frc_out = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/pop_frc.gx3v7.110128_zmean.nc"
+;file_pop_frc = "/discover/nobackup/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_mixed_fv/pop_frc.gx3v7.110128_annual_mean.nc"
+;file_pop_frc_out = "/discover/nobackup/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/pop_frc.gx3v7.110128_zmean.nc"
 
 ;--- ncdata files in/oout --
-;file_ncdata = '/gpfsm/dnb53/etwolf/cesm_scratch/rundir/mars_dev2/run/mars_dev2.cam.i.0001-01-09-00000.nc'
-;file_ncdata_out = '/gpfsm/dnb53/etwolf/models/CESM_Mars/marsfiles/atm/mars_dev2_adjusted.cam.i.0001-01-09-00000.nc'
-file_ncdata = '/gpfsm/dnb53/etwolf/cesm_scratch/archive/t1c_land_ch4/rest/0010-05-01-00000/t1c_land_ch4.cam.i.0010-05-01-00000.nc'
-file_ncdata_out = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/t1c_land_ch4_h2o.cam.i.0010-05-01-00000.nc'
+;file_ncdata = '/discover/nobackup/etwolf/cesm_scratch/rundir/mars_dev2/run/mars_dev2.cam.i.0001-01-09-00000.nc'
+;file_ncdata_out = '/discover/nobackup/etwolf/models/CESM_Mars/marsfiles/atm/mars_dev2_adjusted.cam.i.0001-01-09-00000.nc'
+file_ncdata = '/discover/nobackup/etwolf/cesm_scratch/archive/t1c_land_ch4/rest/0010-05-01-00000/t1c_land_ch4.cam.i.0010-05-01-00000.nc'
+file_ncdata_out = '/discover/nobackup/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/t1c_land_ch4_h2o.cam.i.0010-05-01-00000.nc'
 
 
 ;-- new file names --

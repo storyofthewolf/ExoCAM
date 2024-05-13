@@ -18,9 +18,9 @@
 ! Set glc_smb            with GLC_SMB                            option
 ! Set maxpatch_glcmec    with GLC_NEC                            option
 !----------------------------------------------------------------------------------
-fsurdat = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_mixed_fv/surfdata_4x5_simyr2000_c140627_noglacier.nc'
-!fsurdat = '/gpfsm/dnb53/etwolf/cesm_scratch/inputdata/lnd/clm2/surfdata/surfdata_4x5_simyr2000_c090928.nc'
-finidat = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_mixed_fv/control_L45.clm2.r.0040-01-01-00000.nc'
+fsurdat = '/discover/nobackup/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_mixed_fv/surfdata_4x5_simyr2000_c140627_noglacier.nc'
+!fsurdat = '/discover/nobackup/etwolf/cesm_scratch/inputdata/lnd/clm2/surfdata/surfdata_4x5_simyr2000_c090928.nc'
+finidat = '/discover/nobackup/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_mixed_fv/control_L45.clm2.r.0040-01-01-00000.nc'
 hist_nhtfrq = 0
 hist_avgflag_pertape = 'A'
 

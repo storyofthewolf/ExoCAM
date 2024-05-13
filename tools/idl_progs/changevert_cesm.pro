@@ -20,14 +20,14 @@ do_dry = 0
 ;================================
 ;=======  name of new file ======
 ;================================
-fname_out = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/wolf1069_titan.i.L55.nc'
+fname_out = '/discover/nobackup/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/wolf1069_titan.i.L55.nc'
 diagnostic_out = fname_out
 
 nlev_out = 30
 nilev_out = nlev_out + 1
 
 ;read in appropriate grid coordinates from WACCM 66 level grid 
-lev_fname_new = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/other/oxygen_CE.cam2.avg.nc'
+lev_fname_new = '/discover/nobackup/etwolf/models/ExoCAM/cesm1.2.1/initial_files/other/oxygen_CE.cam2.avg.nc'
 
 ncid=ncdf_open(lev_fname_new, /nowrite)
 ncdf_varget,ncid,'lev',lev_new
@@ -50,11 +50,11 @@ nlon_new = n_elements(lon_new)
 ;===========================================
 ;=======  name file with climate data ======
 ;===========================================
-;clim_fname_in ="/gpfsm/dnb53/etwolf/cesm_scratch/archive/ExoCAM_thai_hab2_L51_n68equiv/rest/0197-01-01-00000/ExoCAM_thai_hab2_L51_n68equiv.cam.i.0197-01-01-00000.nc" 
-;clim_fname_in = "/gpfsm/dnb53/etwolf/cesm_scratch/rundir/samosa5/run/samosa5.cam.i.0004-01-01-00000.nc"
-;clim_fname_in = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/ic_1bar_L51_zmean_ic.nc" 
-;clim_fname_in = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/wolf1069_land_planet.i.nc"
-clim_fname_in = "/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/mars/atm/present_day_mars.cam.i.L40.nc"
+;clim_fname_in ="/discover/nobackup/etwolf/cesm_scratch/archive/ExoCAM_thai_hab2_L51_n68equiv/rest/0197-01-01-00000/ExoCAM_thai_hab2_L51_n68equiv.cam.i.0197-01-01-00000.nc" 
+;clim_fname_in = "/discover/nobackup/etwolf/cesm_scratch/rundir/samosa5/run/samosa5.cam.i.0004-01-01-00000.nc"
+;clim_fname_in = "/discover/nobackup/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/ic_1bar_L51_zmean_ic.nc" 
+;clim_fname_in = "/discover/nobackup/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/wolf1069_land_planet.i.nc"
+clim_fname_in = "/discover/nobackup/etwolf/models/ExoCAM/cesm1.2.1/initial_files/mars/atm/present_day_mars.cam.i.L40.nc"
 
 ncid=ncdf_open(clim_fname_in, /nowrite)
 ncdf_varget,ncid,'lev',lev_old
