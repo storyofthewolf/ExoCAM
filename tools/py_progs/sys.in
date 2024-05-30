@@ -1,8 +1,8 @@
 discover
-/gpfsm/dnb53/etwolf/cesm_scratch/cases
-/gpfsm/dnb53/etwolf/models
-/gpfsm/dnb53/etwolf/models
-/gpfsm/dnb53/etwolf/models
+/discover/nobackup/etwolf/cesm_scratch/cases
+/discover/nobackup/etwolf/models
+/discover/nobackup/etwolf/models
+/discover/nobackup/etwolf/models
 
 ########################################3
 machine name

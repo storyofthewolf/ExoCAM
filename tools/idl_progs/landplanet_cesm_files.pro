@@ -126,8 +126,8 @@ endif
 
 
 
-file_finidat_in = '/gpfsm/dnb53/etwolf/cesm_scratch/archive/paleo_mars_1.0bar/rest/0021-01-01-00000/paleo_mars_1.0bar.clm2.r.0021-01-01-00000.nc'
-file_finidat_out = '/gpfsm/dnb53/etwolf/models/CESM_Mars/marsfiles/lnd/paleo_mars_1.0bar_dry.clm2.r.0021-01-01-00000.nc
+file_finidat_in = '/discover/nobackup/etwolf/cesm_scratch/archive/paleo_mars_1.0bar/rest/0021-01-01-00000/paleo_mars_1.0bar.clm2.r.0021-01-01-00000.nc'
+file_finidat_out = '/discover/nobackup/etwolf/models/CESM_Mars/marsfiles/lnd/paleo_mars_1.0bar_dry.clm2.r.0021-01-01-00000.nc
 ;========== finidat =====================
 if (make_finidat eq 1) then begin
 

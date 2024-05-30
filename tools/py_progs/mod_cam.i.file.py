@@ -1,14 +1,28 @@
-#====================================================================
+#====================================================================================
 # Author: Eric T. Wolf
 # Translator: Russell Deitrick
 # Date:  some time long ago
-#====================================================================
-# Change number of vertical levels in a CAM initial condition file.
-# This is achieved starting with a 66 level WACCM initial condition
-# file and cutting it down to size.
+#====================================================================================
+# python script for modifying the CAM initial condition file (cam.i files for namelist
+#  user_nl_cam, ncdata)
+#
+# functions and options:
+#    1) Change number of vertical levels in a CAM initial condition file.
+#       This is achieved starting with a 66 level WACCM initial condition
+#       file and cutting it down to size.  Users may want to iterate on the 
+#       number of levels depending on the assumed surface pressure.
+#    2) Change the surface pressure of the CAM initial condition file.  
+#    3) Provides access to change contents (moisture and temperature)
+#
+# Note if changing the temperature structure of a cam.i. file, you may also 
+# need to change the land (clm.i or clm.r) and ocean (pop.frc) initial files
+# to match (see also /ExoCAM/tools/idl_progs/mod_cesm_files.pro).
+#
 # Adapted for Python by R. Deitrick from
-# idl_progs/changevert_cesm.pro (E.T. Wolf)
-#====================================================================
+#    idl_progs/changevert_cesm.pro (E.T. Wolf)
+# Merged functionality from changepress_cesm.pro and mod_cesm_files.pro, 
+#    renamed mod_ncdata.py by E.T. Wolf (March 2024)
+#====================================================================================
 
 import netCDF4 as nc
 import numpy as np
@@ -17,9 +31,12 @@ import argparse
 import pathlib
 import exocampy_tools as exo
 
-#user needs to edit these!
-exocam_path = '/home/deitrr/projects/def-czg/deitrr/ExoCAM/'
-ccsm_inputdata = '/home/deitrr/projects/def-czg/deitrr/ccsm/inputdata/'
+#====================================================================================
+# primary paths to models and data
+# user must set for their system
+#====================================================================================
+exocam_path = '/discover/nobackup/etwolf/models/ExoCAM/'
+ccsm_inputdata = '/discover/nobackup/etwolf/cesm_scratch/inputdata'
 
 ccsm_inputdata_paths = [ccsm_inputdata + 'atm/cam/inic/fv/',
                         ccsm_inputdata + 'atm/waccm/ic/',
@@ -29,45 +46,53 @@ ccsm_inputdata_paths = [ccsm_inputdata + 'atm/cam/inic/fv/',
                         exocam_path + '/cesm1.2.1/initial_files/cam_mixed_fv/',
                         exocam_path + '/cesm1.2.1/initial_files/mars/atm/']
 
+#====================================================================================
+# arguments
+#====================================================================================
 parser = argparse.ArgumentParser()
 parser.add_argument('fname_out',nargs=1,help='Name of new IC file')
 parser.add_argument('-n','--num_lev', nargs=1, default=[40], help='Number of levels in new IC file')
 parser.add_argument('-ic','--input_IC_file', nargs=1, default=['cami-mam3_0000-01-01_1.9x2.5_L30_c090306.nc'],
                      help='input climate file')
 parser.add_argument('-w','--overwrite', action='store_true', help = 'force overwrite of output files')
+parser.add_argument('-d','--dry', action='store_true', help = 'zero out water and clouds from new ic')
+parser.add_argument('-ps','--surface_pressure', nargs=1, default=[1], help='Surface pressure in bars')
 args = parser.parse_args()
 
 
-#================================
-#=======  name of new file ======
-#================================
+#====================================================================================
+# name of new initial condition file
+#====================================================================================
 fname_out = args.fname_out[0]
 nlev_out = int(args.num_lev[0])
 nilev_out = nlev_out + 1
 
-
-#read in appropriate lev, hyai for N>26
+#====================================================================================
+# read in a WACCM 66 level grid structure
+#====================================================================================
 lev_fname_new = exocam_path + 'cesm1.2.1/initial_files/other/oxygen_CE.cam2.avg.nc'
-ncid = nc.Dataset(lev_fname_new,'r')
-lev_new = ncid['lev'][:]
-ilev_new = ncid['ilev'][:]
-lat_new = ncid['lat'][:]
-lon_new = ncid['lon'][:]
-hyai_new = ncid['hyai'][:]
-hybi_new = ncid['hybi'][:]
-hyam_new = ncid['hyam'][:]
-hybm_new = ncid['hybm'][:]
+
+ncid      = nc.Dataset(lev_fname_new,'r')
+lev_new   = ncid['lev'][:]
+ilev_new  = ncid['ilev'][:]
+lat_new   = ncid['lat'][:]
+lon_new   = ncid['lon'][:]
+hyai_new  = ncid['hyai'][:]
+hybi_new  = ncid['hybi'][:]
+hyam_new  = ncid['hyam'][:]
+hybm_new  = ncid['hybm'][:]
 ncid.close()
 
-nlev_new = len(lev_new)
+nlev_new  = len(lev_new)
 nilev_new = len(ilev_new)
-nlat_new = len(lat_new)
-nlon_new = len(lon_new)
+nlat_new  = len(lat_new)
+nlon_new  = len(lon_new)
 
 
-#===========================================
-#=======  name file with climate data ======
-#===========================================
+#====================================================================================
+# read in file with desired initial climate data
+#====================================================================================
+
 clim_fname_in = args.input_IC_file[0]
 
 filefound = False
@@ -79,99 +104,128 @@ for fdir in ccsm_inputdata_paths:
 if filefound == False:
   raise IOError('File %s not found!'%clim_fname_in)
 
-lev_old = ncid['lev'][:]
-ilev_old = ncid['ilev'][:]
-lat = ncid['lat'][:]
-lon = ncid['lon'][:]
-hyai_old = ncid['hyai'][:]
-hybi_old = ncid['hybi'][:]
-hyam_old = ncid['hyam'][:]
-hybm_old = ncid['hybm'][:]
+lev_old   = ncid['lev'][:]
+ilev_old  = ncid['ilev'][:]
+lat       = ncid['lat'][:]
+lon       = ncid['lon'][:]
+hyai_old  = ncid['hyai'][:]
+hybi_old  = ncid['hybi'][:]
+hyam_old  = ncid['hyam'][:]
+hybm_old  = ncid['hybm'][:]
 
-nlev_old = len(lev_old)
+nlev_old  = len(lev_old)
 nilev_old = len(ilev_old)
-nlat = len(lat)
-nlon = len(lon)
-nslat = nlat-1
-nslon = nlon
+nlat      = len(lat)
+nlon      = len(lon)
+nslat     = nlat-1
+nslon     = nlon
 
+# primary state variables
 CLDICE_old = ncid['CLDICE'][:]
 CLDLIQ_old = ncid['CLDLIQ'][:]
-Q_old = ncid['Q'][:]
-T_old = ncid['T'][:]
-US_old = ncid['US'][:]
-VS_old = ncid['VS'][:]
+Q_old      = ncid['Q'][:]
+T_old      = ncid['T'][:]
+US_old     = ncid['US'][:]
+VS_old     = ncid['VS'][:]
+P0         = ncid['P0'][:]
+PS         = ncid['PS'][:]
 
-#stuff that doesn't need to be changed
-P0 = ncid['P0'][:]
-slat = ncid['slat'][:]
-slon = ncid['slon'][:]
-w_stag = ncid['w_stag'][:]
-time = ncid['time'][:]
-time_bnds = ncid['time_bnds'][:]
+# other variables
+slat         = ncid['slat'][:]
+slon         = ncid['slon'][:]
+w_stag       = ncid['w_stag'][:]
+time         = ncid['time'][:]
+time_bnds    = ncid['time_bnds'][:]
 date_written = ncid['date_written'][:]
 time_written = ncid['time_written'][:]
-ntrm = ncid['ntrm'][:]
-ntrn = ncid['ntrn'][:]
-ntrk = ncid['ntrk'][:]
-ndbase = ncid['ndbase'][:]
-nsbase = ncid['nsbase'][:]
-nbdate = ncid['nbdate'][:]
-nbsec = ncid['nbsec'][:]
-mdt = ncid['mdt'][:]
-gw = ncid['gw'][:]
-ndcur = ncid['ndcur'][:]
-nscur = ncid['nscur'][:]
-date = ncid['date'][:]
-datesec = ncid['datesec'][:]
-nsteph = ncid['nsteph'][:]
-ICEFRAC = ncid['ICEFRAC'][:]
-PS = ncid['PS'][:]
-SICTHK = ncid['SICTHK'][:]
-SNOWHICE = ncid['SNOWHICE'][:]
-TS1 = ncid['TS1'][:]
-TS2 = ncid['TS2'][:]
-TS3 = ncid['TS3'][:]
-TS4 = ncid['TS4'][:]
-TSICE = ncid['TSICE'][:]
+ntrm         = ncid['ntrm'][:]
+ntrn         = ncid['ntrn'][:]
+ntrk         = ncid['ntrk'][:]
+ndbase       = ncid['ndbase'][:]
+nsbase       = ncid['nsbase'][:]
+nbdate       = ncid['nbdate'][:]
+nbsec        = ncid['nbsec'][:]
+mdt          = ncid['mdt'][:]
+gw           = ncid['gw'][:]
+ndcur        = ncid['ndcur'][:]
+nscur        = ncid['nscur'][:]
+date         = ncid['date'][:]
+datesec      = ncid['datesec'][:]
+nsteph       = ncid['nsteph'][:]
+ICEFRAC      = ncid['ICEFRAC'][:]
+SICTHK       = ncid['SICTHK'][:]
+SNOWHICE     = ncid['SNOWHICE'][:]
+TS1          = ncid['TS1'][:]
+TS2          = ncid['TS2'][:]
+TS3          = ncid['TS3'][:]
+TS4          = ncid['TS4'][:]
+TSICE        = ncid['TSICE'][:]
 ncid.close()
 
+#====================================================================================
 # create pressure grids from hybrid sigma coordinates
+#====================================================================================
 lev_P_new, ilev_P_new = exo.hybrid2pressure(nlon,nlat,nlev_new,PS.squeeze(),P0,hyam_new,hybm_new,hyai_new,hybi_new)
 
 lev_P_old, ilev_P_old =  exo.hybrid2pressure(nlon,nlat,nlev_old,PS.squeeze(),P0,hyam_old,hybm_old,hyai_old,hybi_old)
 
+# evaluate new pressure grid before proceding 
+# define global mean profiles                                                                                                                         
+Pmid_profile_new = analysis_utils.calc_gmean_profiles(lon, lat, lev_P_new)
+Pint_profile_new = analysis_utils.calc_gmean_profiles(lon, lat, ilev_P_new)
+Pmid_profile_old = analysis_utils.calc_gmean_profiles(lon, lat, lev_P_old)
+Pint_profile_old = analysis_utils.calc_gmean_profiles(lon, lat, ilev_P_old)
 
-#-----------------------------------------
-#----- Interpolate relevant fields -------
-#-----------------------------------------
+for il in range(nilev_new):
+  print(i, Pint_profile_new[i])
+
+
+# area_weighted_avg_gen, lon, lat, PS_in, PS_avg
+#  print, "initial file pressure: ", PS_avg, P0_in
+#  scalefac = new_PS_mean/(P0_in/1.0e5)
+#  print, "scalefac: ", scalefac
+#
+#  for x=0,nlon-1 do begin
+#    for y=0,nlat-1 do begin
+#      if (do_flat_psfield) then  PS(x,y) = new_PS_mean*1.0e5
+#      if (do_scale_psfield) then  PS(x,y) = PS_in(x,y)*scalefac
+#    endfor
+#  endfor
+#  if (do_flat_psfield) then P0_out = new_PS_mean*1.0e5
+#  if (do_scale_psfield) then P0_out = P0_in*scalefac
+
+
+
+#====================================================================================
+# Interpolate relevant fields
+#====================================================================================
 
 #out variables
-T_out = np.zeros((nlev_out,nlat,nlon))
+T_out      = np.zeros((nlev_out,nlat,nlon))
 CLDICE_out = np.zeros_like(T_out)
 CLDLIQ_out = np.zeros_like(T_out)
-CLOUD_out = np.zeros_like(T_out)
-Q_out = np.zeros_like(T_out)
-US_out = np.zeros((nlev_out,nslat,nlon))
-VS_out = np.zeros_like(T_out)
+CLOUD_out  = np.zeros_like(T_out)
+Q_out      = np.zeros_like(T_out)
+US_out     = np.zeros((nlev_out,nslat,nlon))
+VS_out     = np.zeros_like(T_out)
 
-lev_out = np.zeros(nlev_out)
-hyam_out = np.zeros(nlev_out)
-hybm_out = np.zeros(nlev_out)
-ilev_out = np.zeros(nilev_out)
-hyai_out = np.zeros(nilev_out)
-hybi_out = np.zeros(nilev_out)
+lev_out    = np.zeros(nlev_out)
+hyam_out  = np.zeros(nlev_out)
+hybm_out  = np.zeros(nlev_out)
+ilev_out  = np.zeros(nilev_out)
+hyai_out  = np.zeros(nilev_out)
+hybi_out  = np.zeros(nilev_out)
 
 n = 66 - nlev_out  #index of lowest pressure (highest altitude) of new vertical grid
 for x in np.arange(nlon):
   for y in np.arange(nlat):
-    T_out[:,y,x] = interp1d(lev_P_old[:,y,x].data, T_old[0,:,y,x].data, fill_value='extrapolate')(lev_P_new[n:,y,x].data)
+    T_out[:,y,x]      = interp1d(lev_P_old[:,y,x].data, T_old[0,:,y,x].data,      fill_value='extrapolate')(lev_P_new[n:,y,x].data)
     CLDICE_out[:,y,x] = interp1d(lev_P_old[:,y,x].data, CLDICE_old[0,:,y,x].data, fill_value='extrapolate')(lev_P_new[n:,y,x].data)
     CLDLIQ_out[:,y,x] = interp1d(lev_P_old[:,y,x].data, CLDLIQ_old[0,:,y,x].data, fill_value='extrapolate')(lev_P_new[n:,y,x].data)
-    Q_out[:,y,x] = interp1d(lev_P_old[:,y,x].data, Q_old[0,:,y,x].data, fill_value='extrapolate')(lev_P_new[n:,y,x].data)
-    VS_out[:,y,x] = interp1d(lev_P_old[:,y,x].data, VS_old[0,:,y,x].data, fill_value='extrapolate')(lev_P_new[n:,y,x].data)
+    Q_out[:,y,x]      = interp1d(lev_P_old[:,y,x].data, Q_old[0,:,y,x].data,      fill_value='extrapolate')(lev_P_new[n:,y,x].data)
+    VS_out[:,y,x]     = interp1d(lev_P_old[:,y,x].data, VS_old[0,:,y,x].data,     fill_value='extrapolate')(lev_P_new[n:,y,x].data)
     if y < nslat:
-      US_out[:,y,x] = interp1d(lev_P_old[:,y,x].data, US_old[0,:,y,x].data, fill_value='extrapolate')(lev_P_new[n:,y,x].data)
+      US_out[:,y,x]   = interp1d(lev_P_old[:,y,x].data, US_old[0,:,y,x].data,     fill_value='extrapolate')(lev_P_new[n:,y,x].data)
 
 for i in np.arange(nilev_out-1,-1,-1):
   j = nilev_new - nilev_out + i
@@ -183,7 +237,7 @@ for i in np.arange(0,nlev_out):
   j = nlev_new - nlev_out + i
   hyam_out[i] = hyam_new[j]
   hybm_out[i] = hybi_new[j]
-  lev_out[i] = lev_new[j]
+  lev_out[i]  = lev_new[j]
 
 
 if not pathlib.Path(fname_out).exists() or args.overwrite:

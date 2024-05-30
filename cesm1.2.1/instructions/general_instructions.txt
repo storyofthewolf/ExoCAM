@@ -51,7 +51,7 @@ STEP 1: Checkout ExoCAM and ExoRT Github packages
   On supported machines, you can use existing distributions maintained by
   Wolf, E.T., found at the following locations...
 
-  Discover: /gpfsm/dnb53/etwolf/models/ExoRT, /gpfsm/dnb53/etwolf/models/ExoCAM
+  Discover: /discover/nobackup/etwolf/models/ExoRT, /discover/nobackup/etwolf/models/ExoCAM
   Hyak: /suppscr/vsm/gscratch/wolfet/ExoRT, /suppscr/vsm/gscratch/wolfet/ExoCAM
   Summit:  /projects/wolfet/models/ExoRT, /projects/wolfet/models/ExoCAM
 

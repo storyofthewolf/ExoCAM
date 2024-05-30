@@ -8,13 +8,13 @@
 !!
 
 !! atmosphere initial condition file
-ncdata = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/mars/atm/paleo_mars_2.0bar_dry.cam.i.0021-01-01-00000.nc'
+ncdata = '/discover/nobackup/etwolf/models/ExoCAM/cesm1.2.1/initial_files/mars/atm/paleo_mars_2.0bar_dry.cam.i.0021-01-01-00000.nc'
 
 !! topography file
-bnd_topo = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/mars/atm/mars_topo_tpw_4x5.nc'
+bnd_topo = '/discover/nobackup/etwolf/models/ExoCAM/cesm1.2.1/initial_files/mars/atm/mars_topo_tpw_4x5.nc'
 
 !! gravity wave file
-gw_drag_file = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/other/newmfspectra40_dc25.nc'
+gw_drag_file = '/discover/nobackup/etwolf/models/ExoCAM/cesm1.2.1/initial_files/other/newmfspectra40_dc25.nc'
 
 
 !!---------------------

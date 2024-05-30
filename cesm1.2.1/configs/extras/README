@@ -1,0 +1,4 @@
+Extra code pieces of relevance
+This folder is in .gitignore
+
+cldwat.F90_summit --- mod to bypass negative cloud amounts found on some systems
