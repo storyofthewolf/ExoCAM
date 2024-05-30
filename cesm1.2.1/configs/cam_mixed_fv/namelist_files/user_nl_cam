@@ -19,7 +19,7 @@ gw_drag_file = '/discover/nobackup/etwolf/models/ExoCAM/cesm1.2.1/initial_files/
 
 &prescribed_ozone_nl
  prescribed_ozone_cycle_yr		= 2000
- prescribed_ozone_datapath       = '/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv'
+ prescribed_ozone_datapath       = '/discover/nobackup/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv'
  prescribed_ozone_file		= 'ozone_1.9x2.5_L26_zeroVMR.nc'
  prescribed_ozone_name		= 'O3'
  prescribed_ozone_type		= 'CYCLICAL'

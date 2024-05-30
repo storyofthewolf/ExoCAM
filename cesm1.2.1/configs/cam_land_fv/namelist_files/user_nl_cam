@@ -1,5 +1,5 @@
-! Users should add all user specific namelist changes below in the form of 
-! namelist_var = new_namelist_value 
+! Users should add all user specific namelist changes below in the form of
+! namelist_var = new_namelist_value
 ! namelist for landplanets
 
 
@@ -15,6 +15,15 @@ bnd_topo = '/discover/nobackup/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_
 
 !! gravity wave file
 gw_drag_file = '/discover/nobackup/etwolf/models/ExoCAM/cesm1.2.1/initial_files/other/newmfspectra40_dc25.nc'
+
+&prescribed_ozone_nl
+ prescribed_ozone_cycle_yr		= 2000
+ prescribed_ozone_datapath       = '/discover/nobackup/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv'
+ prescribed_ozone_file		= 'ozone_1.9x2.5_L26_zeroVMR.nc'
+ prescribed_ozone_name		= 'O3'
+ prescribed_ozone_type		= 'CYCLICAL'
+/
+
 
 
 !!---------------------
@@ -54,6 +63,6 @@ nhtfrq = 0
 mfilt = 1
 avgflag_pertape = 'A'
 fincl1 = 'T','TS','PS','ALDIR','ALDIF','ASDIR','ASDIF','FUL','FUS','FDL','FDS','QRS','QRL','Q','m_CO2_c','m_Q_c','m_CH4_c','CMFSL','CMFLQ','CMFDQ','CMFDQR','CMFDT','CMFMC','CMFMCDZM','FICE','FREQSH','FREQZM','ICLDIWP','ICLDTWP','PBLH','PCONVB','PCONVT','PRECL','PRECSC','PRECSH','PRECSL','PRECT','PSL','FULC','FDLC','FUSC','FDSC','QRSC','QRLC','TROP_T','TROP_Z','TROP_P','CLDTOT','CAPE','CIN','TGCLDIWP','TGCLDLWP','VQ','VT','VU','CBMF','CNVCLD','CONCLD','DTCOND','DTCORE','DQP','DQSED','ENGYCORR','EVAPPREC','EVAPQCM','EVAPQZM','PDELDRY','PTTEND','PTTEND_RESID','QC','SST','TEINP','TEOUT','U','V','OMEGA','ZMDQ','ZMDT','TTEND','REI','REL','LANDFRAC','SOLS','SOLL','SOLSD','SOLLD'
- 
+
 !! MG cloud variables, add to end of fincl1
 !! 'EFFLIQ','EFFICE','IWC','LWC','ICWNC','ICINC'
