@@ -12,3 +12,4 @@ cesm1.2.1/configs/cam4_aqua_dynocn_fv
 /gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/mars
 /gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/configs/extras
 src
+cesm1.2.1/initial_files/cam_aqua_fv/comp_ic.py
