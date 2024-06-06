@@ -10,13 +10,13 @@ module exoplanet_mod
 ! NOTES ::
 
   use shr_kind_mod,    only: r8 => shr_kind_r8
-  
+
   implicit none
   private
   save
 
   !! ============== RUN OPTIONS ============== !!
-  logical, public, parameter :: do_exo_atmconst = .true.        !! Read gas constituents of atmosphere from this file 
+  logical, public, parameter :: do_exo_atmconst = .true.        !! Read gas constituents of atmosphere from this file
                                                                 !! Overrides ghg namelist options
   logical, public, parameter :: do_exo_rt = .true.              !! .true. = use correlated-k "exoplanet" RT
   	   	   	     		    		        !! .false. = use CAM4 RT, refer elsewhere for operating
@@ -24,20 +24,25 @@ module exoplanet_mod
   logical, public, parameter :: do_exo_synchronous = .false.    !! Toggle to synchronous rotation mode
                                                                 !! Eventually replace with better orbital computer
   logical, public, parameter :: do_carma_exort = .false.        !! Set to true only if running with the CARMA microphyiscs package
-                                                                !! and linking aerosol absorption to ExoRT  
-  logical, public, parameter :: do_exo_gw = .false.             !! flag to turn on gravity waves.  Note, present gw wave parameterization    
-                                                                !! does not work for low pressure atmospheres.                  
-  
+                                                                !! and linking aerosol absorption to ExoRT
+  logical, public, parameter :: do_exo_gw = .false.             !! flag to turn on gravity waves.  Note, present gw wave parameterization
+                                                                !! does not work for low pressure atmospheres.
+
+  real(r8), public, parameter :: exo_convect_plim = 5.e0_r8     !! Sets the minimum pressure limit in the convection schemes
+                                                                !! Convection will not operate at pressures lower than this
+                                                                !! Without ozone, 5 Pa is good.
+                                                                !! With ozone, 5 Pa is not stable, use NCAR's original value of 4.e3 (40 mb)
+
   !! ============== RADIATION OPTIONS  ============== !!
   integer, public, parameter :: exo_rad_step = 3                !! freq. of radiation calc in time steps (positive)
                                                                 !! or hours (negative).
   logical, public, parameter :: do_exo_rt_clearsky = .false.    !! Do parallel clearsky radiative calculation for exo rt
                                                                 !! Slow, use sparingly
   logical, public, parameter :: do_exo_rt_spectral = .false.    !! collect and output spectrally resolved radiative fluxes
-                                                                !! 
+                                                                !!
   !! Radiation  Spectral Band Optimization  !!
   !! if .false. LW and SW streams computed over fill bandpasses
-  !! if .true. LW and SW bandpasses reduced to fit SED and assumed Tmax 
+  !! if .true. LW and SW bandpasses reduced to fit SED and assumed Tmax
   logical,  public, parameter :: do_exo_rt_optimize_bands = .true.
   real(r8), public, parameter :: Tmax = 400.          !! Maximum expected temperature for thermal band optimization
   real(r8), public, parameter :: swFluxLimit = 0.999  !! Fraction of stellar flux captured in bands, rescaled
@@ -50,7 +55,7 @@ module exoplanet_mod
   !! looks correct for your assumed dirunal cycle.
   !!
   !! exo_sdays is the length of the sidereal period in seconds.
-  !! exo_ndays is a scaler given in units of Earth days 
+  !! exo_ndays is a scaler given in units of Earth days
   !! exo_porb is the orbital period, optional input used to determine
   !! 	      the sidereal period, exo_sdays, for asynchronous rotators
   !!
@@ -65,11 +70,11 @@ module exoplanet_mod
   !! Note, that the length of the diurnal period does not equal to the
   !! sidereal period!  Take care in setting exo_ndays and exo_sdays!
   !!
-  !! See examples below.   
-  
+  !! See examples below.
+
   !! Generic
   real(r8), public, parameter :: exo_planet_radius   = 6.37122e6_R8     !! radius ~ m
-  real(r8), public, parameter :: exo_surface_gravity = 9.81_R8          !! gravity ~ m/s^2            
+  real(r8), public, parameter :: exo_surface_gravity = 9.81_R8          !! gravity ~ m/s^2
   real(r8), public, parameter :: exo_ndays           = 1.00_R8          !! scaler to number of Earth days.
   real(r8), public, parameter :: exo_porb            = 365._R8          !! orbital period, for obliquity cycle, and optionally for exo_sday
   real(r8), public, parameter :: exo_sday            = 86164.0_r8       !! sidereal period Earth
@@ -82,20 +87,20 @@ module exoplanet_mod
   !real(r8), public, parameter :: exo_surface_gravity = 9.80616_R8       !! gravity ~ m/s^2
   !real(r8), public, parameter :: exo_ndays           = 1.0_R8           !! scaler to number of Earth days.
   !real(r8), public, parameter :: exo_porb            = 365.0_R8
-  !real(r8), public, parameter :: exo_sday            = 86164.0_R8       !! sidereal period [sec], for Earth value = 86164.0 
+  !real(r8), public, parameter :: exo_sday            = 86164.0_R8       !! sidereal period [sec], for Earth value = 86164.0
 
   !! Earth - slow asynchronous rotator
   !real(r8), public, parameter :: exo_planet_radius   = 6.37122e6_R8     !! radius ~ m
   !real(r8), public, parameter :: exo_surface_gravity = 9.80616_R8       !! gravity ~ m/s^2
   !real(r8), public, parameter :: exo_ndays           = 10.0_R8          !! scaler to number of Earth days.
-  !real(r8), public, parameter :: exo_porb            = 365.0_R8         !! orbital period 
+  !real(r8), public, parameter :: exo_porb            = 365.0_R8         !! orbital period
   !real(r8), public, parameter :: exo_sday            = 86400.0_r8 * exo_ndays / (1._r8 + exo_ndays/exo_porb)  !! sidereal period [sec]
 
   !! Trappist-1e  (Gillon et al. 2017)  --  synchronous rotator
   !real(r8), public, parameter :: exo_planet_radius    = 5.84878e6_R8    !! radius ~ m
   !real(r8), public, parameter :: exo_surface_gravity  = 7.22925_R8      !! gravity ~ m/s^2
-  !real(r8), public, parameter :: exo_ndays            = 6.099615_r8               !! scaler to number of Earth days.   
-  !real(r8), public, parameter :: exo_porb             = exo_ndays                   !! orbital period 
+  !real(r8), public, parameter :: exo_ndays            = 6.099615_r8               !! scaler to number of Earth days.
+  !real(r8), public, parameter :: exo_porb             = exo_ndays                   !! orbital period
   !real(r8), public, parameter :: exo_sday = 86400.0_r8 * exo_ndays      !! sidereal period, synchronous rotator
 
   !! if set user_nl_cpl::orb_iyear = -1
@@ -103,7 +108,7 @@ module exoplanet_mod
   real(r8), public, parameter :: exo_obliq = 0.0_r8   ! obliquity [degrees]
   real(r8), public, parameter :: exo_mvelp = 0.0_r8   ! vernal equinox
 
-    
+
   !! ============== STELLAR OPTIONS ============== !!
   !! SOLAR CONSTANT
   real(r8), public, parameter :: exo_scon = 1360.0_r8         ! Solar constant (W m-2)
@@ -114,7 +119,7 @@ module exoplanet_mod
 
 
   !! ============== ATMOSPHERIC CONSTITUENT PARAMETERS ============== !!
-  !! Activated only if (do_exo_atmconst = .true.) 
+  !! Activated only if (do_exo_atmconst = .true.)
   !! Initial conditions file (ncdata) must (approximately) match the total pressure !!
   real(r8), public, parameter :: exo_co2bar  = 0.01_r8                       ! CO2 inventory (bar)
   real(r8), public, parameter :: exo_ch4bar  = 1.0e-3_r8                     ! CH4 inventory (bar)
@@ -143,7 +148,7 @@ module exoplanet_mod
   !! ======================= FUNDAMENTAL CONSTANTS  ====================== !!
   !! ===================================================================== !!
   !! No modifications below this point
-  !! 
+  !!
 
   ! molecular weights
   real(r8), parameter :: mwn2   = 28._r8
@@ -162,8 +167,8 @@ module exoplanet_mod
   !! DERIVED CONSTANTS -- DO NOT MODIFY
   !! automatically calculated from above inputs in bar
   ! dry volume mixing ratios  kg/kmole
-  real(r8), public, parameter :: exo_n2vmr   = exo_n2bar   / (exo_pstd/1.0e5)  
-  real(r8), public, parameter :: exo_o2vmr   = exo_o2bar   / (exo_pstd/1.0e5)  
+  real(r8), public, parameter :: exo_n2vmr   = exo_n2bar   / (exo_pstd/1.0e5)
+  real(r8), public, parameter :: exo_o2vmr   = exo_o2bar   / (exo_pstd/1.0e5)
   real(r8), public, parameter :: exo_h2vmr   = exo_h2bar   / (exo_pstd/1.0e5)
   real(r8), public, parameter :: exo_co2vmr  = exo_co2bar  / (exo_pstd/1.0e5)
   real(r8), public, parameter :: exo_ch4vmr  = exo_ch4bar  / (exo_pstd/1.0e5)
