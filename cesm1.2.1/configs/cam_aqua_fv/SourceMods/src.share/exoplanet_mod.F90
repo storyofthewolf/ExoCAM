@@ -24,10 +24,15 @@ module exoplanet_mod
   logical, public, parameter :: do_exo_synchronous = .false.    !! Toggle to synchronous rotation mode
                                                                 !! Eventually replace with better orbital computer
   logical, public, parameter :: do_carma_exort = .false.        !! Set to true only if running with the CARMA microphyiscs package
-                                                                !! and linking aerosol absorption to ExoRT  
-  logical, public, parameter :: do_exo_gw = .false.             !! flag to turn on gravity waves.  Note, present gw wave parameterization    
-                                                                !! does not work for low pressure atmospheres.                  
-  
+                                                                !! and linking aerosol absorption to ExoRT
+  logical, public, parameter :: do_exo_gw = .false.             !! flag to turn on gravity waves.  Note, present gw wave parameterization
+                                                                !! does not work for low pressure atmospheres.
+
+  real(r8), public, parameter :: exo_convect_plim = 5.e0_r8     !! Sets the minimum pressure limit in the convection schemes
+                                                                !! Convection will not operate at pressures lower than this
+                                                                !! Without ozone, 5 Pa is good.
+                                                                !! With ozone, 5 Pa is not stable, use NCAR's original value of 4.e3 (40 mb)
+
   !! ============== RADIATION OPTIONS  ============== !!
   integer, public, parameter :: exo_rad_step = 3                !! freq. of radiation calc in time steps (positive)
                                                                 !! or hours (negative).
@@ -120,8 +125,9 @@ module exoplanet_mod
   real(r8), public, parameter :: exo_ch4bar  = 1.0e-3_r8                     ! CH4 inventory (bar)
   real(r8), public, parameter :: exo_c2h6bar = 0.0_r8                        ! C2H6 inventory (bar)
   real(r8), public, parameter :: exo_h2bar   = 0.0_r8                        ! H2 inventory (bar)
-  real(r8), public, parameter :: exo_n2bar   = 1.0 - exo_co2bar - exo_ch4bar - exo_c2h6bar    ! N2 inventory (bar)
-  real(r8), public, parameter :: exo_pstd    = (exo_n2bar + exo_h2bar + exo_co2bar + exo_ch4bar + exo_c2h6bar)*1.0e5  ! total pressure (Pascals)
+  real(r8), public, parameter :: exo_o2bar   = 0.0_r8                        ! O2 inventory (bar)
+  real(r8), public, parameter :: exo_n2bar   = 1.0 - exo_co2bar - exo_ch4bar - exo_c2h6bar - exo_o2bar   ! N2 inventory (bar)
+  real(r8), public, parameter :: exo_pstd    = (exo_n2bar + exo_o2bar + exo_h2bar + exo_co2bar + exo_ch4bar + exo_c2h6bar)*1.0e5  ! total pressure (Pascals)
 
 
   !! ============== OCEAN ALBEDO CONSTANTS ============== !!
@@ -148,18 +154,21 @@ module exoplanet_mod
   real(r8), parameter :: mwn2   = 28._r8
   real(r8), parameter :: mwh2   = 2._r8
   real(r8), parameter :: mwco2  = 44._r8
+  real(r8), parameter :: mwo2   = 32._r8
   real(r8), parameter :: mwch4  = 16._r8
   real(r8), parameter :: mwc2h6 = 30._r8
   real(r8), parameter :: cpn2   = 1.039e3_r8
   real(r8), parameter :: cph2   = 14.32e3_r8
   real(r8), parameter :: cpco2  = 0.846e3_r8
+  real(r8), parameter :: cpo2   = 0.918e3_r8
   real(r8), parameter :: cpch4  = 2.226e3
   real(r8), parameter :: cpc2h6 = 1.756e3
 
   !! DERIVED CONSTANTS -- DO NOT MODIFY
   !! automatically calculated from above inputs in bar
   ! dry volume mixing ratios  kg/kmole
-  real(r8), public, parameter :: exo_n2vmr   = exo_n2bar   / (exo_pstd/1.0e5)  
+  real(r8), public, parameter :: exo_n2vmr   = exo_n2bar   / (exo_pstd/1.0e5)
+  real(r8), public, parameter :: exo_o2vmr   = exo_o2bar   / (exo_pstd/1.0e5)
   real(r8), public, parameter :: exo_h2vmr   = exo_h2bar   / (exo_pstd/1.0e5)
   real(r8), public, parameter :: exo_co2vmr  = exo_co2bar  / (exo_pstd/1.0e5)
   real(r8), public, parameter :: exo_ch4vmr  = exo_ch4bar  / (exo_pstd/1.0e5)
@@ -170,6 +179,7 @@ module exoplanet_mod
 
   !! dry mass mixing ratios
   real(r8), public, parameter :: exo_n2mmr   = exo_n2vmr   * mwn2/exo_mwdair
+  real(r8), public, parameter :: exo_o2mmr   = exo_o2vmr   * mwo2/exo_mwdair
   real(r8), public, parameter :: exo_h2mmr   = exo_h2vmr   * mwh2/exo_mwdair
   real(r8), public, parameter :: exo_co2mmr  = exo_co2vmr  * mwco2/exo_mwdair
   real(r8), public, parameter :: exo_ch4mmr  = exo_ch4vmr  * mwch4/exo_mwdair

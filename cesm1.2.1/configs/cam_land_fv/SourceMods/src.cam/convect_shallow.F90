@@ -17,6 +17,7 @@
    use cam_history,       only : outfld, addfld, add_default, phys_decomp
    use cam_logfile,       only : iulog
    use phys_control,      only : phys_getopts
+   use exoplanet_mod,     only : exo_convect_plim
 
    implicit none
    private                 
@@ -274,11 +275,11 @@
      if( masterproc ) write(iulog,*) 'convect_shallow_init: Hack shallow convection'
    ! Limit shallow convection to regions below 40 mb (4.e3);  0.05 mb (5.e0)
    ! Note this calculation is repeated in the deep convection interface
-     if( pref_edge(1) >= 5.e0_r8 ) then
+     if( pref_edge(1) >= exo_convect_plim) then
          limcnv = 1
      else
          do k = 1, plev
-            if( pref_edge(k) < 5.e0_r8 .and. pref_edge(k+1) >= 5.e0_r8 ) then
+            if( pref_edge(k) < exo_convect_plim .and. pref_edge(k+1) >= exo_convect_plim ) then
                 limcnv = k
                 goto 10
             end if
