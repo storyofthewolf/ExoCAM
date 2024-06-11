@@ -17,10 +17,11 @@ that O2 is now pulled from exoplanet_mod.F90 into CESM. Because O3 is not a well
 mixed gas, the profiles are pulled from ozone input files using the standard
 CAM machinery. As such, the ozone file and other options need to be set in
 user_nl_cam. I've added these options to the name lists for cam_aqua_fv,
-cam_mixed_fv, and cam_land_fv. I don't have any experience with the other
-configs, so users will need to check these carefully or may have unwanted ozone
-leaking into their radiation. Right now, those are set to a file I provided
-that has zero ozone everywhere.
+cam_mixed_fv, and cam_land_fv. Right now, those are set to a file I provided
+that has zero ozone everywhere. I don't have any experience with the other
+configs, so users will need to check these carefully (and possibly create a new
+ozone file with zero VMR that fits the configuration) to be sure they don't
+have unwanted ozone leaking into their radiation. 
 
 To add O2, in exoplanet_mod.F90, simply set the parameter: exo_o2bar
 
