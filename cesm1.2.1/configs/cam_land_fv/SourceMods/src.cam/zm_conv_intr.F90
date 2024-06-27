@@ -16,7 +16,8 @@ module zm_conv_intr
    use cam_history,  only: outfld, addfld, add_default, phys_decomp
    use perf_mod
    use cam_logfile,  only: iulog
-   
+   use exoplanet_mod, only: exo_convect_plim
+
    implicit none
    private
    save
@@ -231,11 +232,11 @@ subroutine zm_conv_init(pref_edge)
 ! Note this calculation is repeated in the shallow convection interface
 !
     limcnv = 0   ! null value to check against below
-    if (pref_edge(1) >= 5.e0_r8) then
+    if (pref_edge(1) >= exo_convect_plim) then
        limcnv = 1
     else
        do k=1,plev
-          if (pref_edge(k) < 5.e0_r8 .and. pref_edge(k+1) >= 5.e0_r8) then
+          if (pref_edge(k) < exo_convect_plim .and. pref_edge(k+1) >= exo_convect_plim) then
              limcnv = k
              exit
           end if

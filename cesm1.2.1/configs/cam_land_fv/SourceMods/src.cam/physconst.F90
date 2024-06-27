@@ -375,11 +375,13 @@ contains
         write(iulog,*) '******************************************************'
         write(iulog,*) 'SURFACE PRESSURE: ', SHR_CONST_PSTD
         write(iulog,*) 'N2   BAR: ', exo_n2bar
+        write(iulog,*) 'O2   BAR: ', exo_o2bar
         write(iulog,*) 'H2   BAR: ', exo_h2bar
         write(iulog,*) 'CO2  BAR: ', exo_co2bar
         write(iulog,*) 'CH4  BAR: ', exo_ch4bar
         write(iulog,*) 'C2H6 BAR: ', exo_c2h6bar
         write(iulog,*) 'N2   VMR, MMR: ', exo_n2vmr, exo_n2mmr
+        write(iulog,*) 'O2   VMR, MMR: ', exo_o2vmr, exo_o2mmr
         write(iulog,*) 'H2   VMR, MMR: ', exo_h2vmr, exo_h2mmr
         write(iulog,*) 'CO2  VMR, MMR: ', exo_co2vmr, exo_co2mmr
         write(iulog,*) 'CH4  VMR, MMR: ', exo_ch4vmr, exo_ch4mmr

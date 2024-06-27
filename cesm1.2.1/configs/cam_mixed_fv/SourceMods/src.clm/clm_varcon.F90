@@ -66,8 +66,8 @@ module clm_varcon
   real(r8) :: bdsno = 250._r8       !bulk density snow (kg/m**3)
   real(r8) :: alpha_aero = 1.0_r8   !constant for aerodynamic parameter weighting
   real(r8) :: tlsai_crit = 2.0_r8   !critical value of elai+esai for which aerodynamic parameters are maximum
-  !real(r8) :: watmin = 0.01_r8      !minimum soil moisture (mm) 
-  real(r8) :: watmin = 1.0e-15_r8      !minimum soil moisture (mm) ! WOLF, exo_mod, model crash if set to 0.0 
+  !real(r8) :: watmin = 0.01_r8      !minimum soil moisture (mm)
+  real(r8) :: watmin = 1.0e-10_r8      !minimum soil moisture (mm) ! WOLF, exo_mod, model crash if set to 0.0 
 
   real(r8) :: re = SHR_CONST_REARTH*0.001_r8 !radius of earth (km)
 
@@ -100,10 +100,10 @@ module clm_varcon
   real(r8) :: ht_wasteheat_factor = 1.0_r8/ht_efficiency_factor  !wasteheat factor for urban heating (-)
   real(r8) :: ac_wasteheat_factor = 1.0_r8/ac_efficiency_factor  !wasteheat factor for urban air conditioning (-)
   real(r8) :: wasteheat_limit = 100._r8  !limit on wasteheat (W/m2)
-  
+
   real(r8), parameter :: h2osno_max = 1000000._r8    ! max allowed snow thickness (mm H2O)
   real(r8), parameter :: lapse_glcmec = 0.006_r8  ! surface temperature lapse rate (deg m-1)
-                                                  ! Pritchard et al. (GRL, 35, 2008) use 0.006  
+                                                  ! Pritchard et al. (GRL, 35, 2008) use 0.006
 
   !------------------------------------------------------------------
   ! Initialize water type constants

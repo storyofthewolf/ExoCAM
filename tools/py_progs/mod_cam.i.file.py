@@ -236,7 +236,7 @@ for i in np.arange(nilev_out-1,-1,-1):
 for i in np.arange(0,nlev_out):
   j = nlev_new - nlev_out + i
   hyam_out[i] = hyam_new[j]
-  hybm_out[i] = hybi_new[j]
+  hybm_out[i] = hybm_new[j]
   lev_out[i]  = lev_new[j]
 
 

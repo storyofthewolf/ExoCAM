@@ -18,7 +18,7 @@ module chem_surfvals
    use cam_logfile,    only: iulog
    use m_types,        only: time_ramp
    use constituents,   only: pcnst
-   use exoplanet_mod,  only: exo_n2vmr, exo_co2vmr, exo_ch4vmr, do_exo_atmconst
+   use exoplanet_mod,  only: exo_n2vmr, exo_co2vmr, exo_ch4vmr, do_exo_atmconst, exo_o2mmr, exo_o2vmr
 
 
 !-----------------------------------------------------------------------
@@ -43,6 +43,7 @@ module chem_surfvals
 
    ! Default values for namelist variables -- now set by build-namelist
    real(r8) :: o2mmr = .23143_r8               ! o2 mass mixing ratio
+!   real(r8) :: o2mmr = exo_o2mmr              ! leaving old value for now... setting somewhere else for ExoCAM
    real(r8) :: co2vmr_rad = -1.0_r8            ! co2 vmr override for radiation
    real(r8) :: co2vmr = -1.0_r8                ! co2   volume mixing ratio 
    real(r8) :: n2ovmr = -1.0_r8                ! n2o   volume mixing ratio 
@@ -266,6 +267,7 @@ subroutine chem_surfvals_init()
       write(iulog,*) '  n2 volume mixing ratio = ',exo_n2vmr
       write(iulog,*) '  co2 volume mixing ratio = ',exo_co2vmr
       write(iulog,*) '  ch4 volume mixing ratio = ',exo_ch4vmr
+      write(iulog,*) '  o2 volume mixing ratio = ', exo_o2vmr
       !write(iulog,*) '  n2o volume mixing ratio = ',n2ovmr
       !write(iulog,*) '  f11 volume mixing ratio = ',f11vmr
       !write(iulog,*) '  f12 volume mixing ratio = ',f12vmr
@@ -467,6 +469,7 @@ subroutine chem_surfvals_set( phys_state )
      n2ovmr = 0.0
      f11vmr = 0.0
      f12vmr = 0.0
+     o2mmr  = exo_o2mmr
    endif
 
 
