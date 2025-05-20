@@ -43,4 +43,4 @@ $EXORT_PATH is the path where ExoRT is located
 for instance...
 on Summit; $EXOC_PATH = $EXORT_PATH = /projects/wolfet/models
 on Hyak;   $EXOC_PATH = $EXORT_PATH = /suppscr/vsm/gscratch/wolfet
-on Discover; $EXOC_PATH = $EXORT_PATH = /discover/nobackup/etwolf
+on Discover; $EXOC_PATH = $EXORT_PATH = /discover/nobackup/etwolf/models

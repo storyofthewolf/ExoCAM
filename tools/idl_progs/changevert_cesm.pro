@@ -15,15 +15,22 @@ pro changevert_cesm
 
 do_write_file = 1
 do_print_diagnostic = 1
-do_dry = 0
+do_dry = 1
+do_snowice = 0  ; requires read of cam.h0 file in addition to .i. file
 
 ;================================
 ;=======  name of new file ======
 ;================================
-fname_out = '/discover/nobackup/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/wolf1069_titan.i.L55.nc'
+fname_out = '/discover/nobackup/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_land_fv/ic_0.1bar_L40_zmean_dry_ic.nc'
+;fname_out = '/discover/nobackup/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/gj251c_land_h2_L55.nc'
 diagnostic_out = fname_out
 
-nlev_out = 30
+
+;L40 --- 3 orders of magnitude pressure
+;L46 --- 4 orders of magnitude pressure
+;L51 --- 5 orders of magnitude pressure
+
+nlev_out = 40
 nilev_out = nlev_out + 1
 
 ;read in appropriate grid coordinates from WACCM 66 level grid 
@@ -34,10 +41,12 @@ ncdf_varget,ncid,'lev',lev_new
 ncdf_varget,ncid,'ilev',ilev_new
 ncdf_varget,ncid,'lat',lat_new
 ncdf_varget,ncid,'lon',lon_new
-ncdf_varget,ncid,'hyai',hyai_new   ;ilev
-ncdf_varget,ncid,'hybi',hybi_new   ;ilev
-ncdf_varget,ncid,'hyam',hyam_new   ;lev
-ncdf_varget,ncid,'hybm',hybm_new   ;lev
+ncdf_varget,ncid,'hyai',hyai_new
+ncdf_varget,ncid,'hybi',hybi_new
+ncdf_varget,ncid,'hyam',hyam_new
+ncdf_varget,ncid,'hybm',hybm_new
+ncdf_varget,ncid,'P0',P0_new 
+ncdf_varget,ncid,'PS',PS_new 
 ncdf_close,ncid
 
 nlev_new = n_elements(lev_new)
@@ -52,38 +61,46 @@ nlon_new = n_elements(lon_new)
 ;===========================================
 ;clim_fname_in ="/discover/nobackup/etwolf/cesm_scratch/archive/ExoCAM_thai_hab2_L51_n68equiv/rest/0197-01-01-00000/ExoCAM_thai_hab2_L51_n68equiv.cam.i.0197-01-01-00000.nc" 
 ;clim_fname_in = "/discover/nobackup/etwolf/cesm_scratch/rundir/samosa5/run/samosa5.cam.i.0004-01-01-00000.nc"
-;clim_fname_in = "/discover/nobackup/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/ic_1bar_L51_zmean_ic.nc" 
+clim_i_fname_in = "/discover/nobackup/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/ic_1bar_L51_zmean_ic.nc" 
 ;clim_fname_in = "/discover/nobackup/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/wolf1069_land_planet.i.nc"
-clim_fname_in = "/discover/nobackup/etwolf/models/ExoCAM/cesm1.2.1/initial_files/mars/atm/present_day_mars.cam.i.L40.nc"
+;clim_fname_in = "/discover/nobackup/etwolf/models/ExoCAM/cesm1.2.1/initial_files/mars/atm/present_day_mars.cam.i.L40.nc"
+;clim_i_fname_in = "/gpfsm/dnb33/etwolf/cesm_scratch/archive/gj251c_hycean/rest/0191-08-01-00000/gj251c_hycean.cam.i.0191-01-01-00000.nc"
+;clim_h_fname_in = "/gpfsm/dnb33/etwolf/cesm_scratch/archive/gj251c_hycean/rest/0191-08-01-00000/gj251c_hycean.cam.h0.0191-07.nc"
+;clim_i_fname_in = "/gpfsm/dnb33/etwolf/cesm_scratch/archive/gj251c_land_h2/rest/0548-12-01-00000/gj251c_land_h2.cam.i.0548-01-01-00000.nc"
+;clim_h_fname_in = "/gpfsm/dnb33/etwolf/cesm_scratch/archive/gj251c_land_h2/rest/0548-12-01-00000/gj251c_land_h2.cam.h0.0548-11.nc"
 
-ncid=ncdf_open(clim_fname_in, /nowrite)
-ncdf_varget,ncid,'lev',lev_old
-ncdf_varget,ncid,'ilev',ilev_old
+
+
+
+; read clim_i file (cam.i. initial condition file)
+ncid=ncdf_open(clim_i_fname_in, /nowrite)
+ncdf_varget,ncid,'lev',lev_clim
+ncdf_varget,ncid,'ilev',ilev_clim
 ncdf_varget,ncid,'lat',lat
 ncdf_varget,ncid,'lon',lon
-ncdf_varget,ncid,'hyai',hyai_old
-ncdf_varget,ncid,'hybi',hybi_old
-ncdf_varget,ncid,'hyam',hyam_old
-ncdf_varget,ncid,'hybm',hybm_old
+ncdf_varget,ncid,'hyai',hyai_clim
+ncdf_varget,ncid,'hybi',hybi_clim
+ncdf_varget,ncid,'hyam',hyam_clim
+ncdf_varget,ncid,'hybm',hybm_clim
 
-nlev_old = n_elements(lev_old)
-nilev_old = n_elements(ilev_old)
+nlev_clim = n_elements(lev_clim)
+nilev_clim = n_elements(ilev_clim)
 nlat = n_elements(lat)
 nlon = n_elements(lon)
 ;kludge, I am keeping with a 4x5 grid
 nslat=nlat-1
 nslon=nlon
 
-ncdf_varget,ncid,'CLDICE',CLDICE_old
-ncdf_varget,ncid,'CLDLIQ',CLDLIQ_old
-;ncdf_varget,ncid,'CLOUD',CLOUD_old
-ncdf_varget,ncid,'Q',Q_old
-ncdf_varget,ncid,'T',T_old
-ncdf_varget,ncid,'US',US_old
-ncdf_varget,ncid,'VS',VS_old
+ncdf_varget,ncid,'CLDICE',CLDICE_clim
+ncdf_varget,ncid,'CLDLIQ',CLDLIQ_clim
+ncdf_varget,ncid,'Q',Q_clim
+ncdf_varget,ncid,'T',T_clim
+ncdf_varget,ncid,'US',US_clim
+ncdf_varget,ncid,'VS',VS_clim
+ncdf_varget,ncid,'PS',PS_clim
+ncdf_varget,ncid,'P0',P0_clim
 
 ;stuff that doesn't need to be changed
-ncdf_varget,ncid,'P0',P0
 ncdf_varget,ncid,'slat',slat
 ncdf_varget,ncid,'slon',slon
 ncdf_varget,ncid,'w_stag',w_stag
@@ -105,30 +122,33 @@ ncdf_varget,ncid,'nscur',nscur
 ncdf_varget,ncid,'date',date
 ncdf_varget,ncid,'datesec',datesec
 ncdf_varget,ncid,'nsteph',nsteph
-ncdf_varget,ncid,'ICEFRAC',ICEFRAC
-ncdf_varget,ncid,'PS',PS
-ncdf_varget,ncid,'SICTHK',SICTHK
-ncdf_varget,ncid,'SNOWHICE',SNOWHICE
+; these are all zeros, why?
 ncdf_varget,ncid,'TS1',TS1
 ncdf_varget,ncid,'TS2',TS2
 ncdf_varget,ncid,'TS3',TS3
 ncdf_varget,ncid,'TS4',TS4
 ncdf_varget,ncid,'TSICE',TSICE
+ncdf_varget,ncid,'SICTHK',SICTHK_clim
 ncdf_close,ncid
 
+; read clim_h (cam.h0) history file
+if (do_snowice eq 1) then begin
+  ncid=ncdf_open(clim_h_fname_in, /nowrite)
+  ncdf_varget,ncid,'TS',TS_clim
+  ncdf_varget,ncid,'SNOWHICE',SNOWHICE_clim
+  ncdf_varget,ncid,'ICEFRAC',ICEFRAC_clim
+  ncdf_close,ncid
+endif 
+
+  
 ; create pressure grids from hybrid sigma coordinates
 lev_P_new=fltarr(nlon, nlat, nlev_new)    ;[Pa] pressure coordinate matrix, layer midpoints    
 ilev_P_new=fltarr(nlon, nlat, nilev_new)   ;[Pa] pressure coordinate matrix, layer interfaces  
-hybrid2pressure,nlon,nlat,nlev_new,PS,P0,hyam_new,hybm_new,hyai_new,hybi_new,lev_P_new,ilev_P_new
+hybrid2pressure,nlon,nlat,nlev_new,PS_new,P0_new,hyam_new,hybm_new,hyai_new,hybi_new,lev_P_new,ilev_P_new
 
-lev_P_old=fltarr(nlon, nlat, nlev_old)    ;[Pa] pressure coordinate matrix, layer midpoints     
-ilev_P_old=fltarr(nlon, nlat, nilev_old)   ;[Pa] pressure coordinate matrix, layer interfaces 
-hybrid2pressure,nlon,nlat,nlev_old,PS,P0,hyam_old,hybm_old,hyai_old,hybi_old,lev_P_old,ilev_P_old
-
-
-;-----
-
-
+lev_P_clim=fltarr(nlon, nlat, nlev_clim)    ;[Pa] pressure coordinate matrix, layer midpoints     
+ilev_P_clim=fltarr(nlon, nlat, nilev_clim)   ;[Pa] pressure coordinate matrix, layer interfaces 
+hybrid2pressure,nlon,nlat,nlev_clim,PS_clim,P0_clim,hyam_clim,hybm_clim,hyai_clim,hybi_clim,lev_P_clim,ilev_P_clim
 
 ;out variables
 CLDICE_out=fltarr(nlon,nlat,nlev_out)
@@ -138,6 +158,10 @@ Q_out=fltarr(nlon,nlat,nlev_out)
 T_out=fltarr(nlon,nlat,nlev_out)
 US_out=fltarr(nlon,nslat,nlev_out)
 VS_out=fltarr(nslon,nlat,nlev_out)
+PS_out=fltarr(nlon,nlat)
+SICTHK_out=fltarr(nlon,nlat)
+ICEFRAC_out=fltarr(nlon,nlat)
+SNOWHICE_out=fltarr(nlon,nlat)
 
 
 lev_out=fltarr(nlev_out)
@@ -152,25 +176,36 @@ hybm_out=fltarr(nlev_out)
 n=66-nlev_out
 for x=0,nlon-1 do begin
   for y=0,nlat-1 do begin
-    T_out(x,y,*) = interpol(T_old(x,y,*), lev_P_old(x,y,*), lev_P_new(x,y,n:65))  
-    CLDICE_out(x,y,*) = interpol(CLDICE_old(x,y,*), lev_P_old(x,y,*), lev_P_new(x,y,n:65))  
-    CLDLIQ_out(x,y,*) = interpol(CLDLIQ_old(x,y,*), lev_P_old(x,y,*), lev_P_new(x,y,n:65))  
-;    CLOUD_out(x,y,*)  = interpol(CLOUD_old(x,y,*), lev_P_old(x,y,*), lev_P_new(x,y,n:65))  
-    Q_out(x,y,*) = interpol(Q_old(x,y,*), lev_P_old(x,y,*), lev_P_new(x,y,n:65))  
-    VS_out(x,y,*) = interpol(VS_old(x,y,*), lev_P_old(x,y,*), lev_P_new(x,y,n:65))  
-    
+    T_out(x,y,*) = interpol(T_clim(x,y,*), lev_P_clim(x,y,*), lev_P_new(x,y,n:65))  
+    CLDICE_out(x,y,*) = interpol(CLDICE_clim(x,y,*), lev_P_clim(x,y,*), lev_P_new(x,y,n:65))  
+    CLDLIQ_out(x,y,*) = interpol(CLDLIQ_clim(x,y,*), lev_P_clim(x,y,*), lev_P_new(x,y,n:65))  
+    Q_out(x,y,*)      = interpol(Q_clim(x,y,*), lev_P_clim(x,y,*), lev_P_new(x,y,n:65))  
+ ;   VS_out(x,y,*)     = interpol(VS_clim(x,y,*), lev_P_clim(x,y,*), lev_P_new(x,y,n:65))  
+    VS_out(x,y,*) = 0.0
+
     if (do_dry eq 1) then begin
       CLDICE_out(x,y,*) = 0.0
       CLDLIQ_out(x,y,*) = 0.0
       Q_out(x,y,*) = 0.0
     endif
 
+    PS_out(x,y)       = PS_clim(x,y)
+    SICTHK_out(x,y)   = 5.0  ;SICTHK_clim(x,y)
+    if (do_snowice eq 1) then begin
+      ICEFRAC_out(x,y)  = ICEFRAC_clim(x,y)
+      SNOWHICE_out(x,y) = SNOWHICE_clim(x,y)
+    endif else begin
+      ICEFRAC_out(x,y)  = 0.0
+      SNOWHICE_out(x,y) = 0.0
+    endelse  
   endfor
 endfor
+P0_out = P0_clim
 
 for x=0,nlon-1 do begin
   for y=0,nlat-2 do begin
-    US_out(x,y,*) = interpol(US_old(x,y,*), lev_P_old(x,y,*), lev_P_new(x,y,n:65))  
+  ;  US_out(x,y,*) = interpol(US_old(x,y,*), lev_P_old(x,y,*), lev_P_new(x,y,n:65))  
+    US_out(x,y,*) = 0.0
   endfor
 endfor
 
@@ -245,7 +280,6 @@ if (do_write_file eq 1) then begin
   varid34 = NCDF_VARDEF(id,'nsteph',dim10)
   varid57 = NCDF_VARDEF(id,'CLDICE',[dim2,dim1,dim5,dim10],/double)
   varid58 = NCDF_VARDEF(id,'CLDLIQ',[dim2,dim1,dim5,dim10],/double)
- ; varid58 = NCDF_VARDEF(id,'CLOUD',[dim2,dim1,dim5,dim10],/double)
   varid76 = NCDF_VARDEF(id,'ICEFRAC',[dim2,dim1,dim10],/double)
   varid99 = NCDF_VARDEF(id,'PS',[dim2,dim1,dim10],/double)
   varid100 = NCDF_VARDEF(id,'Q',[dim2,dim1,dim5,dim10],/double)
@@ -340,7 +374,7 @@ if (do_write_file eq 1) then begin
   ncdf_control, id, /ENDEF
 
   
-  NCDF_VARPUT, id, varid1, P0
+  NCDF_VARPUT, id, varid1, P0_out
   NCDF_VARPUT, id, varid2, lat
   NCDF_VARPUT, id, varid3, lon
   NCDF_VARPUT, id, varid4, slat
@@ -376,17 +410,18 @@ if (do_write_file eq 1) then begin
 
   NCDF_VARPUT, id, varid57, CLDICE_out
   NCDF_VARPUT, id, varid58, CLDLIQ_out
-  NCDF_VARPUT, id, varid76, ICEFRAC
-  NCDF_VARPUT, id, varid99, PS
+  NCDF_VARPUT, id, varid76, ICEFRAC_out
+  NCDF_VARPUT, id, varid99, PS_out
   NCDF_VARPUT, id, varid100, Q_out
-  NCDF_VARPUT, id, varid103, SICTHK
-  NCDF_VARPUT, id, varid104, SNOWHICE
+  NCDF_VARPUT, id, varid103, SICTHK_out
+  NCDF_VARPUT, id, varid104, SNOWHICE_out
   NCDF_VARPUT, id, varid105, T_out
   NCDF_VARPUT, id, varid110, TS1
   NCDF_VARPUT, id, varid111, TS2
   NCDF_VARPUT, id, varid112, TS3
   NCDF_VARPUT, id, varid113, TS4
   NCDF_VARPUT, id, varid114, TSICE
+  
   NCDF_VARPUT, id, varid117, US_out
   NCDF_VARPUT, id, varid119, VS_out
 

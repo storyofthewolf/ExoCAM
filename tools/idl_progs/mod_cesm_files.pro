@@ -6,8 +6,8 @@ pro mod_cesm_files
 ;-------------------------------
 
 make_bndtopo = 0 ; topograph files  
-make_popfrc = 0 ; modify existing popfrc file
-make_ncdata = 1
+make_popfrc = 1 ; modify existing popfrc file
+make_ncdata = 0
 make_tropopause_climo_file = 0
 make_ozone = 0
 make_aerosoldep = 0
@@ -106,8 +106,9 @@ file_lnd_domain_out =  "test_domain.nc"
 
 
 ;--- pop.frc files in/out ---
-;file_pop_frc = "/discover/nobackup/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/pop_frc.4x5d.090130_aquaplanet_300Kiso.nc"
-;file_pop_frc_out = "/discover/nobackup/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/pop_frc.4x5d.090130_aquaplanet_200Kiso.nc"
+file_pop_frc_getSST = "/gpfsm/dnb33/etwolf/cesm_scratch/archive/gj251c_hycean/rest/0191-08-01-00000/gj251c_hycean.cam.h0.0191-07.nc"
+file_pop_frc = "/discover/nobackup/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/pop_frc.4x5d.090130_aquaplanet_300Kiso.nc"
+file_pop_frc_out = "popfrc.hycean.nc"
 
 ;file_pop_frc = "/discover/nobackup/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_mixed_fv/pop_frc.gx3v7.110128_annual_mean.nc"
 ;file_pop_frc_out = "/discover/nobackup/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/pop_frc.gx3v7.110128_zmean.nc"
@@ -115,8 +116,8 @@ file_lnd_domain_out =  "test_domain.nc"
 ;--- ncdata files in/oout --
 ;file_ncdata = '/discover/nobackup/etwolf/cesm_scratch/rundir/mars_dev2/run/mars_dev2.cam.i.0001-01-09-00000.nc'
 ;file_ncdata_out = '/discover/nobackup/etwolf/models/CESM_Mars/marsfiles/atm/mars_dev2_adjusted.cam.i.0001-01-09-00000.nc'
-file_ncdata = '/discover/nobackup/etwolf/cesm_scratch/archive/t1c_land_ch4/rest/0010-05-01-00000/t1c_land_ch4.cam.i.0010-05-01-00000.nc'
-file_ncdata_out = '/discover/nobackup/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/t1c_land_ch4_h2o.cam.i.0010-05-01-00000.nc'
+file_ncdata     = '/discover/nobackup/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/ic_0.1bar_L46_eyeball_ic.nc'
+file_ncdata_out = '/discover/nobackup/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_aqua_fv/ic_0.1bar_L46_eyeball_dry_ic.nc'
 
 
 ;-- new file names --
@@ -204,9 +205,14 @@ if (make_popfrc eq 1) then begin
   ncdf_varget,ncid,'S',S  ; salinity ppt
   ncdf_close,ncid
 
+  ncid=ncdf_open(file_pop_frc_getSST, /nowrite)
+  ncdf_varget,ncid,'SST',SST     ; temperature
+  ncdf_close,ncid
+
   ;set everything to fixed value
   mask(*,*) = 1.0   
 ;  T(*,*,*) = 15.0  ; degrees celcius
+;  T(*,*,*) = TS(*,*)
   hblt(*,*,*) = 50.0 ; meter mixed layer depth
 ;  qdp(*,*,*) = 0.0
   dhdx(*,*,*) = 0.0
@@ -214,6 +220,24 @@ if (make_popfrc eq 1) then begin
   U(*,*,*) = 0.0
   V(*,*,*) = 0.0
   S(*,*,*) = 0.0  
+
+  help, T, SST
+  help, lon, lat, time
+
+    T(*,*,0) = SST(*,*)-271.35 ; celcius
+    T(*,*,1) = SST(*,*)-271.35 ; celcius
+    T(*,*,2) = SST(*,*)-271.35 ; celcius
+    T(*,*,3) = SST(*,*)-271.35 ; celcius
+    T(*,*,4) = SST(*,*)-271.35 ; celcius
+    T(*,*,5) = SST(*,*)-271.35 ; celcius
+    T(*,*,6) = SST(*,*)-271.35 ; celcius
+    T(*,*,7) = SST(*,*)-271.35 ; celcius
+    T(*,*,8) = SST(*,*)-271.35 ; celcius
+    T(*,*,9) = SST(*,*)-271.35 ; celcius
+    T(*,*,10) = SST(*,*)-271.35 ; celcius
+    T(*,*,11) = SST(*,*)-271.35 ; celcius
+
+
 
   ; average over time
   ;for x=0,99 do begin 
@@ -234,18 +258,18 @@ if (make_popfrc eq 1) then begin
 
  ; average over time and latitude bands, excluding zeros
 ;  for x=0,99 do begin 
-    for y=0,115 do begin 
-      for ti=0,11 do begin
-        T(*,y,ti) = mean(T(*,y,ti)) 
+;    for y=0,115 do begin 
+;      for ti=0,11 do begin
+;        T(*,y,ti) = mean(T(*,y,ti)) 
 ;        hblt(x,*,ti) = mean(hblt(x,y,*))
-        qdp(*,y,ti) = mean(qdp(*,y,ti))
+;        qdp(*,y,ti) = mean(qdp(*,y,ti))
 ;        dhdx(x,*,ti) = mean(dhdx(x,y,*))
 ;        U(x,*,ti) = mean(U(x,y,*)) 
 ;        V(x,*,ti) = mean(V(x,y,*)) 
 ;        S(x,*,ti) = mean(S(x,y,*)) 
  ;     endfor
-    endfor
-  endfor
+;    endfor
+;  endfor
 
   ; only where mask > 0
 ;  for x=0,99 do begin 
@@ -357,15 +381,15 @@ if (make_ncdata eq 1) then begin
 ;  TS3_OUT(*,*) = 300.0
 ;  TS4_OUT(*,*) = 300.0
 
-   Q_OUT(*,*,*) = 0.01
+   Q_OUT(*,*,*) = 0.00
 ;   Q_OUT(*,*,30:nlev-1) = double(0.01)
 ;   Q_OUT(*,*,20:29) = 1.0e-4
 ;   Q_OUT(*,*,10:14) = 1.0e-6
 ;   Q_OUT(*,*,5:9) = 1.0e-8
 ;   Q_OUT(*,*,0:4) = 0.0
-;  CLDICE_OUT(*,*,*) = 0.0
+  CLDICE_OUT(*,*,*) = 0.0
 ;  CLDICE_CO2_OUT(*,*,*) = 0.0
-;  CLDLIQ_OUT(*,*,*) = 0.0
+  CLDLIQ_OUT(*,*,*) = 0.0
 ;  VS_OUT(*,*,*) = 0.0
 ;  US_OUT(*,*,*) = 0.0
 
@@ -410,9 +434,9 @@ if (make_ncdata eq 1) then begin
 ;  ncdf_varput, ncid, 'TS2',TS2_OUT                &  print, "updated TS2_OUT"
 ;  ncdf_varput, ncid, 'TS3',TS3_OUT                &  print, "updated TS3_OUT"
 ;  ncdf_varput, ncid, 'TS4',TS4_OUT                &  print, "updated TS4_OUT"
-;  ncdf_varput, ncid, 'CLDICE',CLDICE_OUT           &  print, "updated CLDICE"
+  ncdf_varput, ncid, 'CLDICE',CLDICE_OUT           &  print, "updated CLDICE"
 ;  ncdf_varput, ncid, 'CLDICE_CO2',CLDICE_CO2_OUT  &  print, "updated PS"
-;  ncdf_varput, ncid, 'CLDLIQ',CLDLIQ_OUT           &  print, "updated CLDLIQ"
+  ncdf_varput, ncid, 'CLDLIQ',CLDLIQ_OUT           &  print, "updated CLDLIQ"
   ncdf_varput, ncid, 'Q',Q_OUT                     &  print, "updated Q"
 ;  ncdf_varput, ncid, 'T',T_OUT                    &  print, "updated T"
 ;  ncdf_varput, ncid, 'VS',VS_OUT                  &  print, "updated VS"
