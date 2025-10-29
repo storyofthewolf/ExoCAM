@@ -44,7 +44,15 @@ If you use ExoCAM in your work, please also footnote to where the model is avail
 
 I encourage all users to make their 3D model output files publicly available when appropriate. Many academic journals are now requiring this. I store model outputs from my published work at: [https://archive.org/details/@eric\_t\_wolf](https://archive.org/details/@eric_t_wolf) and also on zenodo, or made available upon request.
 
-## Folders
+## Directory Tree
 
-* `cesm1.2.1` -- model versions for CESM1.2.1
-* `idl_progs` -- a colletion of idl utilities
+* **ExoCAM/**
+    * **cesm1.2.1/**
+        * `ccsm_utils_files/`
+        * `configs/`
+        * `initial_files/`
+        * `instructions`
+    * **tools/**
+        * `idl_progs/`
+        * `py_progs/`
+        * `spectral_albedos/`
