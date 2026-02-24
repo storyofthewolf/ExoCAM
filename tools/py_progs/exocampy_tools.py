@@ -205,7 +205,7 @@ def calc_gmean_profiles(lon, lat, var):
 
     for z in range(nlev):
         temp_in      = var[z,:,:] ; temp_in = np.squeeze(temp_in)
-        temp_out     =  exo.area_weighted_avg(lon, lat, temp_in)
+        temp_out     =  area_weighted_avg(lon, lat, temp_in)
         var_gmean[z] = temp_out
 
     return var_gmean

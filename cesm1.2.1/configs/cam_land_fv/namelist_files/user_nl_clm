@@ -24,7 +24,7 @@
 !!
 
 !! land initial condition file
-finidat = "/discover/nobackup/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_land_fv/landplanet_q0_wt10.clm2.r.nc"
+finidat = "/discover/nobackup/etwolf/models/ExoCAM/cesm1.2.1/initial_files/cam_land_fv/landplanet_dry.clm2.r.nc"
 
 !! surface data file
 !! defines land surface types, surface albedo (soil colors) and others.
