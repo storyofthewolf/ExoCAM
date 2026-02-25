@@ -1,12 +1,19 @@
 #! /bin/csh -f
 
 #===============================================================================
-# Summit machine specific settings
+# Discover machine specific settings
 # #===============================================================================
 source /etc/profile.d/modules.csh
-set SLES=`cat /etc/SuSE-release | \grep VERSION`
-echo "You are in SLES ${SLES}"
+#set SLES=`cat /etc/SuSE-release | \grep VERSION`
+#echo "You are in SLES ${SLES}"
+if (-f /etc/SuSE-release) then
+    setenv SLES `cat /etc/SuSE-release | \grep VERSION`
+else
+    setenv SLES `grep VERSION_ID /etc/os-release | cut -d'=' -f2 | tr -d '"' | cut -d'.' -f1`
+endif
+echo "You are in SLES ${SLES}" 
 if ( "${SLES}" == "VERSION = 12" ) then
+	echo "running SLES12"
 	if ( $COMPILER == "intel" ) then
         module purge
 	module load git/2.24.0
@@ -26,26 +33,29 @@ if ( "${SLES}" == "VERSION = 12" ) then
         setenv LIB_NETCDF /usr/local/other/netcdf3/3.6.3/intel/19.0.4.243/lib
 
         endif
+else if ( "${SLES}" == "15" ) then
+	echo "running SLES15"
+        if ( $COMPILER == "intel" ) then
+        module purge
+        module load git/2.42.0
+        module load comp/intel/2021.4.0
+        module load mpi/impi/2021.4.0
+        module load idl/8.5
+        module load nco/5.1.7
+
+        limit stacksize unlimited
+        setenv MKL "-mkl=cluster"
+
+        setenv NETCDF_PATH /usr/local/other/netcdf4/4.9.2/static/intel-2021.4.0
+        setenv PNETCDF_PATH /usr/local/other/parNetcdf/pnetcdf/1.3.1/impi-2021.4.0
+        setenv NETCDF /usr/local/other/netcdf4/4.9.2/static/intel-2021.4.0/
+        setenv MPI_PATH /usr/local/intel/oneapi/2021/mpi/2021.4.0/bin/mpirun
+        setenv INC_NETCDF /usr/local/other/netcdf4/4.9.2/static/intel-2021.4.0/include
+        setenv LIB_NETCDF /usr/local/other/netcdf4/4.9.2/static/intel-2021.4.0/lib
+
+        endif
 else
-	if ( $COMPILER == "intel" ) then
-	module purge
-	module load other/git
-	module load comp/intel-14.0.3.174
-	module load mpi/impi-4.1.0.024
-	module load tool/idl-8.5
-	module load other/svn-1.9.5
-	module load other/nco-4.6.8-gcc-5.3-sp3
-
-	setenv MKL "-mkl=cluster"
-
-  	setenv NETCDF_PATH /usr/local/other/netcdf/3.6.2_intel-14.0.3.174 
-  	setenv PNETCDF_PATH /usr/local/other/pnetcdf/1.2.0_intel-14.0.3.174_impi-4.1.3.048
-  	setenv NETCDF /usr/local/other/netcdf/3.6.2_intel-14.0.3.174
-  	setenv MPI_PATH /usr/local/intel/mpi/4.1.0.024.nopbs/bin64/mpirun
-  	setenv INC_NETCDF /usr/local/other/netcdf/3.6.2_intel-14.0.3.174/include
- 	setenv LIB_NETCDF /usr/local/other/netcdf/3.6.2_intel-14.0.3.174/lib
-
-	endif
+        echo "Must use SLES12 or SLES15"
 endif
 
 # Run time variables

@@ -729,8 +729,7 @@ for mct, etc.
 </compiler>
 
 
-<compiler MACH="discover" COMPILER="intel">
-  <ADD_SLIBS>$(shell $(NETCDF_PATH)/bin/nc-config --flibs) -mkl=cluster</ADD_SLIBS>
+<compiler MACH="discover_old" COMPILER="intel">
   <MPICC>mpiicc</MPICC>
   <MPICXX>mpiicpc </MPICXX>
   <MPIFC>mpiifort </MPIFC>
@@ -738,15 +737,27 @@ for mct, etc.
   <SCXX>icpc </SCXX>
   <SCC>icc </SCC>
   <PIO_FILESYSYEM_HINTS>gpfs</PIO_FILESYSYEM_HINTS>
-  <ADD_FFLAGS>-xHost -march=core-avx2</ADD_FFLAGS>
-  <ADD_CFLAGS>-xHost -march=core-avx2</ADD_CFLAGS>
-  <ADD_SLIBS></ADD_SLIBS>
 </compiler>
 
 <compiler COMPILER="intel" MACH="computecanada">
   <NETCDF_PATH> ${EBROOTNETCDF}</NETCDF_PATH>
   <PNETCDF_PATH>${EBROOTPNETCDF}</PNETCDF_PATH>
   <SLIBS> -L$(NETCDF_PATH)/lib -lnetcdf -lnetcdff  </SLIBS>
+</compiler>
+
+
+<!--   milan, formerly titled "discover-mil"  -->
+<compiler MACH="discover" COMPILER="intel">
+  <SLIBS>$(shell $(NETCDF_PATH)/bin/nf-config --flibs) -mkl=cluster</SLIBS>
+  <MPICC>mpiicc</MPICC>
+  <MPICXX>mpiicpc</MPICXX>
+  <MPIFC>mpiifort</MPIFC>
+  <SFC>ifort</SFC>
+  <SCXX>icpc</SCXX>
+  <SCC>icc</SCC>
+  <PIO_FILESYSTEM_HINTS>gpfs</PIO_FILESYSTEM_HINTS>
+  <ADD_FFLAGS>-xHost -march=core-avx2</ADD_FFLAGS>
+  <ADD_CFLAGS>-xHost -march=core-avx2</ADD_CFLAGS>
 </compiler>
 
 </config_compilers>

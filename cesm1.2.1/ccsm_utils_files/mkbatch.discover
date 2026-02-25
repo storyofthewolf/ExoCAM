@@ -36,10 +36,10 @@ cat >! $file << EOF1
 
 #SBATCH --qos=long
 #SBATCH --time=${time_limit} 
-#SBATCH --mem=20gb
+#SBATCH --mem=100gb
 #SBATCH -N ${mppnodes}                            
 #SBATCH --ntasks-per-node ${MAX_TASKS_PER_NODE}   
-#SBATCH --constraint=sky
+#SBATCH --constraint=mil
 #SBATCH -o run.out          
 limit stacksize unlimited
 
