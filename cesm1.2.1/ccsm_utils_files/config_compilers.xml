@@ -748,7 +748,7 @@ for mct, etc.
 
 <!--   milan, formerly titled "discover-mil"  -->
 <compiler MACH="discover" COMPILER="intel">
-  <SLIBS>$(shell $(NETCDF_PATH)/bin/nf-config --flibs) -mkl=cluster</SLIBS>
+  <SLIBS>$(shell $(NETCDF_PATH)/bin/nf-config --flibs)</SLIBS>
   <MPICC>mpiicc</MPICC>
   <MPICXX>mpiicpc</MPICXX>
   <MPIFC>mpiifort</MPIFC>
@@ -756,8 +756,6 @@ for mct, etc.
   <SCXX>icpc</SCXX>
   <SCC>icc</SCC>
   <PIO_FILESYSTEM_HINTS>gpfs</PIO_FILESYSTEM_HINTS>
-  <ADD_FFLAGS>-xHost -march=core-avx2</ADD_FFLAGS>
-  <ADD_CFLAGS>-xHost -march=core-avx2</ADD_CFLAGS>
 </compiler>
 
 </config_compilers>
