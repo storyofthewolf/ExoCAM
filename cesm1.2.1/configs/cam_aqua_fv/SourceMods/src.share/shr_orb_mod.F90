@@ -11,7 +11,7 @@ MODULE shr_orb_mod
    use shr_log_mod, only: s_loglev  => shr_log_Level
    use shr_log_mod, only: s_logunit => shr_log_Unit
    use exoplanet_mod,  only: exo_eccen, exo_obliq, exo_mvelp, &       		     
-                             do_exo_synchronous, exo_porb
+                             do_exo_synchronous, exo_porb, exo_ve
 
    IMPLICIT none
 
@@ -521,12 +521,13 @@ SUBROUTINE shr_orb_params( iyear_AD , eccen  , obliq , mvelp     ,     &
  
    if ( log_print ) then
      write(s_logunit,F03) '------ Computed Orbital Parameters ------'
-     write(s_logunit,F03) 'Eccentricity      = ',eccen
-     write(s_logunit,F03) 'Obliquity (deg)   = ',obliq
-     write(s_logunit,F03) 'Obliquity (rad)   = ',obliqr
-     write(s_logunit,F03) 'Long of perh(deg) = ',mvelp
-     write(s_logunit,F03) 'Long of perh(rad) = ',mvelpp
-     write(s_logunit,F03) 'Long at v.e.(rad) = ',lambm0
+     write(s_logunit,F03) 'Eccentricity          = ',eccen
+     write(s_logunit,F03) 'Obliquity (deg)       = ',obliq
+     write(s_logunit,F03) 'Obliquity (rad)       = ',obliqr
+     write(s_logunit,F03) 'Long of perh(deg)     = ',mvelp
+     write(s_logunit,F03) 'Long of perh(rad)     = ',mvelpp
+     write(s_logunit,F03) 'Long at v.e.(rad)     = ',lambm0
+     write(s_logunit,F03) 'Calday of v.e. (days) = ',exo_ve
      write(s_logunit,F03) '-----------------------------------------'
    end if
  
@@ -562,11 +563,11 @@ SUBROUTINE shr_orb_decl(calday ,eccen ,mvelpp ,lambm0 ,obliqr ,delta ,eccf)
    !---------------------------Local variables-----------------------------
 
    real   (SHR_KIND_R8),parameter :: dayspy = exo_porb                   ! days per year
-   real   (SHR_KIND_R8),parameter :: ve     = 1.0_SHR_KIND_R8   ! Calday of vernal equinox
+   real   (SHR_KIND_R8),parameter :: ve     = exo_ve                     ! Calday of vernal equinox
 
    !!real   (SHR_KIND_R8),parameter :: dayspy = 365.0_SHR_KIND_R8  ! days per year
    !!real   (SHR_KIND_R8),parameter :: ve     = 80.5_SHR_KIND_R8   ! Calday of vernal equinox
-                                                     ! assumes Jan 1 = calday 1
+                                                                   ! assumes Jan 1 = calday 1
  
    real   (SHR_KIND_R8) ::   lambm  ! Lambda m, mean long of perihelion (rad)
    real   (SHR_KIND_R8) ::   lmm    ! Intermediate argument involving lambm
