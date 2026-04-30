@@ -167,6 +167,8 @@ module exoplanet_mod
   real(r8), parameter :: cpo2   = 0.918e3_r8
   real(r8), parameter :: cpch4  = 2.226e3
   real(r8), parameter :: cpc2h6 = 1.756e3
+  real(r8), parameter :: cpnh3  = 2.175e3_r8  ! NH3 specific heat J/kg/K (300 K)
+  real(r8), parameter :: cpco   = 1.040e3_r8  ! CO  specific heat J/kg/K (300 K)
 
   !! DERIVED CONSTANTS -- DO NOT MODIFY
   !! automatically calculated from above inputs in bar
@@ -194,6 +196,7 @@ module exoplanet_mod
   real(r8), public, parameter :: exo_commr   = exo_covmr   * mwco/exo_mwdair
 
   real(r8), public, parameter :: &   ! specific heat of dry, air J/kg/K
-            exo_cpdair = exo_n2mmr*cpn2 + exo_h2mmr*cph2 + exo_co2mmr*cpco2 + exo_ch4mmr*cpch4 + exo_c2h6mmr*cpc2h6
+            exo_cpdair = exo_n2mmr*cpn2 + exo_h2mmr*cph2 + exo_co2mmr*cpco2 + exo_ch4mmr*cpch4 + exo_c2h6mmr*cpc2h6 &
+                       + exo_nh3mmr*cpnh3 + exo_commr*cpco
 
 end module
