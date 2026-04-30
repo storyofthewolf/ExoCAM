@@ -1,0 +1,58 @@
+# ExoCAM
+[https://github.com/storyofthewolf/ExoCAM](https://github.com/storyofthewolf/ExoCAM)
+
+Eric T. Wolf
+<eric.wolf@colorado.edu>
+
+---
+
+## ❗ DESCRIPTION:
+
+This software (ExoCAM) contains system files, source code files, initial conditions files, namelists, and documentations needed to adapt the NCAR Community Earth System Model 1.2.1 for planetary/exoplanetary applications. The files provided do not run standalone. This is a library of files to be used with publicly available distribution of CESM version 1.2.1. CESM is freely available at [http://www.cesm.ucar.edu/models/current.html](http://www.cesm.ucar.edu/models/current.html)
+
+**It is best to think of ExoCAM as a patch to CESM1.2.1!!**
+
+Familiarity with checking out, building, and running CESM 1.2.1 is assumed. Please refer to the publicly available CESM user’s guide for details.
+[http://www.cesm.ucar.edu/models/cesm1.2/cesm/doc/usersguide/ug.pdf](http://www.cesm.ucar.edu/models/cesm1.2/cesm/doc/usersguide/ug.pdf)
+
+ExoCAM is intended to be run with ExoRT, a correlated-k radiative transfer package for 3-D climate models available at [https://github.com/storyofthewolf/ExoRT](https://github.com/storyofthewolf/ExoRT). ExoRT was separated from ExoCAM in order to faciliate a standalone 1D off-line version of ExoRT, which could more easily be updated and tested. ExoCAM supports several standard "configs" along with options to change planet parameters, and atmospheric compostions. General instructions and descriptions of supported planet modifications is found here `../ExoCAM/cesm1.2.1/instructions`. Specific instructions for configs are located in individual config directories located at `../ExoCAM/cesm1.2.1/configs/*/README`.
+Also refer to the CESM usersguide listed above.
+
+## ⚠️ DISCLAIMER:
+
+This is a research grade code, that is constantly evolving. There are no gaurantees of mercantibility, warrantability, scientific accuracy, or nobel prize winning potential. I make mistakes just like everyone else. Not all functionalties are supported, and sometimes things break. Please see also the LICENSE.
+
+## 💬 SUPPORT:
+
+This is research grade code(!), and the model support and development team is limited to pretty much just me (<eric.wolf@colorado.edu>). While I do my best to keep the code coherent, usable, and documented, while fixing bugs, developing new features, addressing user questions, and trying to do my own science on the side, it is impossible for me to address all concerns and contigencies. I encourage users to experiment different ways to implement, configure, and use ExoCAM and ExoRT with CESM1.2.1. With that said, if you are planning to use this code, I encourage you to reach out to me to ensure that your particular application is possible with the code as is, and that there are no gotchas or hidden idiosyncracies. I also encourage you to report bugs found in the code. Note, many common troubleshoots needed in CESM can be solved by looking here [https://bb.cgd.ucar.edu/cesm/](https://bb.cgd.ucar.edu/cesm/). This site is a wealth on information.
+
+## 📚 CITING:
+
+> **Primary Reference Paper**
+> Please cite the following paper if you use ExoCAM in any form
+
+> "ExoCAM: A 3D Climate Model for Exoplanet Atmospheres"
+> Wolf, E.T., Kopparapu, R.K., Haqq-Misra, J., and Fauchez, T.J.
+> *The Planetary Science Journal*, 3:7 (17pp), 2022
+> doi:10.3847/PSJ/ac3f3d
+
+If you use ExoCAM in your work, please also footnote to where the model is available. I.e. my Github pages.
+* [https://github.com/storyofthewolf/ExoCAM](https://github.com/storyofthewolf/ExoCAM)
+* [https://github.com/storyofthewolf/ExoRT](https://github.com/storyofthewolf/ExoRT)
+
+### 📦 MODEL OUTPUTS:
+
+I encourage all users to make their 3D model output files publicly available when appropriate. Many academic journals are now requiring this. I store model outputs from my published work at: [https://archive.org/details/@eric\_t\_wolf](https://archive.org/details/@eric_t_wolf) and also on zenodo, or made available upon request.
+
+## Directory Tree
+
+* **ExoCAM/**
+    * **cesm1.2.1/**
+        * `ccsm_utils_files/`
+        * `configs/`
+        * `initial_files/`
+        * `instructions`
+    * **tools/**
+        * `idl_progs/`
+        * `py_progs/`
+        * `spectral_albedos/`

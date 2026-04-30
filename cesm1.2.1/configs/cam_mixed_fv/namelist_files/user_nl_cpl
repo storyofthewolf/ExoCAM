@@ -47,4 +47,5 @@
 
 !! orbital mode
 orb_mode = 'fixed_year'
-orb_iyear = -1
+!!orb_iyear = -1  ! read eccen, obliq, mvelp from exoplanet_mod
+orb_iyear = 2000

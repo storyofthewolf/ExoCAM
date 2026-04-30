@@ -29,7 +29,7 @@ import numpy as np
 from scipy.interpolate import interp1d
 import argparse
 import pathlib
-import exocampy_tools as exo
+import exocampy_tools as exotools
 
 #====================================================================================
 # primary paths to models and data
@@ -61,6 +61,11 @@ args = parser.parse_args()
 
 
 #====================================================================================
+print("\n-----------------------------------------------------------------------------")
+print("Entering mod_cam.i.file.py ...")
+
+
+#====================================================================================
 # name of new initial condition file
 #====================================================================================
 fname_out = args.fname_out[0]
@@ -71,6 +76,8 @@ nilev_out = nlev_out + 1
 # read in a WACCM 66 level grid structure
 #====================================================================================
 lev_fname_new = exocam_path + 'cesm1.2.1/initial_files/other/oxygen_CE.cam2.avg.nc'
+print("Reading grid structure ...")
+print("file: ", lev_fname_new)
 
 ncid      = nc.Dataset(lev_fname_new,'r')
 lev_new   = ncid['lev'][:]
@@ -94,6 +101,9 @@ nlon_new  = len(lon_new)
 #====================================================================================
 
 clim_fname_in = args.input_IC_file[0]
+
+print("Reading climate ic file ...")
+print("file: ", clim_fname_in)
 
 filefound = False
 for fdir in ccsm_inputdata_paths:
@@ -165,20 +175,18 @@ ncid.close()
 #====================================================================================
 # create pressure grids from hybrid sigma coordinates
 #====================================================================================
-lev_P_new, ilev_P_new = exo.hybrid2pressure(nlon,nlat,nlev_new,PS.squeeze(),P0,hyam_new,hybm_new,hyai_new,hybi_new)
-
-lev_P_old, ilev_P_old =  exo.hybrid2pressure(nlon,nlat,nlev_old,PS.squeeze(),P0,hyam_old,hybm_old,hyai_old,hybi_old)
+lev_P_new, ilev_P_new = exotools.hybrid2pressure(nlon,nlat,nlev_new,PS.squeeze(),P0,hyam_new,hybm_new,hyai_new,hybi_new)
+lev_P_old, ilev_P_old =  exotools.hybrid2pressure(nlon,nlat,nlev_old,PS.squeeze(),P0,hyam_old,hybm_old,hyai_old,hybi_old)
 
 # evaluate new pressure grid before proceding 
 # define global mean profiles                                                                                                                         
-Pmid_profile_new = analysis_utils.calc_gmean_profiles(lon, lat, lev_P_new)
-Pint_profile_new = analysis_utils.calc_gmean_profiles(lon, lat, ilev_P_new)
-Pmid_profile_old = analysis_utils.calc_gmean_profiles(lon, lat, lev_P_old)
-Pint_profile_old = analysis_utils.calc_gmean_profiles(lon, lat, ilev_P_old)
+Pmid_profile_new = exotools.calc_gmean_profiles(lon, lat, lev_P_new)
+Pint_profile_new = exotools.calc_gmean_profiles(lon, lat, ilev_P_new)
+Pmid_profile_old = exotools.calc_gmean_profiles(lon, lat, lev_P_old)
+Pint_profile_old = exotools.calc_gmean_profiles(lon, lat, ilev_P_old)
 
-for il in range(nilev_new):
-  print(i, Pint_profile_new[i])
-
+#for il in range(nilev_new):
+#  print(il, Pint_profile_new[il])
 
 # area_weighted_avg_gen, lon, lat, PS_in, PS_avg
 #  print, "initial file pressure: ", PS_avg, P0_in
@@ -240,7 +248,21 @@ for i in np.arange(0,nlev_out):
   lev_out[i]  = lev_new[j]
 
 
-if not pathlib.Path(fname_out).exists() or args.overwrite:
+
+# Logic to handle overwritting  
+# If it DOES exist, check if 'args.overwrite' is true OR if the user says 'y'
+path = pathlib.Path(fname_out)
+if not path.exists():
+    should_proceed = True
+elif args.overwrite:
+    should_proceed = True
+else:
+    user_input = input(f"File '{fname_out}' already exists. Overwrite? (y/n): ").lower()
+    should_proceed = user_input == 'y'
+
+  
+  
+if should_proceed:
   print("Creating file '%s'..."%fname_out)
   id = nc.Dataset(fname_out,'w')
   dim1 = id.createDimension("lat",nlat)
@@ -466,3 +488,9 @@ if not pathlib.Path(fname_out).exists() or args.overwrite:
 
   id.close()
 
+else:
+  print("no overwrite")
+  print("file not created")
+
+print("Exiting ...")
+print("-----------------------------------------------------------------------------\n")

@@ -6,6 +6,9 @@ surface type:       land and slab ocean mixed
 dynamical core:     finite volume
 radiation scheme:   user selected from ExoRT/3dmodels
 
+Notes: Default settings in user_nl_cam and user_nl_cpl modified to duplicating modern Earth
+
+
 == create the case ==
 create_newcase -case $my_aquaplanet_case -res f45_g37 -mach discover -compset E2000C4
 

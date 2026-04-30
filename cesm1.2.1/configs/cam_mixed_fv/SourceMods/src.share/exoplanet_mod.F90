@@ -28,7 +28,7 @@ module exoplanet_mod
   logical, public, parameter :: do_exo_gw = .false.             !! flag to turn on gravity waves.  Note, present gw wave parameterization
                                                                 !! does not work for low pressure atmospheres.
 
-  real(r8), public, parameter :: exo_convect_plim = 5.e0_r8     !! Sets the minimum pressure limit in the convection schemes
+  real(r8), public, parameter :: exo_convect_plim = 4.e3_r8     !! Sets the minimum pressure limit in the convection schemes
                                                                 !! Convection will not operate at pressures lower than this
                                                                 !! Without ozone, 5 Pa is good.
                                                                 !! With ozone, 5 Pa is not stable, use NCAR's original value of 4.e3 (40 mb)
@@ -49,10 +49,11 @@ module exoplanet_mod
   real(r8), public, parameter :: lwFluxLimit = 0.999  !! Fraction of thermal flux captured in bands, not rescaled
 
   !! ==============  PLANET PARAMETERS  ============== !!
-  !! It is the responsibility of the USER to set do_exo_synchronous, exo_ndays
-  !! exo_sdays, exo_scon, and exo_solar_file in a self-consistent manner.  It
-  !! is good practice to check that your model output incident stellar flux (FDS)
-  !! looks correct for your assumed dirunal cycle.
+  !! It is the responsibility of the USER to set geophysical, orbital, and stellar
+  !! properties in alignment with their desired experiment.  There is no
+  !! trapping to prohibit physical inconsistent combinations of parameters.
+  !! It advised to check that your model output incident stellar flux (FDS)
+  !! looks correct for your assumed dirunal, and orbital cyclings..
   !!
   !! exo_sdays is the length of the sidereal period in seconds.
   !! exo_ndays is a scaler given in units of Earth days
@@ -103,17 +104,23 @@ module exoplanet_mod
   !real(r8), public, parameter :: exo_porb             = exo_ndays                   !! orbital period
   !real(r8), public, parameter :: exo_sday = 86400.0_r8 * exo_ndays      !! sidereal period, synchronous rotator
 
+  !! ============== ORBITAL OPTIONS ============== !!
   !! if set user_nl_cpl::orb_iyear = -1
+  !! if user_nl_cpl::orb_iyear=YEAR, then these values are overriden
+  !! with empirical orbital calculations for that year
   real(r8), public, parameter :: exo_eccen = 0.0_r8   ! eccentricity
   real(r8), public, parameter :: exo_obliq = 0.0_r8   ! obliquity [degrees]
-  real(r8), public, parameter :: exo_mvelp = 0.0_r8   ! vernal equinox
+  real(r8), public, parameter :: exo_mvelp = 0.0_r8   ! longitude of perihelion
 
-
+  !! must be set regardless of user_nl_cpl::orb_iyear
+  real(r8), public, parameter :: exo_ve = 80.5_r8     ! Calday of vernal equinox, assumes Jan 1 = calday 1
+                                                      ! 80.5 is value for Earth 365 day calendar.  
+                            
   !! ============== STELLAR OPTIONS ============== !!
-  !! SOLAR CONSTANT
+  !! Stellar flux at planet
   real(r8), public, parameter :: exo_scon = 1360.0_r8         ! Solar constant (W m-2)
 
-  ! SOLAR SPECTRAL FILE
+  !! Stellar spectral file
   !! Make sure solar file matches spectral intervals for selected RT configuration !!
   character(len=256), public, parameter :: exo_solar_file = '/discover/nobackup/etwolf/models/ExoRT/data/solar/G2V_SUN_n68.nc'
 
@@ -121,13 +128,13 @@ module exoplanet_mod
   !! ============== ATMOSPHERIC CONSTITUENT PARAMETERS ============== !!
   !! Activated only if (do_exo_atmconst = .true.)
   !! Initial conditions file (ncdata) must (approximately) match the total pressure !!
-  real(r8), public, parameter :: exo_co2bar  = 0.01_r8                       ! CO2 inventory (bar)
-  real(r8), public, parameter :: exo_ch4bar  = 1.0e-3_r8                     ! CH4 inventory (bar)
+  real(r8), public, parameter :: exo_co2bar  = 0.0004_r8                       ! CO2 inventory (bar)
+  real(r8), public, parameter :: exo_ch4bar  = 1.7e-6_r8                     ! CH4 inventory (bar)
   real(r8), public, parameter :: exo_c2h6bar = 0.0_r8                        ! C2H6 inventory (bar)
   real(r8), public, parameter :: exo_nh3bar  = 0.0_r8                        ! NH3 inventory (bar)
   real(r8), public, parameter :: exo_cobar   = 0.0_r8                        ! CO inventory (bar)
   real(r8), public, parameter :: exo_h2bar   = 0.0_r8                        ! H2 inventory (bar)
-  real(r8), public, parameter :: exo_o2bar   = 0.0_r8                        ! O2 inventory (bar)
+  real(r8), public, parameter :: exo_o2bar   = 0.2095_r8                        ! O2 inventory (bar)
   real(r8), public, parameter :: exo_n2bar   = 1.0 - exo_co2bar - exo_ch4bar - exo_c2h6bar - exo_o2bar   ! N2 inventory (bar)
   real(r8), public, parameter :: exo_pstd    = (exo_n2bar + exo_o2bar + exo_h2bar + exo_co2bar + exo_ch4bar + exo_c2h6bar)*1.0e5  ! total pressure (Pascals)
 
@@ -183,7 +190,7 @@ module exoplanet_mod
   real(r8), public, parameter :: exo_covmr   = exo_cobar   / (exo_pstd/1.0e5)
 
   real(r8), public, parameter :: &   ! molecular weight of dry air
-            exo_mwdair = exo_n2vmr*mwn2 + exo_h2vmr*mwh2 + exo_co2vmr*mwco2 + exo_ch4vmr*mwch4 + exo_c2h6vmr*mwc2h6 + exo_o2vmr*mwo2
+            exo_mwdair = exo_n2vmr*mwn2 + exo_h2vmr*mwh2 + exo_co2vmr*mwco2 + exo_ch4vmr*mwch4 + exo_c2h6vmr*mwc2h6 + exo_o2vmr*mwo2 + exo_nh3vmr*mwnh3 + exo_covmr*mwco
 
   !! dry mass mixing ratios
   real(r8), public, parameter :: exo_n2mmr   = exo_n2vmr   * mwn2/exo_mwdair

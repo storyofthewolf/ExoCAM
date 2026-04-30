@@ -23,21 +23,38 @@ import numpy as np
 import scipy.interpolate as ip
 import matplotlib.pyplot as plt
 import scipy.interpolate as interpol
+import argparse
+from pathlib import Path
+import sys
+
+# input arguments and options                                                                                                                  
+parser = argparse.ArgumentParser()
+parser.add_argument('stel'     , type=str,  default=' ',  help='Stellar spectra file name')
+parser.add_argument('--stel_dir'     , type=str,   default='/discover/nobackup/etwolf/models/ExoRT/data/solar/raw',  help='Standard directory')
+parser.add_argument('--snow',        action='store_true', help='use snow albedo file')
+parser.add_argument('--blueice',       action='store_true', help='use blue marine ice file')
+parser.add_argument('--mixed',        action='store_true', help='use 50/50 mix file')
+args = parser.parse_args()
+
+
+directory = Path(args.stel_dir)
+filename = args.stel
+stellar_file = directory / filename
+
 
 #Set number of lines of header information to ignore
-stel_nh = 20
-alb_nh = 0
+stel_nh = 26
+alb_nh = 1
 
 #Conversion factor
 #wavelengths must be converted to microns
 #check header information for given SED
 #1.0e-4 angstroms to microns
 stel_convert_wavl = 1.0e-4
+#stel_convert_wavl = 1.0 
 alb_convert_wavl = 1.0
 
 #Reading in the stellar file 
-stellar_file = "/discover/nobackup/etwolf/models/ExoRT/data/solar/raw/TOI700_SED_HST.txt"
-#stellar_file = "/discover/nobackup/etwolf/models/ExoRT/data/solar/raw/lte033-4.5-0.0a+0.0.BT-NextGen.7.dat.txt"
 with open(stellar_file, 'r') as f: 
     lines = f.readlines()
     header = lines[0:stel_nh]
@@ -55,11 +72,25 @@ with open(stellar_file, 'r') as f:
 
     #lamda= [float(line.split()[0]) * stel_convert_wavl for line in lines[stel_nh:]]
     #flux= [float(line.split()[1]) for line in lines[stel_nh:]] 
-    
+
+
+
+alb_modes = [args.mixed, args.snow, args.blueice]
+true_count = sum(alb_modes)
+if true_count != 1:
+        print("\nConfiguration Error: Invalid execution mode selected.")
+        print(f"You must select **exactly one** of --snow, --blueice, or --mixed.")
+        
+        # Optionally show the usage/help message before exiting
+        #parser.print_help() 
+        
+        # Exit the script with a non-zero status code (indicates an error)
+        sys.exit(1)
+
 #Reading in the Albedo file for surface
-#albedo_file = "../spectral_albedos/50%Mixture.txt"
-#albedo_file = "../spectral_albedos/snow100um.txt"
-albedo_file = "../spectral_albedos/Bluemarineice.txt"
+if args.mixed:    albedo_file = "../spectral_albedos/50%Mixture.txt"
+if args.snow:  albedo_file = "../spectral_albedos/snow100um.txt"
+if args.blueice:     albedo_file = "../spectral_albedos/Bluemarineice.txt"
 with open(albedo_file, 'r') as f:
     lines = f.readlines()
     header = lines[0:alb_nh]
@@ -93,6 +124,7 @@ wavelengthgrid = (mingrid + k * n / (ngrid-1))
 dlamda = (np.max(wavelengthgrid)- np.min(wavelengthgrid))/(len(wavelengthgrid)-1)
 
 # Interpolation
+#print(len(wavelengthgrid),len(lamda),len(flux))
 stellarInterpolate4 = np.interp(wavelengthgrid,lamda,flux)
 temp = interpol.CubicSpline(wave,albedo)
 albedoInterpolate = temp(wavelengthgrid)
