@@ -53,6 +53,8 @@ module physconst
    real(r8), public, parameter :: mwn2o       =  44._r8             ! molecular weight n2o
    real(r8), public, parameter :: mwch4       =  16._r8             ! molecular weight ch4
    real(r8), public, parameter :: mwc2h6      =  30._r8             ! molecular weight c2h6
+   real(r8), public, parameter :: mwnh3       =  17.031_r8          ! molecular weight nh3
+   real(r8), public, parameter :: mwco        =  28.010_r8          ! molecular weight co
    real(r8), public, parameter :: mwf11       = 136._r8             ! molecular weight cfc11
    real(r8), public, parameter :: mwf12       = 120._r8             ! molecular weight cfc12
    real(r8), public, parameter :: mwo2        =  32._r8             ! molecular weight O2
@@ -385,7 +387,9 @@ contains
         write(iulog,*) 'H2   VMR, MMR: ', exo_h2vmr, exo_h2mmr
         write(iulog,*) 'CO2  VMR, MMR: ', exo_co2vmr, exo_co2mmr
         write(iulog,*) 'CH4  VMR, MMR: ', exo_ch4vmr, exo_ch4mmr
-        write(iulog,*) 'C2H6 VMR, MMR: ', exo_c2h6vmr, exo_c2h6mmr     
+        write(iulog,*) 'C2H6 VMR, MMR: ', exo_c2h6vmr, exo_c2h6mmr
+        write(iulog,*) 'NH3  VMR, MMR: ', exo_nh3vmr,  exo_nh3mmr
+        write(iulog,*) 'CO   VMR, MMR: ', exo_covmr,   exo_commr
         write(iulog,*) 'CPDAIR:  ', SHR_CONST_CPDAIR
         write(iulog,*) 'MWDRY:   ', SHR_CONST_MWDAIR
         write(iulog,*) 'RWV:     ', SHR_CONST_RWV

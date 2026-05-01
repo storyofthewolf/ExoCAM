@@ -174,7 +174,6 @@ module exoplanet_mod
   real(r8), parameter :: cph2 = 14.32e3_r8
   real(r8), parameter :: cpco2 = 0.846e3_r8
   real(r8), parameter :: cpch4 = 2.226e3
-
   !! DERIVED CONSTANTS -- DO NOT MODIFY
   !! automatically calculated from above inputs in bar
   ! dry volume mixing ratios  kg/kmole
@@ -182,7 +181,6 @@ module exoplanet_mod
   real(r8), public, parameter :: exo_h2vmr = exo_h2bar / (exo_pstd/1.0e5)
   real(r8), public, parameter :: exo_co2vmr = exo_co2bar / (exo_pstd/1.0e5)
   real(r8), public, parameter :: exo_ch4vmr = exo_ch4bar / (exo_pstd/1.0e5)
-
   real(r8), public, parameter :: &   ! molecular weight of dry air
             exo_mwdair = exo_n2vmr*mwn2 + exo_h2vmr*mwh2 + exo_co2vmr*mwco2 + exo_ch4vmr*mwch4
 
@@ -191,7 +189,6 @@ module exoplanet_mod
   real(r8), public, parameter :: exo_h2mmr = exo_h2vmr * mwh2/exo_mwdair
   real(r8), public, parameter :: exo_co2mmr = exo_co2vmr * mwco2/exo_mwdair
   real(r8), public, parameter :: exo_ch4mmr = exo_ch4vmr * mwch4/exo_mwdair
-
   real(r8), public, parameter :: &   ! specific heat of dry, air J/kg/K
             exo_cpdair = exo_n2mmr*cpn2 + exo_h2mmr*cph2 + exo_co2mmr*cpco2 + exo_ch4mmr*cpch4
 
