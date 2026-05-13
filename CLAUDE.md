@@ -73,3 +73,31 @@ See `cesm1.2.1/instructions/adding_oxygen_ozone.txt`. Two-step: set `exo_o2bar` 
 - Do not commit machine-specific paths back to upstream namelists — but the file convention is to keep Discover paths there as templates. Don't "fix" them away.
 - `experimental/` and `extras/` are gitignored intentionally; don't restore them.
 - Companion repo ExoRT must be checked out separately for any actual model run.
+
+## Active work: CO2 condensation debugging (branch `co2_claude_diag`)
+
+As of 2026-05-13, active development is on branch `co2_claude_diag`. This targets the `experimental/co2condense` configuration only — a Mars-targeted experimental build. Do not apply changes from this branch to other configs without explicit review.
+
+**Full session notes:** `DEVELOPER_NOTES.md` (project root)  
+**Full bug inventory:** `Opus4.7_Bug_Report.md` (project root)
+
+### Key design constraints for `experimental/co2condense`
+
+- The model currently runs **pure CO2** (`exo_co2vmr = 1.0`, compile-time constant). Local composition feedback is intentionally disabled. Do not add local vmr tracking until explicitly requested.
+- `SHR_CONST_CPDAIR` is overridden to the CO2 value in `shr_const_mod.F90`. Uses of `SHR_CONST_CPDAIR` in `exo_condense_mod.F90` are correct — do not change them to Earth's 1004.64 J/kg/K.
+- `cam_out%co2srf_snow` carries kg/m² (not kg/m²/s) despite being registered as `a2x_fluxes`. This is intentional and relies on `cpl_dt == atm_dt`. Both ends are commented. Do not change `cpl_dt` without revisiting this field.
+
+### What was fixed (commits `eea21c9`, `05695cf`)
+
+1. **P1 — Atmospheric mass budget:** `state%pdel` and `state%ps` now updated in `exo_condense_co2` after condensation. Bottom-up layer-peel in dp_coupling replaces layer-averaging. Non-`local_dp_map` branch now has identical Mars adjustment.
+2. **P2 — Forget-1998 pot/heat correction:** `fxcld_in` (incoming flux per layer) now returned from `exo_cloud_sediment_tend` and used in place of `sed_tend` for pot/heat corrections. Eliminates positive feedback over thin-layer high-terrain cells.
+3. **P3 — k=1 top-layer loop:** Typo `do i=i,ncol` fixed to `do i=1,ncol`. Missing `cld_tmp`/`tmid_tmp` updates and diagnostics added for k=1.
+4. **P4 — CLM double-counted latent energy:** Full-sublimation branch in `exo_clm_condense.F90` no longer both cools the soil and sends energy to atmosphere from the same latent release.
+5. **Budget diagnostics:** `exo_condense_diag_calc` now outputs `CO2_COL_GAS`, `CO2_COL_ICE`, `CO2_COL_SRF`, `CO2_COL_TOT` (all kg/m²). `physpkg.F90` call updated to pass `cam_in`.
+
+### Next steps (in priority order)
+
+1. **Run the model and inspect `CO2_COL_TOT` globally.** Flat global mean = P1 working. Negative drift = likely double-subtraction of snowfall path (see A4 in bug report).
+2. **If budget closes, check Olympus Mons column** for `CO2_COL_GAS` decreasing when frost forms. If still runaway, address B3: recompute `tcond` each substep using evolving pressure rather than fixed `state%pmid`.
+3. **Update derived pressure fields** (`pmid`, `pint`, `lnpmid`) after the P1 `pdel` change so downstream parameterizations see the post-condensation pressure (B4 in bug report).
+4. **Investigate double-subtraction (A4):** If `CO2_COL_TOT` drifts, the snowfall path may subtract mass from `pdel` twice — once in physics via `ptend%q` and once in dp_coupling via `co2_mass_change`. Fix by either excluding sedimented mass from the physics `pdel` update, or by zeroing the snowfall component of `co2_mass_change` before dp_coupling acts on it.
