@@ -308,14 +308,16 @@ module exo_clm_condense
          co2dp(c) = co2dp(c) + co2_mass_change(c)
          if (co2dp(c) .lt. 0.d0) then      ! more CO2 sublimation occured than ice was available
            co2_mass_change(c) = -co2dp_ip   ! set to CO2 existant mass
+           ! P4: latent energy from full sublimation goes entirely to the atmosphere
+           ! via eflx_lh_co2 (set below).  Do NOT also cool the soil here -- that
+           ! would double-count the same energy.  The soil will cool on the next
+           ! timestep via the standard conductive heat flux once t_grnd is free to evolve.
            co2ice_lh(p) = SHR_CONST_CO2LATSUB/dtime*co2_mass_change(c)
-           temp_change = SHR_CONST_CO2LATSUB/(SHR_CONST_SOILBD*SHR_CONST_SOILCP*thick_layer1)*co2dp_ip
-           t_grnd(c) = t_grnd(c) - temp_change
-           co2_temp_change(c) = t_grnd(c) - t_grnd_i
            co2dp(c) = 0.d0
-           if (ltype(l) == istdlak .or. ltype(l) == istslak) then 
+           co2_temp_change(c) = t_grnd(c) - t_grnd_i
+           if (ltype(l) == istdlak .or. ltype(l) == istslak) then
               t_lake(c,1) = t_grnd(c)
-           else 
+           else
              t_soisno(c,snl(c)+1) = t_grnd(c)
            endif
          else      ! CO2 ice remains on ground after sublimation occurs

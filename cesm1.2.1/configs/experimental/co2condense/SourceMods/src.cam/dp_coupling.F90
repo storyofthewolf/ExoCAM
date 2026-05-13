@@ -769,38 +769,38 @@ chnk_loop2 : &
                    delpxy(lons(i),lats(i),k) = phys_state(lchnk)%pdel(i,k)
                    dptdtxy(lons(i),lats(i),k) = phys_tend(lchnk)%dtdt(i,k)  !! C. Bardeen
 !
-! mars, insert major species gas condensation here
-!
-! double check that this is working. i think it is.
+! mars: adjust delp for CO2 surface condensation/sublimation passed back from CLM.
+! co2_mass_change [kg/m2]: positive = frost grew (mass left atmosphere),
+!                          negative = frost sublimed (mass returned to atmosphere).
+! Subtract g*co2_mass_change from the bottom layer; if that layer is insufficient
+! (can happen during strong condensation events), peel additional layers upward
+! rather than averaging across layers, which would destroy the hydrostatic profile.
                    if (k == km) then
-                      if ( (gravit*cam_in(lchnk)%co2_mass_change(i)) < delpxy(lons(i),lats(i),k) ) then
-                         delpxy(lons(i),lats(i),k) = delpxy(lons(i),lats(i),k) - gravit*cam_in(lchnk)%co2_mass_change(i)
-                         do_co2_exloop=.false.
-                      else
-                         write(6,*)'bottom level will be depleted:lon,lat,delp,g*co2mass=',lons(i),lats(i), &
-                                  delpxy(lons(i),lats(i),k),gravit*cam_in(lchnk)%co2_mass_change(i)
-                         nlay = 1.
-                         do j=pver-1,1,-1
-                            nlay = nlay + 1.
-                            delptemp=sum(delpxy(lons(i),lats(i),j:k))
-                            if ( (gravit*cam_in(lchnk)%co2_mass_change(i)) < delptemp ) then
-                               delptemp=delptemp - gravit*cam_in(lchnk)%co2_mass_change(i)
-                               do m=j,k
-                                  delpxy(lons(i),lats(i),m) = (delptemp / nlay) !- ((plev - m) * 0.1)
-
-                                 if (delpxy(lons(i),lats(i),m) < 0.) write(6,*)'delp < 0 in dp_coup:',delpxy(lons(i),lats(i),m)
-                               enddo
-                               do_co2_exloop=.false.
+                      delptemp = gravit * cam_in(lchnk)%co2_mass_change(i)
+                      if (abs(delptemp) > 0.0_r8) then
+                         do j = km, 1, -1
+                            if (delptemp >= 0.0_r8) then
+                               ! condensation: remove mass from layer j
+                               if (delpxy(lons(i),lats(i),j) > delptemp) then
+                                  delpxy(lons(i),lats(i),j) = delpxy(lons(i),lats(i),j) - delptemp
+                                  delptemp = 0.0_r8
+                               else
+                                  write(6,*)'mars dp_coup: layer',j,'depleted; continuing upward. lon,lat=',lons(i),lats(i)
+                                  delptemp = delptemp - delpxy(lons(i),lats(i),j)
+                                  delpxy(lons(i),lats(i),j) = 0.0_r8
+                               endif
                             else
-                               do_co2_exloop=.true.
+                               ! sublimation: add mass back to bottom layer only
+                               delpxy(lons(i),lats(i),j) = delpxy(lons(i),lats(i),j) - delptemp
+                               delptemp = 0.0_r8
                             endif
-                            if (.not. do_co2_exloop) exit
+                            if (delptemp == 0.0_r8) exit
                          enddo
+                         if (delptemp > 0.0_r8) write(6,*)'mars dp_coup: WARNING co2 mass exceeds full column:',lons(i),lats(i),delptemp
                       endif
-                     if (isnan(delpxy(lons(i),lats(i),k))) write(6,*)'delpxy is nan after co2 adjust in dpcoup,masschange=',cam_in(lchnk)%co2_mass_change(i) 
+                      if (isnan(delpxy(lons(i),lats(i),k))) write(6,*)'delpxy is nan after co2 adjust in dpcoup,masschange=',cam_in(lchnk)%co2_mass_change(i)
                  endif
-!
-! mars, insert major species gas condensation here
+! mars end
 !
                 enddo
              enddo
@@ -895,6 +895,38 @@ chnk_loop2 : &
           deallocate(bpter)
           deallocate(bbuffer)
           deallocate(cbuffer)
+
+! mars: apply CO2 surface condensation mass adjustment to delpxy for the
+! non-local_dp_map (block-transpose) decomposition.  Identical logic to the
+! local_dp_map branch above: peel layers from the bottom upward rather than
+! averaging, to preserve the hydrostatic pressure profile.
+!$omp parallel do private(lchnk, i, k, ncol, lons, lats, delptemp, j)
+          do lchnk = begchunk,endchunk
+             ncol = get_ncols_p(lchnk)
+             call get_lon_all_p(lchnk, ncol, lons)
+             call get_lat_all_p(lchnk, ncol, lats)
+             do i = 1, ncol
+                delptemp = gravit * cam_in(lchnk)%co2_mass_change(i)
+                if (abs(delptemp) > 0.0_r8) then
+                   do j = km, 1, -1
+                      if (delptemp >= 0.0_r8) then
+                         if (delpxy(lons(i),lats(i),j) > delptemp) then
+                            delpxy(lons(i),lats(i),j) = delpxy(lons(i),lats(i),j) - delptemp
+                            delptemp = 0.0_r8
+                         else
+                            delptemp = delptemp - delpxy(lons(i),lats(i),j)
+                            delpxy(lons(i),lats(i),j) = 0.0_r8
+                         endif
+                      else
+                         delpxy(lons(i),lats(i),j) = delpxy(lons(i),lats(i),j) - delptemp
+                         delptemp = 0.0_r8
+                      endif
+                      if (delptemp == 0.0_r8) exit
+                   enddo
+                endif
+             enddo
+          enddo
+! mars end
 
        endif
 

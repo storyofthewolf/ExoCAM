@@ -374,6 +374,7 @@ subroutine exo_condense_co2(state, pbuf, ext_ts, ext_co2dp, ext_co2srf_snow, pte
   real(r8), dimension(pcols, pver)  :: tcond      ! [K]       atmosphere condensation temperature grid        
   real(r8), dimension(pcols, pver)  :: tnuc       ! [K]       atmosphere nucleation temperature grid        
   real(r8), dimension(pcols, pver)  :: sed_tend   ! [kg/kg/s] sedimentation tendency
+  real(r8), dimension(pcols, pver)  :: fxcld_in   ! [kg/kg/s] incoming sedimentation flux into layer (P2)
   real(r8), dimension(pcols, pver)  :: cld_tend   ! [kg/kg/s] total cloud tendency
   real(r8), dimension(pcols, pver)  :: cond_tend  ! [kg/kg/s] condensation tendency 
   real(r8), dimension(pcols, pver)  :: pot_tend   ! [kg/kg/s] tendency from potential energy release of falling ice  
@@ -401,7 +402,8 @@ subroutine exo_condense_co2(state, pbuf, ext_ts, ext_co2dp, ext_co2srf_snow, pte
   cld_pvel(:,:)      = 0.0    
   cld_rho(:,:)       = 0.0    
   tmid_tmp(:,:)      = 0.0    
-  sed_tend(:,:)      = 0.0    
+  sed_tend(:,:)      = 0.0
+  fxcld_in(:,:)      = 0.0
   cond_tend(:,:)     = 0.0    
   temp_tend(:,:)     = 0.0    
   pot_tend(:,:)      = 0.0     
@@ -480,7 +482,7 @@ subroutine exo_condense_co2(state, pbuf, ext_ts, ext_co2dp, ext_co2srf_snow, pte
     ! calculate particle sedimentation velocities and tendency
     call exo_cloud_sediment_vel(ncol, tmid_tmp, state%pmid, state%pdel, cld_tmp, cld_reff, cld_vfall, cld_pvel)
     call exo_cloud_sediment_tend(ncol, subtime, tmid_tmp, state%pmid, state%pint, state%pdel, &
-                                  cld_tmp, cld_pvel, tcond, sed_tend, sf_tend) 
+                                  cld_tmp, cld_pvel, tcond, sed_tend, sf_tend, fxcld_in) 
 
    ! add sedimentation tendencies
    do k = 1,pver
@@ -502,13 +504,21 @@ subroutine exo_condense_co2(state, pbuf, ext_ts, ext_co2dp, ext_co2srf_snow, pte
    !! FORGET 1998 method
 if(do_forget1998) then
 
-   ! top layer of model
+   ! top layer of model (k=1): no incoming sedimentation flux, no pot/heat correction
    k=1
-   do i=i,ncol
+   do i=1,ncol   ! P3: was "do i=i,ncol" (typo -- used uninitialized loop bound)
      if ( (tmid_tmp(i,k) .lt. tnuc(i,k) ) ) then
        cond_tend(i,k) = SHR_CONST_CPDAIR/SHR_CONST_CO2LATSUB * (tcond(i,k)-tmid_tmp(i,k)) / subtime
+       cld_tend(i,k)  = cond_tend(i,k)
        temp_tend(i,k) = (tcond(i,k)-tmid_tmp(i,k)) / subtime
+       cld_tmp(i,k)   = cld_tmp(i,k)  + cld_tend(i,k)  * subtime
+       tmid_tmp(i,k)  = tmid_tmp(i,k) + temp_tend(i,k) * subtime
      endif
+     if (cld_tmp(i,k) .lt. 0.0) cld_tmp(i,k) = 0.0
+     ! diagnostics
+     sed_tend_diag(i,k)  = sed_tend_diag(i,k)  + sed_tend(i,k)/nsubsteps_co2cld
+     cond_tend_diag(i,k) = cond_tend_diag(i,k) + cond_tend(i,k)/nsubsteps_co2cld
+     temp_tend_diag(i,k) = temp_tend_diag(i,k) + temp_tend(i,k)/nsubsteps_co2cld
    enddo
    ! layers below
    do k = 2,pver
@@ -520,11 +530,13 @@ if(do_forget1998) then
          cond_tend(i,k) = SHR_CONST_CPDAIR/SHR_CONST_CO2LATSUB * (tcond(i,k)-tmid_tmp(i,k)) / subtime  
 
          !! tendency from potential energy released by ice falling into the grid box
-         pot_tend(i,k)  = 1./SHR_CONST_CO2LATSUB*(SHR_CONST_G*(state%zm(i,kstar) - state%zm(i,k))) * sed_tend(i,k) 
+         !! P2: use incoming flux fxcld_in (flux through top interface), not net sed_tend,
+         !! so layers that are net losers do not get the wrong-sign PE/heat correction.
+         pot_tend(i,k)  = 1./SHR_CONST_CO2LATSUB*(SHR_CONST_G*(state%zm(i,kstar) - state%zm(i,k))) * fxcld_in(i,k)
 
          !! tendency from energy to heat ice to Tc of lower level as it falls into grid box
          cpco2ice = 349.0 + 4.8*tmid_tmp(i,k)
-         heat_tend(i,k) = 1./SHR_CONST_CO2LATSUB*(cpco2ice*(tmid_tmp(i,kstar) - tmid_tmp(i,k))) * sed_tend(i,k)
+         heat_tend(i,k) = 1./SHR_CONST_CO2LATSUB*(cpco2ice*(tmid_tmp(i,kstar) - tmid_tmp(i,k))) * fxcld_in(i,k)
 
          !! add tendencies
          cld_tend(i,k) = cond_tend(i,k) - pot_tend(i,k) - heat_tend(i,k)
@@ -593,17 +605,50 @@ endif
   do k = 1,pver
      do i = 1,ncol
        cld_rho(i,k) = state%pmid(i,k) / (rair * tmid_tmp(i,k))*cld_tmp(i,k)  ! diagnostic for cloud density
-       cld_tend_diag(i,k) =  (cld_tmp(i,k) - state%q(i,k,ixcldice_co2)) / dtime 
-!if (masterproc)  write(*,*),  cld_tmp(i,k), state%q(i,k,ixcldice_co2), ( cld_tmp(i,k) - state%q(i,k,ixcldice_co2) ) / dtime 
-       ptend%q(i,k,ixcldice_co2) =  (cld_tmp(i,k) - state%q(i,k,ixcldice_co2)) / dtime 
-!if (masterproc)  write(*,*), "after", ptend%q(i,k,ixcldice_co2)
-       ptend%s(i,k) =   (tmid_tmp(i,k) - state%t(i,k)) * SHR_CONST_CPDAIR / dtime 
+       cld_tend_diag(i,k) =  (cld_tmp(i,k) - state%q(i,k,ixcldice_co2)) / dtime
+       ptend%q(i,k,ixcldice_co2) =  (cld_tmp(i,k) - state%q(i,k,ixcldice_co2)) / dtime
+       ptend%s(i,k) =   (tmid_tmp(i,k) - state%t(i,k)) * SHR_CONST_CPDAIR / dtime
      enddo
+  enddo
+
+  ! -----------------------------------------------------------------------
+  ! P1: Close the atmospheric mass budget.
+  ! CO2 that condenses into the airborne ice reservoir (CLDICE_CO2) or
+  ! sediments to the surface (co2_snowfall) has left the bulk gas phase.
+  ! Subtract that mass from state%pdel (and state%ps) so that the dynamics
+  ! see a reduced column mass.  This is the only mechanism that limits
+  ! condensation at high-terrain grid cells and enables atmospheric collapse.
+  !
+  ! Mass removed from layer k [Pa]:
+  !   airborne ice growth:  ptend%q(i,k,ixcldice_co2) * dtime * state%pdel(i,k) / gravit
+  !     -> in pressure units: delta_q * pdel  (kg/kg * Pa = Pa * kg/kg, then /g -> Pa)
+  !        more precisely: delta_q [kg_ice/kg_air] * pdel [Pa] / gravit [m/s2]
+  !        = kg_ice/m2 * g -> Pa via dp = rho*g*dz; here dp = g * kg_ice/m2
+  !   Note: CLDICE_CO2 mixing ratio denominator is the same air mass, so
+  !         the change in pdel equals g * (delta_q * pdel / g) = delta_q * pdel.
+  !
+  ! Surface snowfall removes mass from the entire column (all layers contributed
+  ! via sedimentation); that is handled by dp_coupling using co2_mass_change
+  ! from CLM plus the snowfall sent here.  We only update pdel for the in-cloud
+  ! condensation here; the surface-snow path reduces pdel by an equal amount
+  ! because the tracer mixing ratios already account for what sedimented out.
+  ! -----------------------------------------------------------------------
+  do k = 1,pver
+    do i = 1,ncol
+      ! delta_pdel [Pa] = delta_q [kg/kg] * pdel [Pa]
+      ! (equivalent to g * delta_mass_per_area, since pdel = g * rho * dz)
+      state%pdel(i,k)  = state%pdel(i,k)  - ptend%q(i,k,ixcldice_co2) * dtime * state%pdel(i,k)
+      state%rpdel(i,k) = 1.0_r8 / state%pdel(i,k)
+    enddo
+  enddo
+  ! Update surface pressure as sum of layer thicknesses
+  do i = 1,ncol
+    state%ps(i) = sum(state%pdel(i,1:pver))
   enddo
 
   ! set snowfall output
   do i=1,ncol
-    ext_co2srf_snow(i) = co2_snowfall(i)   ![kg/m2]  
+    ext_co2srf_snow(i) = co2_snowfall(i)   ! [kg/m2], relies on cpl_dt == atm_dt
   enddo
   
   cld_reff(:,:) = cld_reff(:,:)*1.0e6  ! convert from meters to microns
@@ -746,8 +791,8 @@ end subroutine exo_cloud_sediment_vel
 !=======================================================================
 
 subroutine exo_cloud_sediment_tend(ncol, dtime, ext_tmid, ext_pmid, ext_pint, ext_pdel, ext_cld, &
-                                   ext_cld_pvel, tcond, sed_tend, sf_tend)
-!-----------------------------------------------------------------------  
+                                   ext_cld_pvel, tcond, sed_tend, sf_tend, fxcld_in)
+!-----------------------------------------------------------------------
 ! Purpose: Apply cloud particle sedimentation to condensate
 ! Adatpted from cld_sediment_tend in cld_pkg_sediment
 !
@@ -761,11 +806,13 @@ subroutine exo_cloud_sediment_tend(ncol, dtime, ext_tmid, ext_pmid, ext_pint, ex
   real(r8), intent(in), dimension(pcols,pverp)  :: ext_pint      ! interfaces pressure (Pa)
   real(r8), intent(in), dimension(pcols,pver)   :: ext_pdel      ! pressure diff across layer (Pa)
   real(r8), intent(in), dimension(pcols,pver)   :: ext_cld       ! cloud condensate (kg/kg)
-  real(r8), intent(in), dimension(pcols,pverp)  :: ext_cld_pvel  ! vertical velocity of liquid drops  (Pa/s) 
-  real(r8), intent(in), dimension(pcols, pver) :: tcond          ! atmosphere condensation temperature grid 
-  ! -> note that pvel is at the interfaces (loss from cell is based on pvel(k+1)) 
+  real(r8), intent(in), dimension(pcols,pverp)  :: ext_cld_pvel  ! vertical velocity of liquid drops  (Pa/s)
+  real(r8), intent(in), dimension(pcols, pver) :: tcond          ! atmosphere condensation temperature grid
+  ! -> note that pvel is at the interfaces (loss from cell is based on pvel(k+1))
   real(r8), intent(out), dimension(pcols,pver) :: sed_tend       ! condensate tend [kg/kg/s]
   real(r8), intent(out), dimension(pcols) :: sf_tend             ! surface mass flux of condensate (snow/rain, kg/m2/s)
+  ! P2: incoming flux per layer [kg/kg/s], used by Forget-1998 pot/heat corrections
+  real(r8), intent(out), dimension(pcols,pver) :: fxcld_in       ! incoming flux into layer k [kg/kg/s]
 
 !  real(r8), intent(out) :: wvtend (pcols,pver)       ! water vapor tend
 !  real(r8), intent(out), dimensions(pcols,pver) :: h_tend    ! heating rate
@@ -781,6 +828,7 @@ subroutine exo_cloud_sediment_tend(ncol, dtime, ext_tmid, ext_pmid, ext_pint, ex
   fxcld(:ncol,:) = 0.0
   sed_tend(:ncol,:) = 0.0
   sf_tend(:ncol) = 0.0
+  fxcld_in(:ncol,:) = 0.0
 
   !
   ! Start Code
@@ -853,11 +901,18 @@ subroutine exo_cloud_sediment_tend(ncol, dtime, ext_tmid, ext_pmid, ext_pint, ex
 ! net flux into cloud changes cloud liquid/ice (all flux is out of cloud)                                        
 !          cld_tend(i,k)  = (fxcld(i,k)*cldovrl - fxcld(i,k+1)) / (dtime * ext_pdel(i,k))
 
-         sed_tend(i,k)  = (fxcld(i,k) - fxcld(i,k+1)) / (dtime * ext_pdel(i,k)) 
-
+         sed_tend(i,k)  = (fxcld(i,k) - fxcld(i,k+1)) / (dtime * ext_pdel(i,k))
 
        end do
     end do
+
+  ! P2: incoming flux into each layer [kg/kg/s], used by Forget-1998 pot/heat corrections.
+  ! fxcld(i,k) is the downward flux through the top interface of layer k [Pa units].
+  do k = 1,pver
+    do i = 1,ncol
+      fxcld_in(i,k) = fxcld(i,k) / (dtime * ext_pdel(i,k))
+    enddo
+  enddo
 
 ! convert flux out the bottom to mass units Pa -> kg/m2/s                                                        
     sf_tend(:ncol) = fxcld(:ncol,pverp) / (dtime*SHR_CONST_G)
