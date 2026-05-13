@@ -15,3 +15,4 @@ src
 cesm1.2.1/initial_files/cam_aqua_fv/comp_ic.py
 cesm1.2.1/configs/cam_mixed_fv_O2O3
 .DS_Store
+.claude/
