@@ -39,7 +39,7 @@ public exo_condense_register
 public exo_condense_init
 public exo_condense_init_cnst
 public exo_condense_implements_cnst
-public exo_condense_diag_calc
+public exo_condense_diag_calc  ! signature: (state, pbuf, cam_in)
 public exo_condense_tend
 
 
@@ -187,6 +187,11 @@ subroutine exo_condense_init
 
   call addfld ('CO2_SNOWFALL_RATE','kg/m2/s',1,    'A','CO2 snow fall rate'   ,phys_decomp, sampling_seq=sampling_seq)
 
+  ! CO2 mass budget diagnostics
+  call addfld ('CO2_COL_GAS',  'kg/m2', 1, 'A', 'CO2 column mass in bulk gas (pdel/g)',            phys_decomp, sampling_seq=sampling_seq)
+  call addfld ('CO2_COL_ICE',  'kg/m2', 1, 'A', 'CO2 column mass in airborne ice (CLDICE_CO2)',    phys_decomp, sampling_seq=sampling_seq)
+  call addfld ('CO2_COL_SRF',  'kg/m2', 1, 'A', 'CO2 surface frost mass (co2dp from CLM)',         phys_decomp, sampling_seq=sampling_seq)
+  call addfld ('CO2_COL_TOT',  'kg/m2', 1, 'A', 'Total CO2 column mass: gas + ice + surface frost',phys_decomp, sampling_seq=sampling_seq)
 
 end subroutine exo_condense_init
 
@@ -241,23 +246,31 @@ end subroutine exo_condense_init_cnst
 
 
 !=======================================================================
-subroutine exo_condense_diag_calc(state, pbuf)
+subroutine exo_condense_diag_calc(state, pbuf, cam_in)
 !-----------------------------------------------------------------------
-! Purpose: Compute co2 ice path
+! Purpose: Compute CO2 ice path and column mass budget diagnostics.
 !
-  use physics_types, only: physics_state 
+  use physics_types, only: physics_state
   use physics_buffer,only: physics_buffer_desc, pbuf_get_field
+  use camsrfexch,    only: cam_in_t
 
   ! input arguments
-  type(physics_state), intent(in)    :: state        ! state variables
+  type(physics_state), intent(in)    :: state
   type(physics_buffer_desc), pointer :: pbuf(:)
+  type(cam_in_t),      intent(in)    :: cam_in
 
-  real(r8), pointer :: cicewp_co2(:,:)    ! in-cloud cloud ice water path 
+  real(r8), pointer :: cicewp_co2(:,:)    ! in-cloud cloud ice water path
   real(r8) :: gicewp_co2(pcols,pver)      ! grid-box cloud ice water path
   real(r8) :: tgicewp_co2(pcols)          ! Vertically integrated ice water path
-  
+
+  ! budget diagnostics
+  real(r8) :: co2_col_gas(pcols)   ! [kg/m2] bulk gas CO2 column mass
+  real(r8) :: co2_col_ice(pcols)   ! [kg/m2] airborne ice CO2 column mass
+  real(r8) :: co2_col_srf(pcols)   ! [kg/m2] surface frost CO2 mass
+  real(r8) :: co2_col_tot(pcols)   ! [kg/m2] total CO2 column mass
+
   ! local arguments
-  integer :: i,k
+  integer :: i, k
   integer :: ncol, lchnk
 
   if (.not. do_exo_condense_co2) return
@@ -267,27 +280,61 @@ subroutine exo_condense_diag_calc(state, pbuf)
   ncol  = state%ncol
 
   if (cicewp_co2_idx>0) then
-    call pbuf_get_field(pbuf, cicewp_co2_idx, cicewp_co2 )
+    call pbuf_get_field(pbuf, cicewp_co2_idx, cicewp_co2)
   else
     allocate(cicewp_co2(pcols,pver))
   endif
 
   do k=1,pver
     do i = 1,ncol
-      gicewp_co2(i,k) = state%q(i,k,ixcldice_co2)*state%pdel(i,k)/SHR_CONST_G*1000.0_r8 ! Grid box co2 ice condensate  [g/m2]
-      cicewp_co2(i,k) = gicewp_co2(i,k)  !/ max(0.01_r8,cld(i,k))   ! in cloud condensate, for now, no cloud fraction treatement
-!      write(*,*) "exo_condense_diag_calc",i,k, state%q(i,k,ixcldice_co2), cicewp_co2(i,k) 
+      gicewp_co2(i,k) = state%q(i,k,ixcldice_co2)*state%pdel(i,k)/SHR_CONST_G*1000.0_r8 ! [g/m2]
+      cicewp_co2(i,k) = gicewp_co2(i,k)
     end do
   enddo
 
-  ! calculate column amount of CO2 cice cloud
+  ! column-integrated CO2 ice cloud path
   tgicewp_co2(:ncol) = 0._r8
   do k=1,pver
-    tgicewp_co2(:ncol)  = tgicewp_co2(:ncol) + gicewp_co2(:ncol,k)
+    tgicewp_co2(:ncol) = tgicewp_co2(:ncol) + gicewp_co2(:ncol,k)
   end do
 
-  call outfld('TGCLDIWP_CO2',tgicewp_co2, pcols,lchnk)
-  call outfld('CLDICE_CO2_COL' ,cicewp_co2    ,          pcols,lchnk)
+  call outfld('TGCLDIWP_CO2',  tgicewp_co2, pcols, lchnk)
+  call outfld('CLDICE_CO2_COL', cicewp_co2,  pcols, lchnk)
+
+  ! ------------------------------------------------------------------
+  ! CO2 mass budget: gas + airborne ice + surface frost
+  ! All three components in kg/m2 so they can be summed and compared.
+  !
+  ! CO2_COL_GAS: total column mass of bulk gas = sum(pdel)/g
+  !   For a pure-CO2 atmosphere this equals the full atmospheric column.
+  !   For mixed atmospheres it would need weighting by co2vmr -- here
+  !   we track the total atmospheric mass as a proxy since co2vmr=1.
+  !
+  ! CO2_COL_ICE: airborne ice = sum(CLDICE_CO2 * pdel / g)
+  !
+  ! CO2_COL_SRF: surface frost mass from CLM (cam_in%co2dp) [kg/m2]
+  !
+  ! CO2_COL_TOT: sum of all three -- should be globally conserved
+  !   after the P1 fix.  Any drift in the global integral indicates
+  !   a remaining mass-budget leak.
+  ! ------------------------------------------------------------------
+  co2_col_gas(:ncol) = 0._r8
+  co2_col_ice(:ncol) = 0._r8
+  do k = 1, pver
+    do i = 1, ncol
+      co2_col_gas(i) = co2_col_gas(i) + state%pdel(i,k) / SHR_CONST_G
+      co2_col_ice(i) = co2_col_ice(i) + state%q(i,k,ixcldice_co2) * state%pdel(i,k) / SHR_CONST_G
+    enddo
+  enddo
+  do i = 1, ncol
+    co2_col_srf(i) = cam_in%co2dp(i)
+    co2_col_tot(i) = co2_col_gas(i) + co2_col_ice(i) + co2_col_srf(i)
+  enddo
+
+  call outfld('CO2_COL_GAS', co2_col_gas, pcols, lchnk)
+  call outfld('CO2_COL_ICE', co2_col_ice, pcols, lchnk)
+  call outfld('CO2_COL_SRF', co2_col_srf, pcols, lchnk)
+  call outfld('CO2_COL_TOT', co2_col_tot, pcols, lchnk)
 
 end subroutine exo_condense_diag_calc
 

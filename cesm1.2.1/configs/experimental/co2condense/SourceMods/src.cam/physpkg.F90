@@ -2178,7 +2178,7 @@ subroutine tphysbc (ztodt,               &
 
     call cloud_diagnostics_calc(state, pbuf)
 
-    call exo_condense_diag_calc(state, pbuf)
+    call exo_condense_diag_calc(state, pbuf, cam_in)
 
     call t_stopf('bc_cld_diag_history_write')
 
