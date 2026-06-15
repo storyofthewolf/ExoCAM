@@ -1,6 +1,7 @@
 #gitignore file
 
 .DS_Store
+.claude/
 
 
 #
@@ -9,8 +10,15 @@ tools/idl_progs/topobathy.pro
 tools/idl_progs/*.nc
 tools/idl_progs/*~
 cesm1.2.1/configs/cam4_aqua_dynocn_fv
-/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/initial_files/mars
-/gpfsm/dnb53/etwolf/models/ExoCAM/cesm1.2.1/configs/extras
+
+# Untracked from the repo (kept locally only): unsupported/experimental
+# configs and their initial-condition files. NOTE: the co2_claude_diag branch
+# still tracks these; a future merge to main will reintroduce them and they
+# must be re-removed (git rm -r --cached) before committing on main.
+cesm1.2.1/configs/experimental/
+cesm1.2.1/configs/extras/
+cesm1.2.1/initial_files/mars/
+
 src
 cesm1.2.1/initial_files/cam_aqua_fv/comp_ic.py
 cesm1.2.1/configs/cam_mixed_fv_O2O3
