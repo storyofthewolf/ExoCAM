@@ -2,6 +2,10 @@
 Created on Sat June 5 21:25:32 2021
 @author: Vidya Venkatesan (vidyav1@uci.edu)
 
+Modified by
+@author Eric Wolf
+@author Claude
+
 Project description: This code is a python version of ice_gcm.pro which calculates the albedo from stellar
 spectrum and spectrum of reflectance.
 Note: any spectrum file can be used along with any
