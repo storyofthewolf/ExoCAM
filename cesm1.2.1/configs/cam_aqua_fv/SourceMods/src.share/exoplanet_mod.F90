@@ -28,7 +28,7 @@ module exoplanet_mod
   logical, public, parameter :: do_exo_gw = .false.             !! flag to turn on gravity waves.  Note, present gw wave parameterization
                                                                 !! does not work for low pressure atmospheres.
 
-  real(r8), public, parameter :: exo_convect_plim = 4.e3_r8     !! Sets the minimum pressure limit in the convection schemes
+  real(r8), public, parameter :: exo_convect_plim = 5.0_r8     !! Sets the minimum pressure limit in the convection schemes
                                                                 !! Convection will not operate at pressures lower than this
                                                                 !! Without ozone, 5 Pa is good.
                                                                 !! With ozone, 5 Pa is not stable, use NCAR's original value of 4.e3 (40 mb)
@@ -134,7 +134,7 @@ module exoplanet_mod
   real(r8), public, parameter :: exo_nh3bar  = 0.0_r8                        ! NH3 inventory (bar)
   real(r8), public, parameter :: exo_cobar   = 0.0_r8                        ! CO inventory (bar)
   real(r8), public, parameter :: exo_h2bar   = 0.0_r8                        ! H2 inventory (bar)
-  real(r8), public, parameter :: exo_o2bar   = 0.2095_r8                        ! O2 inventory (bar)
+  real(r8), public, parameter :: exo_o2bar   = 0.0_r8                        ! O2 inventory (bar)
   real(r8), public, parameter :: exo_n2bar   = 1.0 - exo_co2bar - exo_ch4bar - exo_c2h6bar - exo_o2bar   ! N2 inventory (bar)
   real(r8), public, parameter :: exo_pstd    = (exo_n2bar + exo_o2bar + exo_h2bar + exo_co2bar + exo_ch4bar + exo_c2h6bar)*1.0e5  ! total pressure (Pascals)
 

@@ -3,6 +3,7 @@
 1)  cam_aqua_fv 
     --  aquaplanet, slab ocean, finite volume dynamical core, cam4/5 phys
     --  must link external radiative transfer options from ../ExoRT/3dmodels
+    --  default to anoxic, exo_convect_plim = 5.0 Pa
 
 2)  cam_aqua_se   
     --  aquaplanet, slab ocean, se cubed sphere dynamical core, cam4/5 phys
@@ -11,10 +12,12 @@
 3)  cam_land_fv  
     --  land planet, finite volume dynamical core dynamical core, cam4/5 phys
     --  must link external radiative transfer options from ../ExoRT/3dmodels
+    --  default to anoxic, exo_convect_plim = 5.0 Pa
 
 4)  cam_mixed_fv
     --  continents + slab ocean, finite volume dynamical core, cam4/5 phys
     --  must link external radiative transfer options from ../ExoRT/3dmodels
+    --  default to modern O2, O3, exo_convect_plim = 4.e30 Pa
 
 5)  circumbinary
     --  continents + slab ocean, finite volume dycore, cam4 phys
