@@ -101,25 +101,88 @@ Added four new CAM history fields to `exo_condense_diag_calc` to diagnose the ma
 
 ---
 
+---
+
+# Session 2 — 2026-07-12 (Claude Fable 5)
+
+## A4 static trace: sign was OPPOSITE the original hypothesis
+
+The feared double-subtraction of the snowfall path does not exist. In
+`exo_clm_condense.F90`, snowfall is added to the frost reservoir
+(`co2dp(c) = co2dp_i + forc_co2srf_snow(c)`, before the energy-balance logic)
+but `co2_mass_change` is set **only** from the energy-balance term
+(`dtime/L * co2ice_lh * wtcol`). dp_coupling therefore never subtracts snowfall
+from `delpxy`.
+
+The real bug was on the physics side: the P1 update used the **net** tracer
+change `ptend%q*dtime`, which includes sedimentation transport. Layers that
+lost ice by sedimentation (Δq < 0 from transport) had their `pdel` *refunded*
+gas that never sublimed. Column-integrated, physics removed only
+`(column condensation − snowfall)` while the snowfall mass simultaneously
+appeared in CLM's frost — **mass creation at the global snowfall rate;
+`CO2_COL_TOT` would have drifted positive.**
+
+## Changes made (all in `src.cam/exo_condense_mod.F90`)
+
+### A4 — pdel update now uses phase conversion only
+
+New accumulator `cond_accum(i,k)` [kg/kg] sums `cld_tend*subtime` (gas↔ice
+conversion, including Forget pot/heat sublimation of falling ice) across
+substeps, in all three branches (Forget k=1, Forget k≥2, LMDG). It excludes
+`sed_tend` transport. When the negative-cloud clamp fires, the clamped deficit
+is backed out of `cond_accum` (that ice never existed, so the gas phase is not
+credited for subliming it). Final update: `pdel = pdel*(1 − cond_accum)`.
+
+Budget closure per column per step:
+- physics: removes net atmospheric gas→ice conversion, in the layers where it occurred
+- dp_coupling: removes direct surface exchange only (CLM energy balance; snowfall excluded)
+- snowfall: pure ice transport atm→surface, already paid for in gas at the condensing layer
+
+### B3 — tcond/tnuc recomputed every substep from evolving pressure
+
+`pdel_tmp`/`pmid_tmp` are rebuilt at the end of each substep from `cond_accum`
+(running interface-pressure integration starting at `state%pint(i,1)`);
+`tcond`/`tnuc` are recomputed from `pmid_tmp` at the top of each substep. This
+restores the negative feedback: as a column thins, its frost point falls and
+condensation self-limits. Guard: `cond_accum` clamped at 0.99 with a warning
+(prevents non-positive pressures if a layer would totally deplete).
+Sedimentation calls deliberately stay on the fixed original `state%` pressure
+basis, consistent with the fixed-basis mixing-ratio bookkeeping.
+
+### B4 — derived pressure fields rebuilt after the pdel update
+
+`pint`, `lnpint`, `pmid`, `lnpmid` rebuilt with the same formulas
+`d_p_coupling` uses (`pint(k+1)=pint(k)+pdel(k)`, `pmid=0.5*(pint(k)+pint(k+1))`),
+`pint(1)` unchanged, and `ps = pint(pverp)` — which also fixes the original
+P1 `ps = sum(pdel)` omitting ptop.
+
+Two facts discovered while verifying downstream consistency:
+- `exo_condense_tend` is called from **tphysbc** (not tphysac as Session 1
+  notes said), immediately before radiation — so B4 directly changes what
+  radiation sees the same step.
+- `physics_update` (physpkg.F90:2156) calls `geopotential_dse` with
+  `lnpint/lnpmid/pint/pmid/pdel/rpdel`, so `t`, `zi`, `zm` are automatically
+  reconciled with the new pressures right after our routine returns.
+  `cam_export` runs later in tphysbc, so `forc_pbot` (used for CLM's surface
+  frost point) is also post-condensation.
+
 ## Open Items for Next Session
 
 ### High priority
 
-1. **Run model, check `CO2_COL_TOT`** — this is the first thing to do. Flat global mean confirms P1 works. If it drifts, investigate the double-subtraction issue (A4 in bug report): the snowfall path may be subtracting mass from `pdel` twice (once in physics via `ptend%q`, once in dp_coupling via `co2_mass_change`).
-
-2. **`tcond` not updated during substep loop (B3 in bug report)** — `tcond` is computed once before the substep loop using `state%pmid` (the pressure at the start of the timestep). Now that `pdel` decreases as condensation proceeds, the actual pressure during substeps is lower, meaning the frost point should also be lower. Without this update, the model keeps condensing at the original `tcond` even as the column thins. Fix: recompute `tcond` inside the substep loop using an estimated current `pmid` derived from the evolving `pdel`, or at minimum once after the substep loop for the next timestep's starting point.
-
-### Medium priority
-
-3. **Update `pmid`, `pint`, `lnpmid` after `pdel` change (B4 in bug report)** — derived pressure fields are stale for the remainder of the physics column step after the P1 `pdel` update. Radiation and boundary-layer routines called later see pre-condensation pressures. Consider calling `physics_state_set_deriv` or equivalent after the `pdel` update, or moving the update to after all other parameterizations in `tphysac`.
-
-4. **Verify double-subtraction not occurring (A4)** — if `CO2_COL_TOT` shows a negative drift, the fix is to either (a) not update `pdel` in physics for ice that subsequently sediments to the surface (only update for suspended ice that stays airborne), or (b) have dp_coupling skip the `co2_mass_change` adjustment for mass already accounted for in physics. Option (b) requires tracking what fraction of `co2_mass_change` is snowfall vs. direct surface condensation.
+1. **Run model, check `CO2_COL_TOT`** — global mean should now be flat. If a
+   drift remains, suspects are (in order): coupler lag between `co2srf_snow`
+   delivery and `co2_mass_change` return (one-step offset is fine, secular
+   drift is not); CLM energy-balance mass terms; the `cond_accum` 0.99 clamp
+   firing (grep logs for `cond_accum > 0.99 clamped`).
+2. **Olympus Mons column** — `CO2_COL_GAS` should decrease as frost forms and
+   condensation should self-limit (B3). Compare `CLDICE_CO2_COND_TEND` before/after.
 
 ### Low priority
 
-5. **Fix C2 (pft loop)** — `co2_mass_change` overwritten not summed in pft loop; only relevant for multi-pft columns (vegetated land surfaces). Not an issue for bare-ground Mars runs.
-
-6. **Fix C3 (`t_grnd = tcond` clamp)** — unconditional clamping of surface temperature to frost point when frost is present removes thermal inertia. Low priority now that A1 is fixed, but worth revisiting for thin-frost sublimation at sunrise.
+3. **Fix C2 (pft loop)** — `co2_mass_change` overwritten not summed in pft loop; only relevant for multi-pft columns (vegetated land surfaces). Not an issue for bare-ground Mars runs.
+4. **Fix C3 (`t_grnd = tcond` clamp)** — unconditional clamping of surface temperature to frost point when frost is present removes thermal inertia. Worth revisiting for thin-frost sublimation at sunrise.
+5. **`check_energy_chng` noise** — column mass changes are not representable in CAM's fixed-mass energy check; expect logged imbalances after `exo_condense_tend`. Log-only, but worth a comment or a bypass if it becomes distracting.
 
 ---
 
@@ -146,22 +209,29 @@ Direct surface condensation (no CLDICE_CO2 path):
 Atmospheric bulk gas → [CLM energy balance] → co2dp → co2_mass_change → delpxy
 ```
 
-### Call sequence for CO2 condensation (within one `tphysac` call)
+### Call sequence for CO2 condensation (within one `tphysbc` call — Session 2 correction: this is tphysbc, not tphysac; radiation follows in the same call)
 
 ```
-tphysac
+tphysbc
   └─ exo_condense_tend (physpkg.F90:2154)
        └─ exo_condense_co2
             ├─ substep loop (20x)
+            │    ├─ [B3] recompute tcond/tnuc from evolving pmid_tmp
             │    ├─ calc_co2_reff
             │    ├─ exo_cloud_sediment_vel
-            │    ├─ exo_cloud_sediment_tend  [now returns fxcld_in]
-            │    └─ Forget-1998 condensation [uses fxcld_in for pot/heat]
+            │    ├─ exo_cloud_sediment_tend  [returns fxcld_in]
+            │    ├─ Forget-1998 condensation [uses fxcld_in for pot/heat;
+            │    │                            accumulates cond_accum (A4)]
+            │    └─ [B3] rebuild pdel_tmp/pmid_tmp from cond_accum
             ├─ set ptend%q, ptend%s
-            └─ [P1] update state%pdel, state%rpdel, state%ps
-  └─ physics_update (applies ptend to state)
+            ├─ [P1/A4] state%pdel *= (1 - cond_accum); rpdel
+            └─ [B4] rebuild pint, lnpint, pmid, lnpmid; ps = pint(pverp)
+  └─ physics_update (applies ptend; geopotential_dse reconciles t, zi, zm
+                     with the updated pressure fields)
   └─ exo_condense_diag_calc (physpkg.F90:2181)
-       └─ [now outputs CO2_COL_GAS/ICE/SRF/TOT]
+       └─ [outputs CO2_COL_GAS/ICE/SRF/TOT]
+  └─ radiation (sees post-condensation pressures)
+  └─ cam_export (surface forcing, incl. forc_pbot -> CLM frost point)
 
 p_d_coupling (dp_coupling.F90, called from stepon.F90)
   └─ copy phys_state%pdel → delpxy  [includes P1 update]

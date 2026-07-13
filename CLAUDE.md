@@ -87,7 +87,9 @@ As of 2026-05-13, active development is on branch `co2_claude_diag`. This target
 - `SHR_CONST_CPDAIR` is overridden to the CO2 value in `shr_const_mod.F90`. Uses of `SHR_CONST_CPDAIR` in `exo_condense_mod.F90` are correct — do not change them to Earth's 1004.64 J/kg/K.
 - `cam_out%co2srf_snow` carries kg/m² (not kg/m²/s) despite being registered as `a2x_fluxes`. This is intentional and relies on `cpl_dt == atm_dt`. Both ends are commented. Do not change `cpl_dt` without revisiting this field.
 
-### What was fixed (commits `eea21c9`, `05695cf`)
+### What was fixed
+
+**Session 1 (commits `eea21c9`, `05695cf`):**
 
 1. **P1 — Atmospheric mass budget:** `state%pdel` and `state%ps` now updated in `exo_condense_co2` after condensation. Bottom-up layer-peel in dp_coupling replaces layer-averaging. Non-`local_dp_map` branch now has identical Mars adjustment.
 2. **P2 — Forget-1998 pot/heat correction:** `fxcld_in` (incoming flux per layer) now returned from `exo_cloud_sediment_tend` and used in place of `sed_tend` for pot/heat corrections. Eliminates positive feedback over thin-layer high-terrain cells.
@@ -95,9 +97,14 @@ As of 2026-05-13, active development is on branch `co2_claude_diag`. This target
 4. **P4 — CLM double-counted latent energy:** Full-sublimation branch in `exo_clm_condense.F90` no longer both cools the soil and sends energy to atmosphere from the same latent release.
 5. **Budget diagnostics:** `exo_condense_diag_calc` now outputs `CO2_COL_GAS`, `CO2_COL_ICE`, `CO2_COL_SRF`, `CO2_COL_TOT` (all kg/m²). `physpkg.F90` call updated to pass `cam_in`.
 
+**Session 2 (2026-07-12), all in `exo_condense_mod.F90`:**
+
+6. **A4 — resolved (sign was opposite the hypothesis):** no double-subtraction; the P1 net-Δq `pdel` update refunded gas to layers that lost ice by sedimentation, creating mass at the global snowfall rate. New `cond_accum` accumulator (gas↔ice phase conversion only, excludes `sed_tend` transport) now drives the `pdel` update. CLM's `co2_mass_change` correctly excludes snowfall — do not add it there.
+7. **B3 — frost-point feedback:** `tcond`/`tnuc` recomputed every substep from evolving `pmid_tmp` (rebuilt from `cond_accum`); condensation now self-limits as the column thins. `cond_accum` clamped at 0.99 with a warning.
+8. **B4 — derived pressure fields:** `pint`/`lnpint`/`pmid`/`lnpmid`/`ps` rebuilt after the `pdel` update (mirrors `d_p_coupling` formulas; `ps = pint(pverp)` now includes ptop). Note: `exo_condense_tend` runs in **tphysbc** immediately before radiation, and `physics_update`'s `geopotential_dse` call reconciles `t`/`zi`/`zm` with the new pressures.
+
 ### Next steps (in priority order)
 
-1. **Run the model and inspect `CO2_COL_TOT` globally.** Flat global mean = P1 working. Negative drift = likely double-subtraction of snowfall path (see A4 in bug report).
-2. **If budget closes, check Olympus Mons column** for `CO2_COL_GAS` decreasing when frost forms. If still runaway, address B3: recompute `tcond` each substep using evolving pressure rather than fixed `state%pmid`.
-3. **Update derived pressure fields** (`pmid`, `pint`, `lnpmid`) after the P1 `pdel` change so downstream parameterizations see the post-condensation pressure (B4 in bug report).
-4. **Investigate double-subtraction (A4):** If `CO2_COL_TOT` drifts, the snowfall path may subtract mass from `pdel` twice — once in physics via `ptend%q` and once in dp_coupling via `co2_mass_change`. Fix by either excluding sedimented mass from the physics `pdel` update, or by zeroing the snowfall component of `co2_mass_change` before dp_coupling acts on it.
+1. **Run the model and inspect `CO2_COL_TOT` globally.** Should now be flat. If it drifts: check coupler timing of `co2srf_snow`→`co2_mass_change`, CLM energy-balance mass terms, and grep logs for `cond_accum > 0.99 clamped`.
+2. **Check Olympus Mons column:** `CO2_COL_GAS` should decrease as frost forms; condensation should self-limit via the B3 frost-point feedback.
+3. **C2 (pft loop, multi-pft columns) and C3 (`t_grnd = tcond` clamp)** remain open — low priority for bare-ground Mars runs.

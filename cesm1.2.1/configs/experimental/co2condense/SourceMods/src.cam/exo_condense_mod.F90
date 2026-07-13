@@ -427,6 +427,11 @@ subroutine exo_condense_co2(state, pbuf, ext_ts, ext_co2dp, ext_co2srf_snow, pte
   real(r8), dimension(pcols, pver)  :: pot_tend   ! [kg/kg/s] tendency from potential energy release of falling ice  
   real(r8), dimension(pcols, pver)  :: heat_tend  ! [kg/kg/s] tendency from energy for heating falling mass
   real(r8), dimension(pcols, pver)  :: temp_tend  ! [K/s]     temperature tendency
+  real(r8), dimension(pcols, pver)  :: cond_accum ! [kg/kg]   accumulated net gas->ice conversion this timestep (A4)
+                                                  !           positive = gas condensed; excludes sedimentation transport
+  real(r8), dimension(pcols, pver)  :: pdel_tmp   ! [Pa]      evolving layer thickness during substeps (B3)
+  real(r8), dimension(pcols, pver)  :: pmid_tmp   ! [Pa]      evolving mid-layer pressure during substeps (B3)
+  real(r8) :: pint_run                            ! [Pa]      running interface pressure for pmid_tmp rebuild
   real(r8), dimension(pcols) :: sf_tend           ! [kg/m2/s] surface flux of cloud material
   real(r8), dimension(pcols) :: co2_snowfall      ! [kg/m2]   accumulated co2 surface ice mass during the timestep
   real(r8) :: tcond_tmp, tnuc_tmp                 ! [K]       condensation and nucleation temperatures,  temporary 
@@ -451,7 +456,8 @@ subroutine exo_condense_co2(state, pbuf, ext_ts, ext_co2dp, ext_co2srf_snow, pte
   tmid_tmp(:,:)      = 0.0    
   sed_tend(:,:)      = 0.0
   fxcld_in(:,:)      = 0.0
-  cond_tend(:,:)     = 0.0    
+  cond_accum(:,:)    = 0.0
+  cond_tend(:,:)     = 0.0
   temp_tend(:,:)     = 0.0    
   pot_tend(:,:)      = 0.0     
   heat_tend(:,:)     = 0.0    
@@ -494,18 +500,19 @@ subroutine exo_condense_co2(state, pbuf, ext_ts, ext_co2dp, ext_co2srf_snow, pte
   enddo
 
 
-  ! calculate condensation and nucleation temperatures
-  ! save to arrays
+  ! B3: initialize evolving pressures.  As condensation removes bulk gas from a
+  ! layer, the local pressure (and with it the CO2 frost point) must drop --
+  ! this is the physical negative feedback that limits condensation as the
+  ! column thins.  pdel_tmp/pmid_tmp track that evolution across substeps and
+  ! are used to recompute tcond/tnuc at the top of every substep.
   do k=1,pver
     do i=1,ncol
-      call get_condense_temp(1, state%pmid(i,k)*exo_co2vmr, tcond_tmp)
-      call get_condense_temp(1, state%pmid(i,k)*exo_co2vmr/co2_supersat, tnuc_tmp)
-      tcond(i,k) = tcond_tmp
-      tnuc(i,k) = tnuc_tmp
+      pdel_tmp(i,k) = state%pdel(i,k)
+      pmid_tmp(i,k) = state%pmid(i,k)
     enddo
   enddo
-       
-       
+
+
   !-----------------------------------------------------------
   ! Atmospheric condensation, sublimation, and sedimentation
   !-----------------------------------------------------------
@@ -514,7 +521,19 @@ subroutine exo_condense_co2(state, pbuf, ext_ts, ext_co2dp, ext_co2srf_snow, pte
   !! Start substep loop here
   !! ------------------------
   do nt = 1,nsubsteps_co2cld
-  
+
+   ! B3: recompute condensation and nucleation temperatures every substep from
+   ! the evolving mid-layer pressure (was: computed once from state%pmid before
+   ! the loop, which kept tcond fixed even as condensation depleted the column).
+   do k=1,pver
+     do i=1,ncol
+       call get_condense_temp(1, pmid_tmp(i,k)*exo_co2vmr, tcond_tmp)
+       call get_condense_temp(1, pmid_tmp(i,k)*exo_co2vmr/co2_supersat, tnuc_tmp)
+       tcond(i,k) = tcond_tmp
+       tnuc(i,k) = tnuc_tmp
+     enddo
+   enddo
+
    ! add tendencies from external processes on substep loop increment
 !    do k = 1,pver
 !      do i = 1,ncol
@@ -560,8 +579,14 @@ if(do_forget1998) then
        temp_tend(i,k) = (tcond(i,k)-tmid_tmp(i,k)) / subtime
        cld_tmp(i,k)   = cld_tmp(i,k)  + cld_tend(i,k)  * subtime
        tmid_tmp(i,k)  = tmid_tmp(i,k) + temp_tend(i,k) * subtime
+       cond_accum(i,k) = cond_accum(i,k) + cld_tend(i,k) * subtime  ! A4: gas<->ice conversion only
      endif
-     if (cld_tmp(i,k) .lt. 0.0) cld_tmp(i,k) = 0.0
+     if (cld_tmp(i,k) .lt. 0.0) then
+       ! A4: the clamped ice deficit never existed, so the gas phase must not
+       ! be credited for subliming it -- back the overshoot out of cond_accum
+       cond_accum(i,k) = cond_accum(i,k) - cld_tmp(i,k)
+       cld_tmp(i,k) = 0.0
+     endif
      ! diagnostics
      sed_tend_diag(i,k)  = sed_tend_diag(i,k)  + sed_tend(i,k)/nsubsteps_co2cld
      cond_tend_diag(i,k) = cond_tend_diag(i,k) + cond_tend(i,k)/nsubsteps_co2cld
@@ -598,10 +623,15 @@ if(do_forget1998) then
                    cpco2ice*(tmid_tmp(i,kstar) - tmid_tmp(i,k)))  * cld_tmp(i,k) / subtime
          endif
 
-         cld_tmp(i,k)  = cld_tmp(i,k)  + cld_tend(i,k)*subtime 
-         tmid_tmp(i,k) = tmid_tmp(i,k) + temp_tend(i,k)*subtime 
+         cld_tmp(i,k)  = cld_tmp(i,k)  + cld_tend(i,k)*subtime
+         tmid_tmp(i,k) = tmid_tmp(i,k) + temp_tend(i,k)*subtime
+         cond_accum(i,k) = cond_accum(i,k) + cld_tend(i,k)*subtime  ! A4: gas<->ice conversion only
         endif
-        if (cld_tmp(i,k) .lt. 0.0) cld_tmp(i,k) = 0.0   ! remove small negative values that sometimes occur
+        if (cld_tmp(i,k) .lt. 0.0) then   ! remove small negative values that sometimes occur
+          ! A4: clamped ice deficit never existed -- do not credit the gas phase for it
+          cond_accum(i,k) = cond_accum(i,k) - cld_tmp(i,k)
+          cld_tmp(i,k) = 0.0
+        endif
         ! diagnostics across substeps
         sed_tend_diag(i,k)  = sed_tend_diag(i,k)  + sed_tend(i,k)/nsubsteps_co2cld
         cond_tend_diag(i,k) = cond_tend_diag(i,k) + cond_tend(i,k)/nsubsteps_co2cld
@@ -631,17 +661,40 @@ if(do_lmdg) then
             cond_tend(i,k) = -cld_tmp(i,k)/subtime
             temp_tend(i,k) = -cld_tmp(i,k)/(SHR_CONST_CPDAIR/SHR_CONST_CO2LATSUB)/subtime
           endif
-          cld_tmp(i,k)  = cld_tmp(i,k)  + cond_tend(i,k)*subtime 
+          cld_tmp(i,k)  = cld_tmp(i,k)  + cond_tend(i,k)*subtime
           tmid_tmp(i,k) = tmid_tmp(i,k) + temp_tend(i,k)*subtime  ! sets atmosphere temperature equal to condensation temperature
+          cond_accum(i,k) = cond_accum(i,k) + cond_tend(i,k)*subtime  ! A4: gas<->ice conversion only
 !!!if (masterproc)  write(*,*), "cond_tend", nt,i,k, cond_tend(i,k), cld_tmp(i,k)
 !!!if (masterproc)  write(*,*), "temp_tend", nt,i,k, temp_tend(i,k), tmid_tmp(i,k)
         endif
-        if (cld_tmp(i,k) .lt. 0.0) cld_tmp(i,k) = 0.0   ! remove small negative values that sometimes occur
+        if (cld_tmp(i,k) .lt. 0.0) then   ! remove small negative values that sometimes occur
+          cond_accum(i,k) = cond_accum(i,k) - cld_tmp(i,k)  ! A4: do not credit gas for clamped deficit
+          cld_tmp(i,k) = 0.0
+        endif
         !cld_rho(i,k) = state%pmid(i,k) / (rair * tmid_tmp(i,k))*cld_tmp(i,k)  ! diagnostic for cloud density
       enddo
     enddo
 endif
 !!!!!!!!!!!!!!!!!!!!
+
+   ! B3: rebuild the evolving pressure profile from the accumulated gas->ice
+   ! conversion, so the next substep's tcond/tnuc see the thinned column.
+   ! Layer thinning uses the fixed original pdel basis, consistent with how
+   ! ptend%q and the final state%pdel update are applied.
+   ! Guard against (unphysical) total layer depletion, which would otherwise
+   ! produce non-positive pressures downstream.
+   do i = 1,ncol
+     pint_run = state%pint(i,1)
+     do k = 1,pver
+       if (cond_accum(i,k) .gt. 0.99_r8) then
+         write(*,*) 'exo_condense_co2: WARNING cond_accum > 0.99 clamped, i,k,lchnk=', i, k, lchnk
+         cond_accum(i,k) = 0.99_r8
+       endif
+       pdel_tmp(i,k) = state%pdel(i,k) * (1.0_r8 - cond_accum(i,k))
+       pmid_tmp(i,k) = pint_run + 0.5_r8*pdel_tmp(i,k)
+       pint_run = pint_run + pdel_tmp(i,k)
+     enddo
+   enddo
 
   enddo    !! End Substep Loop
 
@@ -659,38 +712,50 @@ endif
   enddo
 
   ! -----------------------------------------------------------------------
-  ! P1: Close the atmospheric mass budget.
-  ! CO2 that condenses into the airborne ice reservoir (CLDICE_CO2) or
-  ! sediments to the surface (co2_snowfall) has left the bulk gas phase.
-  ! Subtract that mass from state%pdel (and state%ps) so that the dynamics
-  ! see a reduced column mass.  This is the only mechanism that limits
-  ! condensation at high-terrain grid cells and enables atmospheric collapse.
+  ! P1/A4: Close the atmospheric mass budget.
+  ! Only the net gas<->ice phase conversion (cond_accum, accumulated over the
+  ! substeps) moves mass between the bulk gas and the ice reservoirs.  The
+  ! earlier form of this update used the net tracer change ptend%q*dtime,
+  ! which also contains sedimentation transport: layers that lost ice to the
+  ! surface were refunded gas they never regained, so snowfall mass was
+  ! counted twice (once as surface frost via co2srf_snow -> co2dp, once as
+  ! resurrected gas).  cond_accum excludes transport, charging each layer
+  ! exactly the gas that condensed (or crediting what sublimed) in place.
   !
-  ! Mass removed from layer k [Pa]:
-  !   airborne ice growth:  ptend%q(i,k,ixcldice_co2) * dtime * state%pdel(i,k) / gravit
-  !     -> in pressure units: delta_q * pdel  (kg/kg * Pa = Pa * kg/kg, then /g -> Pa)
-  !        more precisely: delta_q [kg_ice/kg_air] * pdel [Pa] / gravit [m/s2]
-  !        = kg_ice/m2 * g -> Pa via dp = rho*g*dz; here dp = g * kg_ice/m2
-  !   Note: CLDICE_CO2 mixing ratio denominator is the same air mass, so
-  !         the change in pdel equals g * (delta_q * pdel / g) = delta_q * pdel.
-  !
-  ! Surface snowfall removes mass from the entire column (all layers contributed
-  ! via sedimentation); that is handled by dp_coupling using co2_mass_change
-  ! from CLM plus the snowfall sent here.  We only update pdel for the in-cloud
-  ! condensation here; the surface-snow path reduces pdel by an equal amount
-  ! because the tracer mixing ratios already account for what sedimented out.
+  ! Budget closure (per column, per step):
+  !   physics (here):    -sum(cond_accum*pdel)  = -(net atmospheric gas->ice)
+  !   dp_coupling:       -g*co2_mass_change     = -(direct surface exchange
+  !                                                 from CLM energy balance;
+  !                                                 snowfall NOT included)
+  !   Snowfall is pure ice transport: removed from gas here at the layer
+  !   where it condensed, delivered to CLM frost via co2srf_snow.
   ! -----------------------------------------------------------------------
   do k = 1,pver
     do i = 1,ncol
-      ! delta_pdel [Pa] = delta_q [kg/kg] * pdel [Pa]
-      ! (equivalent to g * delta_mass_per_area, since pdel = g * rho * dz)
-      state%pdel(i,k)  = state%pdel(i,k)  - ptend%q(i,k,ixcldice_co2) * dtime * state%pdel(i,k)
+      ! delta_pdel [Pa] = -cond_accum [kg/kg] * pdel [Pa], fixed original basis
+      state%pdel(i,k)  = state%pdel(i,k) * (1.0_r8 - cond_accum(i,k))
       state%rpdel(i,k) = 1.0_r8 / state%pdel(i,k)
     enddo
   enddo
-  ! Update surface pressure as sum of layer thicknesses
+
+  ! -----------------------------------------------------------------------
+  ! B4: Rebuild the derived pressure fields so downstream physics see the
+  ! post-condensation pressures.  Radiation is called immediately after this
+  ! routine (tphysbc), and physics_update calls geopotential_dse with
+  ! lnpint/lnpmid/pint/pmid/pdel/rpdel, which reconciles t, zi, zm with the
+  ! updated pressures.  Formulas mirror d_p_coupling:
+  !   pint(k+1) = pint(k) + pdel(k);  pmid = 0.5*(pint(k)+pint(k+1))
+  ! pint(1) (model top) is unchanged.  Note ps = pint(pverp), which correctly
+  ! includes ptop (the previous ps = sum(pdel) omitted it).
+  ! -----------------------------------------------------------------------
   do i = 1,ncol
-    state%ps(i) = sum(state%pdel(i,1:pver))
+    do k = 1,pver
+      state%pint(i,k+1)   = state%pint(i,k) + state%pdel(i,k)
+      state%lnpint(i,k+1) = log(state%pint(i,k+1))
+      state%pmid(i,k)     = 0.5_r8*(state%pint(i,k) + state%pint(i,k+1))
+      state%lnpmid(i,k)   = log(state%pmid(i,k))
+    enddo
+    state%ps(i) = state%pint(i,pverp)
   enddo
 
   ! set snowfall output
