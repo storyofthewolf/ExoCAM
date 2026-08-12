@@ -13,6 +13,7 @@ module docn_comp_mod
                                shr_file_setlogunit, shr_file_setloglevel, shr_file_setio, &
                                shr_file_freeunit
   use shr_mpi_mod      , only: shr_mpi_bcast
+  use exoplanet_mod    , only: t_int
   use mct_mod
   use esmf
   use perf_mod
@@ -647,12 +648,13 @@ subroutine docn_comp_run( EClock, cdata,  x2o, o2x)
             o2x%rAttr(kt,n) = somtp(n) + &
                (x2o%rAttr(kswnet,n) + &  ! shortwave 
                 x2o%rAttr(klwup ,n) + &  ! longwave
-                x2o%rAttr(klwdn ,n) + &  ! longwave
-                x2o%rAttr(ksen  ,n) + &  ! sensible
-                x2o%rAttr(klat  ,n) + &  ! latent
-                x2o%rAttr(kmelth,n) - &  ! ice melt
-                avstrm%rAttr(kqbot ,n) - &  ! flux at bottom
-                (x2o%rAttr(ksnow,n)+x2o%rAttr(kioff,n))*latice) * &  ! latent by prec and roff
+                x2o%rAttr(klwdn ,n) &  ! longwave
+                + x2o%rAttr(ksen  ,n) &  ! sensible
+                + x2o%rAttr(klat  ,n) &  ! latent
+                + x2o%rAttr(kmelth,n) &  ! ice melt
+                !- avstrm%rAttr(kqbot ,n) &  ! flux at bottom
+                - (x2o%rAttr(ksnow,n)+x2o%rAttr(kioff,n))*latice & ! latent by prec and roff
+                + shr_const_stebol*t_int**4 ) * &  !extra internal heat flux
                 dt/(cpsw*rhosw*hn)
              !--- compute ice formed or melt potential ---
             o2x%rAttr(kq,n) = (TkFrzSw - o2x%rAttr(kt,n))*(cpsw*rhosw*hn)/dt  ! ice formed q>0
