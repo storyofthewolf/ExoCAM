@@ -14,10 +14,12 @@ eric.wolf@colorado.edu.
 
 
 
-Total Number published (57)
-submitted/in revision/accepted (3)
+Total Number published (72)
+submitted/in revision/accepted (?)
 
 Number by year
+2026 (5)
+2025 (10)
 2024 (8)
 2023 (5)
 2022 (10)
@@ -32,25 +34,80 @@ Number by year
 2013 (1)
 
 ======================= submitted/in revision/in press ========================
-(65) Corey's Paper
 
-(64) HAzy CHamps Paper
 
-(63) "Formation of Near-surface Atmospheric Inversion and Surface Inversion in Hothouse Climates."
-     Liu, J., Ding, F., and Yang, J.
-     Accepted at ApJ
+================================== 2026 ======================================
+
+(72) "ThousandWorlds: A benchmark for climate emulation of potentially habitable
+       exoplanets."
+      Stevenson, E.T., Mak, M.T., Wolf, E.T., Sergeev, D.E., Hammond, T.,
+      Mayne, N.J., and Cranmer, M.
+      arXiv preprint arXiv:2606.18338 (2026)
+      https://doi.org/10.48550/arXiv.2606.18338
+
+(71) "Gaussian Process Latent Factor Regression for Low-Data, High-Dimensional
+       Output Problems."
+      Stevenson, E.T., Wolf, E.T., Mak, M.T., Mayne, N.J., and Cranmer, M.
+      arXiv preprint arXiv:2606.06576 (2026)
+      https://doi.org/10.48550/arXiv.2606.06576
+
+(70) "Modeling Volcanic Plume Heights across Exoplanet Atmospheres: Insights from
+       TRAPPIST-1."
+      Saxena, P., and Fauchez, T.J.
+      The Astrophysical Journal, 1003:201 (2026)
+
+(69) "Maximum lifetime of the vegetative biosphere."
+      Haqq-Misra, J., and Wolf, E.T.
+      Journal of Geophysical Research: Atmospheres, 131, e2025JD045586 (2026)
+
+(68) "The influence of hypothetical exomoons on planetary thermal phase curves."
+      Song, X., Yang, J., Ouyang, Y., 
+      A&A, 708, A79 (2026)
+      https://doi.org/10.1051/0004-6361/202555379
+
 
 ================================== 2025 ======================================
-(62) "The climates and thermal emission spectra of prime nearby temperate rocky exoplanet targets."
-     Hammond, T., Komacek, T.D., Kopparapu, R.K., Fauchez, T.J., Mandell, A.M., Wolf, E.T., Kofman, V., Kane, S.R., Johnson, T.M., Desai, A., Arney, G., Crouse, J.S/
+
+(67) "Snowball Bistability Vanishes at Moderate Orbital Eccentricity"
+     Ji, X., and Abbot, D.S.
+     Planet. Sci. J. 6 296 (2025)
+     DOI 10.3847/PSJ/ae201c
+
+(66) "Discovery of a Nearby Habitable Zone Super-Earth Candidate Amenable to Direct Imaging"
+     Beard, C., Robertson, P, et al.
+     AJ 170 279 (2025)
+     DOI 10.3847/1538-3881/ae0e20
+
+(65) "Chemistry, Climate, and Transmission Spectra of TRAPPIST-1 e Explored with a Multimodel Sparse Sampled Ensemble"
+     Wolf, E.T., Schwieterman, E.W, Haqq-Misra, J., et al.
+     Planet. Sci. J. 6 231, (2025)
+     DOI 10.3847/PSJ/ae031e
+
+(64) "Formation of Near-surface Atmospheric Inversion and Surface Inversion in Hothouse Climates."
+     Liu, J., Ding, F., and Yang, J.
+     ApJ 985 193 (2025)
+     DOI 10.3847/1538-4357/adca3c
+
+(63) "The climates and thermal emission spectra of prime nearby temperate rocky exoplanet targets."
+     Hammond, T., Komacek, T.D., Kopparapu, R.K., et al.
+     ApJ 984 181 (2025)
+     DOI 10.3847/1538-4357/adc73b
+
+(62) "General circulation models of Hycean worlds"
+     Barrier, E.F.L. and Madhusudhan, N.
+     MNRAS 544, 4, 4098-4118 (2025),
+     https://doi.org/10.1093/mnras/staf1948
 
 (61) "A new convection scheme for GCMs of temperate sub-Neptunes."
      Barrier, E.F.L. and Madhusudhan, N.
-
+     MNRAS 538, 44, 2463-2482 (2025),
+     https://doi.org/10.1093/mnras/staf267
+     
 (60) "Increased Surface Temperatures of Habitable White Dwarf Worlds Relative
        to Main-Sequence Exoplanets"
       Shields, A.L., Wolf, E.T., Agol, E., and Tremblay, P.E.
-      Accepted somewhere
+      ApJ 979 45 (2025)
+      DOI 10.3847/1538-4357/ad9827
 
 (59) "Oxidizing ExoCAM: Introducing the Radiative Effects of Oxygen and Ozone into
        the ExoCAM General Circulation Model."
