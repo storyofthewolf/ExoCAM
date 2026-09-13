@@ -31,42 +31,57 @@ Stellar input — two accepted formats (autodetected by extension):
                          1 - wavelength, in microns
                          2 - reflectance at that wavelength (0 - 1)
                          3 - error, if any
+
+Two ways to use this file:
+
+    CLI (unchanged):
+        python broadband_albedo_calculator.py G2V_SUN_n68.nc --stel_dir <dir> --blueice
+
+    Library (added 2026-09-13 so exocam-casemgr's `build.py prep` can call it
+    without shelling out and scraping stdout):
+        from broadband_albedo_calculator import compute_albedo
+        r = compute_albedo('/path/to/G2V_SUN_n68.nc', 'blueice')
+        r['vis'], r['ir'], r['bond']
+
+    The reflectance spectra live in ../spectral_albedos relative to THIS file,
+    not relative to the working directory, so the function works from anywhere.
+    The numerics are identical to the original script.
 """
-#Importing all the libraries
-import numpy as np
-import scipy.interpolate as ip
-import matplotlib.pyplot as plt
-import scipy.interpolate as interpol
+# Importing all the libraries
 import argparse
-from pathlib import Path
+import os
 import sys
+from pathlib import Path
 
-# input arguments and options
-parser = argparse.ArgumentParser()
-parser.add_argument('stel'     , type=str,  default=' ',  help='Stellar spectra file name (ASCII 2-column, or ExoRT n68/n84 *.nc)')
-parser.add_argument('--stel_dir'     , type=str,   default='/discover/nobackup/etwolf/models/ExoRT/data/solar/raw',  help='Standard directory')
-parser.add_argument('--header-lines', type=int, default=None, help='Force this many leading header lines to skip in an ASCII stellar file (default: autodetect)')
-parser.add_argument('--snow',        action='store_true', help='use snow albedo file')
-parser.add_argument('--blueice',       action='store_true', help='use blue marine ice file')
-parser.add_argument('--mixed',        action='store_true', help='use 50/50 mix file')
-args = parser.parse_args()
+import numpy as np
+import scipy.interpolate as interpol
 
+# Reflectance spectra shipped with ExoCAM, keyed by the surface name used on
+# the CLI (--snow / --blueice / --mixed) and by casemgr's `ice_surface` key.
+SURFACE_FILES = {
+    'blueice': 'Bluemarineice.txt',
+    'mixed':   '50%Mixture.txt',
+    'snow':    'snow100um.txt',
+}
+DEFAULT_ALBEDO_DIR = Path(__file__).resolve().parent.parent / 'spectral_albedos'
 
-directory = Path(args.stel_dir)
-filename = args.stel
-stellar_file = directory / filename
-
-
-#Set number of lines of header information to ignore
+# Set number of lines of header information to ignore in the reflectance file
 alb_nh = 1
 
-#Conversion factor
-#wavelengths must be converted to microns
-#check header information for given SED
-#1.0e-4 angstroms to microns
+# Conversion factor
+# wavelengths must be converted to microns
+# check header information for given SED
+# 1.0e-4 angstroms to microns
 stel_convert_wavl = 1.0e-4
-#stel_convert_wavl = 1.0
 alb_convert_wavl = 1.0
+
+# Cut between the visible and near-IR broadband albedos (microns). This is the
+# CICE convention behind albicev/albicei and albsnowv/albsnowi.
+VIS_IR_CUTOFF_UM = 0.76923
+
+# Solar-constant normalisation of the interpolated spectrum. Only the shape of
+# the SED matters for the albedo ratio; this cancels.
+SNORM = 1360.0
 
 
 def _detect_header_lines(lines):
@@ -84,7 +99,7 @@ def _detect_header_lines(lines):
     return len(lines)
 
 
-def read_stellar_ascii(path, forced_header=None):
+def read_stellar_ascii(path, forced_header=None, verbose=True):
     """Read a 2-column ASCII stellar SED. Returns (lamda_microns, flux) lists.
     Header length is autodetected unless forced_header is given."""
     with open(path, 'r') as f:
@@ -98,7 +113,8 @@ def read_stellar_ascii(path, forced_header=None):
             flux.append(float(line.split()[1]))
         except (ValueError, IndexError):
             # Skip lines that cannot be converted to float
-            print(f"Skipping line: {line.strip()}")
+            if verbose:
+                print(f"Skipping line: {line.strip()}")
     return lamda, flux
 
 
@@ -129,113 +145,179 @@ def read_stellar_netcdf(path):
     return lam_center[order].tolist(), flux_density[order].tolist()
 
 
-# Dispatch on file type: NetCDF if .nc extension, else ASCII.
-if str(stellar_file).lower().endswith('.nc'):
-    lamda, flux = read_stellar_netcdf(stellar_file)
-else:
-    lamda, flux = read_stellar_ascii(stellar_file, forced_header=args.header_lines)
+def read_stellar(path, header_lines=None, verbose=True):
+    """Dispatch on file type: NetCDF if .nc extension, else ASCII."""
+    if str(path).lower().endswith('.nc'):
+        return read_stellar_netcdf(path)
+    return read_stellar_ascii(path, forced_header=header_lines, verbose=verbose)
 
 
-
-alb_modes = [args.mixed, args.snow, args.blueice]
-true_count = sum(alb_modes)
-if true_count != 1:
-        print("\nConfiguration Error: Invalid execution mode selected.")
-        print(f"You must select **exactly one** of --snow, --blueice, or --mixed.")
-
-        # Optionally show the usage/help message before exiting
-        #parser.print_help()
-
-        # Exit the script with a non-zero status code (indicates an error)
-        sys.exit(1)
-
-#Reading in the Albedo file for surface
-if args.mixed:    albedo_file = "../spectral_albedos/50%Mixture.txt"
-if args.snow:  albedo_file = "../spectral_albedos/snow100um.txt"
-if args.blueice:     albedo_file = "../spectral_albedos/Bluemarineice.txt"
-with open(albedo_file, 'r') as f:
-    lines = f.readlines()
-    header = lines[0:alb_nh]
+def read_reflectance(albedo_file):
+    """Read a USGS-style reflectance spectrum. Returns (wave_microns, albedo)."""
+    with open(albedo_file, 'r') as f:
+        lines = f.readlines()
     wave = [float(line.split()[0]) * alb_convert_wavl for line in lines[alb_nh:]]
     albedo = [float(line.split()[1]) for line in lines[alb_nh:]]
-
-print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-print("Using stellar spectral file...")
-print("  ", stellar_file)
-print("Using albedo file...")
-print("  ", albedo_file)
-
-#find the minimum and maximum in both stellar and albedo files and match them for interpolation purpose
-a = np.min(wave)
-b = np.max(wave)
-c = np.min(lamda)
-d = np.max(lamda)
-start_g = max(a,c)
-end_g = min(b,d)
-
-# Checking maximum and minimum grid is important else code result is NAN. Default = 2.5, Warm ice 2.3
-mingrid = start_g
-maxgrid = end_g
+    return wave, albedo
 
 
-#Set up the grid
-ngrid = 10000
-n = np.arange(10000)
-k = maxgrid - mingrid
-wavelengthgrid = (mingrid + k * n / (ngrid-1))
-dlamda = (np.max(wavelengthgrid)- np.min(wavelengthgrid))/(len(wavelengthgrid)-1)
+def resolve_surface_file(surface, albedo_dir=None):
+    """Map a surface name (blueice/mixed/snow) or an explicit reflectance file
+    path to the file to read."""
+    if surface in SURFACE_FILES:
+        base = Path(albedo_dir) if albedo_dir else DEFAULT_ALBEDO_DIR
+        return base / SURFACE_FILES[surface]
+    p = Path(surface)
+    if p.is_file():
+        return p
+    raise ValueError(
+        f"unknown surface '{surface}': expected one of "
+        f"{', '.join(sorted(SURFACE_FILES))} or a reflectance file path")
 
-# Interpolation
-#print(len(wavelengthgrid),len(lamda),len(flux))
-stellarInterpolate4 = np.interp(wavelengthgrid,lamda,flux)
-temp = interpol.CubicSpline(wave,albedo)
-albedoInterpolate = temp(wavelengthgrid)
 
-#Normalization
-flux4 = stellarInterpolate4/np.max(stellarInterpolate4)
+def compute_albedo(stellar_file, surface, albedo_dir=None, header_lines=None,
+                   verbose=False):
+    """SED-weighted broadband albedos of one surface under one star.
 
-#More calculations for scaling
-Snorm = 1360
-total_sed4 = sum(stellarInterpolate4*dlamda)
-ScaleFac = Snorm/total_sed4
-scaledflux4 = total_sed4*ScaleFac
-new_total_sed4 = scaledflux4
-new_flux4 = stellarInterpolate4*ScaleFac
-total_new_flux_4 = sum(new_flux4 * dlamda)
+    stellar_file : ExoRT *.nc (preferred — it is exactly the spectrum the
+                   model sees) or a 2-column ASCII SED.
+    surface      : 'blueice' | 'mixed' | 'snow', or a reflectance file path.
+    albedo_dir   : override the ../spectral_albedos directory.
 
-#Setting up cuts between IR and Vis
-#cutoff wavelengths in microns
-cutoff = 0.76923
-ind_v = np.where(wavelengthgrid[:]<cutoff)
-ind_i = np.where(wavelengthgrid[:]> cutoff )
+    Returns a dict: vis, ir, bond (floats), plus stellar_file, albedo_file and
+    cutoff_um for provenance. The numerics are the original script's, verbatim.
+    """
+    stellar_file = Path(stellar_file)
+    albedo_file = resolve_surface_file(surface, albedo_dir)
 
-print("Using cuttoff wavelength (microns) ...")
-print("  ", cutoff)
+    lamda, flux = read_stellar(stellar_file, header_lines, verbose=verbose)
+    wave, albedo = read_reflectance(albedo_file)
 
-#use this to calculate bond albedo
-ind_w = np.where(wavelengthgrid[:]>0)
+    if verbose:
+        print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+        print("Using stellar spectral file...")
+        print("  ", stellar_file)
+        print("Using albedo file...")
+        print("  ", albedo_file)
 
-#Multiplying reflectance spectrum to normalized stellar specrtrum
-albedo_sed_M_v = (albedoInterpolate[ind_v]) * (new_flux4[ind_v]) *dlamda
-albedo_sed_M_i = (albedoInterpolate[ind_i]) * (new_flux4[ind_i]) *dlamda
-albedo_sed = (albedoInterpolate[ind_w])*(new_flux4[ind_w]) *dlamda
+    # find the minimum and maximum in both stellar and albedo files and match
+    # them for interpolation purpose
+    a = np.min(wave)
+    b = np.max(wave)
+    c = np.min(lamda)
+    d = np.max(lamda)
+    start_g = max(a, c)
+    end_g = min(b, d)
 
-#Calculate the sum
-total_albedo_sed_M_v = sum(albedo_sed_M_v)
-total_albedo_sed_M_i = sum(albedo_sed_M_i)
-total_albedo_sed = sum(albedo_sed)
+    # Checking maximum and minimum grid is important else code result is NAN.
+    mingrid = start_g
+    maxgrid = end_g
 
-total_sed_M_v = sum(new_flux4[ind_v]*dlamda)
-total_sed_M_i = sum(new_flux4[ind_i]*dlamda)
-total_sed = sum(new_flux4[ind_w]*dlamda)
+    # Set up the grid
+    ngrid = 10000
+    n = np.arange(10000)
+    k = maxgrid - mingrid
+    wavelengthgrid = (mingrid + k * n / (ngrid - 1))
+    dlamda = (np.max(wavelengthgrid) - np.min(wavelengthgrid)) / (len(wavelengthgrid) - 1)
 
-#Calculate albedo for IR, Vis, and bond albedo for a given host star SED
-albedo_M_v = total_albedo_sed_M_v/total_sed_M_v
-albedo_M_i = total_albedo_sed_M_i/total_sed_M_i
-Bond_albedo = total_albedo_sed/total_sed
+    # Interpolation
+    stellarInterpolate4 = np.interp(wavelengthgrid, lamda, flux)
+    temp = interpol.CubicSpline(wave, albedo)
+    albedoInterpolate = temp(wavelengthgrid)
 
-#Print the numbers
-print('Albedo Vis =', albedo_M_v)
-print('Albedo IR =', albedo_M_i)
-print('Broadband Albedo =', Bond_albedo)
-print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+    # Normalisation to the solar constant (cancels in the ratio below)
+    total_sed4 = sum(stellarInterpolate4 * dlamda)
+    ScaleFac = SNORM / total_sed4
+    new_flux4 = stellarInterpolate4 * ScaleFac
+
+    # Setting up cuts between IR and Vis
+    cutoff = VIS_IR_CUTOFF_UM
+    ind_v = np.where(wavelengthgrid[:] < cutoff)
+    ind_i = np.where(wavelengthgrid[:] > cutoff)
+    ind_w = np.where(wavelengthgrid[:] > 0)
+
+    if verbose:
+        print("Using cuttoff wavelength (microns) ...")
+        print("  ", cutoff)
+
+    # Multiplying reflectance spectrum to normalized stellar spectrum
+    albedo_sed_M_v = (albedoInterpolate[ind_v]) * (new_flux4[ind_v]) * dlamda
+    albedo_sed_M_i = (albedoInterpolate[ind_i]) * (new_flux4[ind_i]) * dlamda
+    albedo_sed = (albedoInterpolate[ind_w]) * (new_flux4[ind_w]) * dlamda
+
+    total_albedo_sed_M_v = sum(albedo_sed_M_v)
+    total_albedo_sed_M_i = sum(albedo_sed_M_i)
+    total_albedo_sed = sum(albedo_sed)
+
+    total_sed_M_v = sum(new_flux4[ind_v] * dlamda)
+    total_sed_M_i = sum(new_flux4[ind_i] * dlamda)
+    total_sed = sum(new_flux4[ind_w] * dlamda)
+
+    # Calculate albedo for IR, Vis, and bond albedo for a given host star SED
+    albedo_M_v = total_albedo_sed_M_v / total_sed_M_v
+    albedo_M_i = total_albedo_sed_M_i / total_sed_M_i
+    Bond_albedo = total_albedo_sed / total_sed
+
+    if verbose:
+        print('Albedo Vis =', albedo_M_v)
+        print('Albedo IR =', albedo_M_i)
+        print('Broadband Albedo =', Bond_albedo)
+        print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+
+    return {
+        'vis': float(albedo_M_v),
+        'ir': float(albedo_M_i),
+        'bond': float(Bond_albedo),
+        'stellar_file': str(stellar_file),
+        'albedo_file': str(albedo_file),
+        'cutoff_um': cutoff,
+    }
+
+
+def compute_cice_albedos(stellar_file, ice_surface='blueice', albedo_dir=None):
+    """The four user_nl_cice broadband albedos for one star.
+
+    albice{v,i} come from `ice_surface` (blueice or mixed); albsnow{v,i} always
+    from the snow spectrum. Returns {'albicev', 'albicei', 'albsnowv',
+    'albsnowi'} plus the two per-surface results under 'ice' and 'snow'.
+    """
+    ice = compute_albedo(stellar_file, ice_surface, albedo_dir)
+    snow = compute_albedo(stellar_file, 'snow', albedo_dir)
+    return {
+        'albicev': ice['vis'], 'albicei': ice['ir'],
+        'albsnowv': snow['vis'], 'albsnowi': snow['ir'],
+        'ice': ice, 'snow': snow,
+    }
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser()
+    parser.add_argument('stel', type=str, default=' ',
+                        help='Stellar spectra file name (ASCII 2-column, or ExoRT n68/n84 *.nc)')
+    parser.add_argument('--stel_dir', type=str,
+                        default='/discover/nobackup/etwolf/models/ExoRT/data/solar/raw',
+                        help='Standard directory')
+    parser.add_argument('--header-lines', type=int, default=None,
+                        help='Force this many leading header lines to skip in an ASCII '
+                             'stellar file (default: autodetect)')
+    parser.add_argument('--snow', action='store_true', help='use snow albedo file')
+    parser.add_argument('--blueice', action='store_true', help='use blue marine ice file')
+    parser.add_argument('--mixed', action='store_true', help='use 50/50 mix file')
+    parser.add_argument('--albedo-dir', default=None,
+                        help=f'directory holding the reflectance spectra (default: {DEFAULT_ALBEDO_DIR})')
+    args = parser.parse_args(argv)
+
+    alb_modes = {'mixed': args.mixed, 'snow': args.snow, 'blueice': args.blueice}
+    chosen = [k for k, v in alb_modes.items() if v]
+    if len(chosen) != 1:
+        print("\nConfiguration Error: Invalid execution mode selected.")
+        print("You must select **exactly one** of --snow, --blueice, or --mixed.")
+        sys.exit(1)
+
+    stellar_file = Path(args.stel_dir) / args.stel
+    compute_albedo(stellar_file, chosen[0], albedo_dir=args.albedo_dir,
+                   header_lines=args.header_lines, verbose=True)
+
+
+if __name__ == '__main__':
+    main()

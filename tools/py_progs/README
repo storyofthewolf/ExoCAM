@@ -3,6 +3,10 @@ a variety of useful python scripts for use with ExoCAM
 
 sys.in 	     	    	        -- contains system information (paths)
 exocampy_tools.py               -- a collection of standard tools for manipulating CAM files
-changevert_cesm.py              -- change the numnber of vertical levels in CAM .i. files
-broadband_albedo_calculator.py  -- script to produce SED weighted snow and ice
-				   albedo for user_nl_cice
+mod_ncdata.py                   -- modify CAM .i. files (ncdata): vertical levels,
+                                   surface pressure (flat/scaled), dry. Importable
+                                   (modify_ncdata) and a CLI; replaces the IDL
+                                   changevert_cesm.pro / changepress_cesm.pro.
+broadband_albedo_calculator.py  -- SED-weighted snow and ice broadband albedos for
+                                   user_nl_cice. CLI, or import compute_albedo /
+                                   compute_cice_albedos (used by exocam-casemgr prep)
