@@ -16,7 +16,8 @@
                     pkkp, wzkp, cx_om, cy_om, filtcw, s_trac,      &
                     mlt, ncx, ncy, nmfx, nmfy, iremote,            &
                     cxtag, cytag, mfxtag, mfytag,                  &
-                    cxreqs, cyreqs, mfxreqs, mfyreqs)
+                    cxreqs, cyreqs, mfxreqs, mfyreqs,              &
+                    do_am_fixes, dod, don)
 
 ! !USES:
    use shr_kind_mod,  only : r8 => shr_kind_r8
@@ -153,6 +154,18 @@
     ptc(grid%im,grid%jfirst:grid%jlast,grid%kfirst:grid%klast)
   real(r8), intent(out) ::   &
     ptk(grid%im,grid%jfirst:grid%jlast,grid%kfirst:grid%klast)
+
+! C.-C. Chen, omega calculation
+    real(r8), intent(out) ::   &
+    cx_om(grid%im,grid%jfirst:grid%jlast,grid%kfirst:grid%klast)   ! Courant in X
+  real(r8), intent(out) ::  &
+    cy_om(grid%im,grid%jfirst:grid%jlast+1,grid%kfirst:grid%klast) ! Courant in Y
+
+! do_am_fixes options
+   logical, intent(in) :: do_am_fixes
+   real(r8), intent(out) :: don(grid%jm,grid%km), & ! num of d(Omega)
+   dod(grid%jm,grid%km)    ! denom of same
+
 ! Work arrays
 
 ! ! !DESCRIPTION:
@@ -256,7 +269,7 @@
       integer :: npes_yz
 
       integer i, j, k, ml
-      integer js1g1, js2g0, js2g1, jn2g1
+      integer js1g1, js2g0, js2g1, jn2g1, js4g0, jn3g0 
       integer jn2g0, jn1g1
       integer iord , jord
       integer ktot, ktotp
@@ -288,12 +301,33 @@
   logical :: ldiv4 = .false.  
   logical :: ldel2 = .false.   
 
+  ! do_am_fixes options
+  real(r8) :: oma
+  real(r8) :: xakap
+  real(r8), pointer :: cosp(:)
+  real(r8), pointer :: cose(:)
 
-! C.-C. Chen, omega calculation
-  real(r8), intent(out) ::   &
-    cx_om(grid%im,grid%jfirst:grid%jlast,grid%kfirst:grid%klast)   ! Courant in X
-  real(r8), intent(out) ::  &
-    cy_om(grid%im,grid%jfirst:grid%jlast+1,grid%kfirst:grid%klast) ! Courant in Y
+  real(r8), allocatable :: help(:,:,:) 
+  real(r8), allocatable :: kelp(:,:,:) 
+  real(r8), allocatable :: dpn(:,:,:)
+  real(r8), allocatable :: dpo(:,:,:)
+  real(r8), allocatable :: dpr(:,:,:)
+  real(r8), allocatable :: ddpu(:,:,:)
+  real(r8), allocatable :: dpns(:,:)
+  real(r8), allocatable :: ddus(:,:)
+
+  ! referenced outside AM conditional even though it's not used
+  real(r8) :: ddpa(grid%im,grid%jfirst-1:grid%jlast  ,grid%kfirst:grid%klast  ) 
+  real(r8) :: ddu( grid%im,grid%jfirst  :grid%jlast  ,grid%kfirst:grid%klast  )
+  real(r8) :: vf(  grid%im,grid%jfirst-2:grid%jlast+2,grid%kfirst:grid%klast  )   ! v-Winds on U points
+
+  ! Used to allow the same code to execute with or without the AM correction
+  real(r8) :: ptr(grid%im,grid%jfirst-1:grid%jlast+1,grid%kfirst:grid%klast+1)
+
+  logical  :: sw_am_corr
+  logical  :: am_press_crrct
+  real(r8) :: wg_hiord
+  real(r8) :: tpr, acap
 
 !******************************************************************
 !******************************************************************
@@ -367,6 +401,33 @@
       ktot = klast - kfirst + 1
       ktotp = ktot + 1
 
+   ! Allocate do_am_fixes options
+      if (do_am_fixes) then 
+         allocate( &
+            help(grid%im,grid%jfirst-1:grid%jlast ,grid%kfirst:grid%klast  ), &
+            kelp(grid%im,grid%jfirst-1:grid%jlast ,grid%kfirst:grid%klast  ), &
+            dpn(grid%im,grid%jfirst  :grid%jlast  ,grid%kfirst:grid%klast  ), &
+            dpo(grid%im,grid%jfirst  :grid%jlast  ,grid%kfirst:grid%klast  ) )
+         acap = 1._r8/4._r8 ! effective AM/MoI contribution from polar caps
+
+
+         allocate( &
+            ddpu(grid%im,grid%jfirst  :grid%jlast ,grid%kfirst:grid%klast  ), &
+            dpns(grid%jfirst:grid%jlast,grid%kfirst:grid%klast), &
+            ddus(grid%jfirst:grid%jlast,grid%kfirst:grid%klast) )
+         ddus = 0._r8
+      else
+         xakap = 1._r8
+      endif
+   
+      ! maintain consistent accuracy (uniform PPM order) over domain
+
+      oma  =  ae*om
+      don  = 0.0_r8
+      dod  = 0.0_r8
+      cosp => grid%cosp
+      cose => grid%cose
+
     if (iam .lt. npes_yz) then
 
       call FVstartclock(grid,'---PRE_C_CORE')
@@ -388,6 +449,9 @@
       jn2g0  = min(jm-1,jlast)
       jn1g1  = min(jm,jlast+1)
       jn2g1 = min(jm-1,jlast+1)
+
+      js4g0  = max(4,jfirst)
+      jn3g0  = min(jm-2,jlast)
 
       if( abs(grid%dt0-dt) > D0_1 ) then
 
@@ -574,7 +638,7 @@
             !
             ! 4th-order divergence damping
             !            
-            tau4 = 0.01_r8 / (abs(dt)) 
+            tau4 = 0.005_r8 / (abs(dt)) 
             !
             !**************************************
             !
@@ -1108,26 +1172,187 @@
 ! Call the vertical independent part of the dynamics on the D-grid
 !-----------------------------------------------------------------
 
-         call d_sw( grid, u(1,jfirst-ng_d,k),      v(1,jfirst-ng_s,k),     &
-                    uc(1,jfirst-ng_d,k),    vc(1,jfirst-2,k),        &
-                    pt(1,jfirst-ng_d,k),   delp(1,jfirst,k),         &
-                    delpf(1,jfirst-ng_d,k), cx3(1,jfirst-ng_d,k),    &
-                    cy3(1,jfirst,k),        mfx(1,jfirst,k),         &
-                    mfy(1,jfirst,k),              &
-                    grid%cdx  (js2g0:,k),grid%cdy (js2g0:,k),        &
-                    grid%cdxde (js2g0:,k),grid%cdxdp (js2g0:,k),     & 
-                    grid%cdyde(js2g0:,k) ,grid%cdydp(js2g0:,k),      & 
-                    grid%cdxdiv(:,k),grid%cdydiv(:,k) ,              & 
-                    grid%cdx4 (js2g0:,k),grid%cdy4(js2g0:,k) ,       & 
-                    grid%cdtau4(js2g0:,k), ldiv2, ldiv4, ldel2,      & 
-                    iord, jord, tiny )
+         if (do_am_fixes) then 
+            do j = jfirst, jlast
+               do i = 1, im
+                  kelp(i,j,k) = delp(i,j,k) ! un-updated delp on A grid
+               end do
+            end do
+         end if
 
+         ! don't apply correction if order is not 4
+         sw_am_corr = do_am_fixes .and. iord.eq.iord_d .and. jord.eq.jord_d 
+
+         call d_sw( grid, u(1,jfirst-ng_d,k),      v(1,jfirst-ng_s,k),  &
+                    uc(1,jfirst-ng_d,k),    vc(1,jfirst-2,k),           &
+                    pt(1,jfirst-ng_d,k),   delp(1,jfirst,k),            &
+                    delpf(1,jfirst-ng_d,k), cx3(1,jfirst-ng_d,k),       &
+                    cy3(1,jfirst,k),        mfx(1,jfirst,k),            &
+                    mfy(1,jfirst,k),                                    &
+                    grid%cdx  (js2g0:,k),grid%cdy (js2g0:,k),           &
+                    grid%cdxde (js2g0:,k),grid%cdxdp (js2g0:,k),        & 
+                    grid%cdyde(js2g0:,k) ,grid%cdydp(js2g0:,k),         & 
+                    grid%cdxdiv(:,k),grid%cdydiv(:,k) ,                 & 
+                    grid%cdx4 (js2g0:,k),grid%cdy4(js2g0:,k) ,          & 
+                    grid%cdtau4(js2g0:,k), ldiv2, ldiv4, ldel2,         & 
+                    iord, jord, tiny, sw_am_corr,                       &
+                    ddpa(1,jfirst,k), ddu(1,jfirst,k),                  &
+                    vf(1,jfirst-2   ,k) )
+
+         if (do_am_fixes) then 
+            do j = jfirst, jlast
+               do i = 1, im
+                  help(i,j,k) = delp(i,j,k) ! updated delp on A grid
+               end do
+            end do
+         end if
+      
       enddo
 #if !defined(USE_OMP)
 !CSD$ END PARALLEL DO
 #endif
 
       call FVstopclock(grid,'---D_CORE')
+
+      ! AM correction and fixer (main block)
+      if (do_am_fixes) then 
+ 
+         call FVbarrierclock(grid,'sync_dp4corr_1', grid%commyz) 
+         call FVstartclock(grid,'---dp4corr_COMM_1')
+
+#if defined( SPMD )
+         ! only (jfirst-1) halo point required (iam,jlast) -> (iam+1,jfirst-1)
+         dest = iam+1
+         src  = iam-1
+         if ( mod(iam,  npr_y) == 0 ) src = -1
+         if ( mod(iam+1,npr_y) == 0 ) dest = -1
+         call mp_send3d( grid%commyz, dest, src, im, jm, km,            &
+                         1, im, jfirst-1, jlast, kfirst, klast,         &
+                         1, im, jlast   , jlast, kfirst, klast, help )            
+         call mp_recv3d( grid%commyz, src, im, jm, km,                  &
+                         1, im, jfirst-1, jlast   , kfirst, klast,      &
+                         1, im, jfirst-1, jfirst-1, kfirst, klast, help )
+         call mp_send3d( grid%commyz, dest, src, im, jm, km,            &
+                         1, im, jfirst-1, jlast, kfirst, klast,         &
+                         1, im, jlast   , jlast, kfirst, klast, kelp )            
+         call mp_recv3d( grid%commyz, src, im, jm, km,                  &
+                         1, im, jfirst-1, jlast   , kfirst, klast,      &
+                         1, im, jfirst-1, jfirst-1, kfirst, klast, kelp )
+         call mp_send3d( grid%commyz, dest, src, im, jm, km,         &
+                           1, im, jfirst-1, jlast, kfirst, klast,      &
+                           1, im, jlast   , jlast, kfirst, klast, ddpa )            
+         call mp_recv3d( grid%commyz, src, im, jm, km,                  &
+                           1, im, jfirst-1, jlast   , kfirst, klast,      &
+                           1, im, jfirst-1, jfirst-1, kfirst, klast, ddpa )
+#endif
+         call FVstopclock(grid,'---dp4corr_COMM_1')
+
+         call FVbarrierclock(grid,'sync_dp4corr_2', grid%commyz) 
+         call FVstartclock(grid,'---dp4corr_COMM_2')
+
+!$omp parallel do private(i, j, k) 
+         do k = kfirst, klast
+            do j = js2g0, jlast
+               do i = 1, im
+                  dpn(i,j,k)=(help(i,j,k)*cosp(j)+help(i,j-1,k)*cosp(j-1))/(cosp(j)+cosp(j-1)) ! A->D
+                  dpo(i,j,k)=(kelp(i,j,k)*cosp(j)+kelp(i,j-1,k)*cosp(j-1))/(cosp(j)+cosp(j-1)) ! A->D
+               end do
+            end do
+            if (jfirst == 1) then
+               do i = 1, im
+                  dpn(i, 2,k)=(help(i,  2 ,k)*cosp(  2 )+acap*help(i, 1,k)*cose( 2))/cosp(  2 )
+                  dpo(i, 2,k)=(kelp(i,  2 ,k)*cosp(  2 )+acap*kelp(i, 1,k)*cose( 2))/cosp(  2 )
+               end do
+            endif
+            if (jlast == jm) then
+               do i = 1, im
+                  dpn(i,jm,k)=(help(i,jm-1,k)*cosp(jm-1)+acap*help(i,jm,k)*cose(jm))/cosp(jm-1)
+                  dpo(i,jm,k)=(kelp(i,jm-1,k)*cosp(jm-1)+acap*kelp(i,jm,k)*cose(jm))/cosp(jm-1)
+               end do
+            endif
+         end do
+
+         do k = kfirst, klast
+            do j = js2g0, jlast
+               do i = 1, im
+                  ddpu(i,j,k)=(ddpa(i,j,k)*cosp(j)+ddpa(i,j-1,k)*cosp(j-1))/(cosp(j)+cosp(j-1)) ! A->D
+               end do
+            end do
+         end do
+
+         do k = kfirst, klast
+            do j = js2g0, jlast
+               do i = 1, im
+                  ddu(i,j,k) = ddu(i,j,k)*0.5_r8*(dpo(i,j,k) + dpn(i,j,k))
+               end do
+            end do
+         end do
+
+         do k = kfirst, klast
+            do j = js2g0, jlast
+               ddus(j,k) = ddu(1,j,k) &
+                           + (u(1,j,k) + uc(1,j,k)*0.5_r8)*ddpu(1,j,k) &
+                           + wg_hiord*vf(1,j,k)*(dpn(1,j,k) - dpo(1,j,k))*0.5_r8
+               dpns(j,k) = dpn(1,j,k)
+               do i = 2, im
+                  ddus(j,k) = ddus(j,k) &
+                              + ddu(i,j,k) &
+                              + (u(i,j,k)+uc(i,j,k)*0.5_r8)*ddpu(i,j,k) &
+                              + wg_hiord*vf(i,j,k)*(dpn(i,j,k)-dpo(i,j,k))*0.5_r8
+                  dpns(j,k) = dpns(j,k) + dpn(i,j,k)
+               end do
+               ddus(j,k) = ddus(j,k)/dpns(j,k)  
+               ! taper beyond 72S/N
+               tpr = max(abs(-2.5_r8 + ((j-1)-0.5_r8)*(5._r8/(jm-1))),2._r8)
+               tpr = cos(pi*tpr)**2
+               ddus(j,k)=ddus(j,k)*tpr
+            end do
+         end do
+
+         do k = kfirst, klast
+            do j = js4g0, jn3g0
+               do i = 1, im !+++++++++++++++++++++++++++++++++++++++++++++
+                  uc(i,j,k) = uc(i,j,k) + ddus(j,k) !  APPLY AM CORRECTION
+               enddo        !+++++++++++++++++++++++++++++++++++++++++++++
+            enddo
+         enddo
+ 
+         ! AM fixer section
+         do k = kfirst, klast
+            do j = js2g0, jlast
+               do i = 1, im
+                  dpn(i,j,k) = (help(i,j,k) + help(i,j-1,k) )/ 2._r8
+                  dpo(i,j,k) = (kelp(i,j,k) + kelp(i,j-1,k) )/ 2._r8
+               end do
+            end do
+            if (jfirst == 1) then
+               do i = 1, im
+                  dpn(i,2,k) = (help(i,2,k) + help(i,1,k) )/ 2._r8
+                  dpo(i,2,k) = (kelp(i,2,k) + kelp(i,1,k) )/ 2._r8
+               end do
+            endif
+            if (jlast == jm) then
+               do i = 1, im
+                  dpn(i,jm,k) = (help(i,jm-1,k) + help(i,jm,k) )/ 2._r8
+                  dpo(i,jm,k) = (kelp(i,jm-1,k) + kelp(i,jm,k) )/ 2._r8
+               end do
+            endif
+         end do
+
+         do k = kfirst, klast
+            do j = js2g0, jlast
+               do i = 1, im
+                  don(j,k) = don(j,k) + (cosp(j) + cosp(j-1))*cose(j) &
+                              *(uc(i,j,k)*dpn(i,j,k)                   &
+                              + (u(i,j,k) + cose(j)*oma)*(dpn(i,j,k) - dpo(i,j,k)))
+                  dod(j,k) = dod(j,k) + (cosp(j) + cosp(j-1))*cose(j)**2*dpn(i,j,k)
+               end do
+            end do
+         end do
+ 
+         call FVstopclock(grid,'---dp4corr_COMM_2')
+ 
+      endif ! do_am_fixer main block
 
       call FVbarrierclock(grid,'sync_d_geop', grid%commyz)
 

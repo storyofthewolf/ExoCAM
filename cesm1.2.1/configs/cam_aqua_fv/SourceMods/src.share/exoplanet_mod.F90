@@ -27,6 +27,10 @@ module exoplanet_mod
                                                                 !! and linking aerosol absorption to ExoRT
   logical, public, parameter :: do_exo_gw = .false.             !! flag to turn on gravity waves.  Note, present gw wave parameterization
                                                                 !! does not work for low pressure atmospheres.
+  logical, public, parameter :: do_am_fixes = .true.            !! Implements Toniazzi et al. 2020 angular momentum correction in SW transport
+                                                                !! and also global angular momentum fixer. Does not include geometric corrections
+  logical, public, parameter :: do_am_fix_lbl = .true.          !! Implements Toniazzi et al. 2020 angular momentum level by level correction
+                                                                !! instead of spreading over all levels
 
   real(r8), public, parameter :: exo_convect_plim = 5.0_r8     !! Sets the minimum pressure limit in the convection schemes
                                                                 !! Convection will not operate at pressures lower than this
@@ -104,6 +108,20 @@ module exoplanet_mod
   !real(r8), public, parameter :: exo_porb             = exo_ndays                   !! orbital period
   !real(r8), public, parameter :: exo_sday = 86400.0_r8 * exo_ndays      !! sidereal period, synchronous rotator
 
+  !!K2-18b (Benneke et al. 2019) -- assumed tidally locked
+  !real(r8), public, parameter :: exo_planet_radius = 1.66e7_R8           !! radius ~ m
+  !real(r8), public, parameter :: exo_surface_gravity = 12.4_R8           !! gravity ~ m/s^2
+  !real(r8), public, parameter :: exo_ndays = 32.94                       !! scaler to number of Earth days
+  !real(r8), public, parameter :: exo_porb = 32.94                        !! orbital period
+  !real(r8), public, parameter :: exo_sday = 86400.0_r8 * exo_ndays       !! sidereal period, synchronous rotator
+
+  !!TOI-270d (Van Eylen et al. 2021) -- assumed tidally locked
+  ! real(r8), public, parameter :: exo_planet_radius = 1.36e7_R8           !! radius ~ m
+  ! real(r8), public, parameter :: exo_surface_gravity = 10.34_R8           !! gravity ~ m/s^2
+  ! real(r8), public, parameter :: exo_ndays = 11.38                       !! scaler to number of Earth days
+  ! real(r8), public, parameter :: exo_porb = 11.38                        !! orbital period
+  ! real(r8), public, parameter :: exo_sday = 86400.0_r8 * exo_ndays       !! sidereal period, synchronous rotator
+
   !! ============== ORBITAL OPTIONS ============== !!
   !! if set user_nl_cpl::orb_iyear = -1
   !! if user_nl_cpl::orb_iyear=YEAR, then these values are overriden
@@ -151,6 +169,9 @@ module exoplanet_mod
   real(r8), public, parameter :: exo_lnd_albifr_dry = 0.30    ! land albedo, infrared, dry soil
   real(r8), public, parameter :: exo_lnd_albvis_sat = 0.30    ! land albedo, visible, saturated soil
   real(r8), public, parameter :: exo_lnd_albifr_sat = 0.30    ! land albedo, infrared, saturated soil
+
+  !! ============== SURFACE CONDITIONS ============== !!
+  real(r8), public, parameter :: t_int = 30.0_r8        ! internal temperature (K) - applied as a temperature forcing to the slab ocean
 
 
   !! ===================================================================== !!

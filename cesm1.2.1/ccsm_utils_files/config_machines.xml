@@ -50,6 +50,44 @@
         <MAX_TASKS_PER_NODE>USERDEFINED_required_build</MAX_TASKS_PER_NODE>
 </machine>
 
+<machine MACH="ioa">
+        <DESC>Machine to be run on the HPC</DESC>
+        <COMPILERS>gnu</COMPILERS>
+        <COMPILER>gnu</COMPILER>
+        <MPILIBS>openmpi</MPILIBS>
+        <MPILIB>openmpi</MPILIB>
+        <OS>LINUX</OS>
+        <RUNDIR>/home/efxlb2/rds/hpc-work/gcm/runs</RUNDIR>
+        <EXEROOT>/home/efxlb2/rds/hpc-work/gcm/exe</EXEROOT>
+        <DIN_LOC_ROOT>/home/efxlb2/rds/hpc-work/gcm/din_loc</DIN_LOC_ROOT>
+        <DOUT_S>TRUE</DOUT_S>
+        <DOUT_S_ROOT>/home/efxlb2/rds/hpc-work/gcm/archive</DOUT_S_ROOT>
+        <SUPPORTED_BY>Edouard Barrier</SUPPORTED_BY>
+        <GMAKE_J>8</GMAKE_J>
+        <MAX_TASKS_PER_NODE>76</MAX_TASKS_PER_NODE>
+        <BATCHQUERY>squeue -u</BATCHQUERY>
+        <BATCHSUBMIT>sbatch</BATCHSUBMIT>
+</machine>
+
+<machine MACH="ioa_2">
+        <DESC>Machine to be run on the HPC, option to run concurrently with ioa</DESC>
+        <COMPILERS>gnu</COMPILERS>
+        <COMPILER>gnu</COMPILER>
+        <MPILIBS>openmpi</MPILIBS>
+        <MPILIB>openmpi</MPILIB>
+        <OS>LINUX</OS>
+        <RUNDIR>/home/efxlb2/rds/hpc-work/gcm/runs_2</RUNDIR>
+        <EXEROOT>/home/efxlb2/rds/hpc-work/gcm/exe_2</EXEROOT>
+        <DIN_LOC_ROOT>/home/efxlb2/rds/hpc-work/gcm/din_loc</DIN_LOC_ROOT>
+        <DOUT_S>TRUE</DOUT_S>
+        <DOUT_S_ROOT>/home/efxlb2/rds/hpc-work/gcm/archive</DOUT_S_ROOT>
+        <SUPPORTED_BY>Edouard Barrier</SUPPORTED_BY>
+        <GMAKE_J>8</GMAKE_J>
+        <MAX_TASKS_PER_NODE>76</MAX_TASKS_PER_NODE>
+        <BATCHQUERY>squeue -u</BATCHQUERY>
+        <BATCHSUBMIT>sbatch</BATCHSUBMIT>
+</machine>
+
 <machine MACH="bluewaters">
          <DESC>ORNL XE6, os is CNL, 32 pes/node, batch system is PBS</DESC>
 	 <COMPILERS>pgi,cray,gnu</COMPILERS>
@@ -476,116 +514,6 @@
         <PES_PER_NODE>16</PES_PER_NODE>
 </machine>
 
-<machine MACH="hyak">
-         <DESC>HYAK Linux Cluster </DESC>
-         <OS>LINUX</OS>
-	     <COMPILERS>intel</COMPILERS>
-	     <MPILIBS>openmpi,mpich,impi</MPILIBS>
-         <RUNDIR>/gscratch/vsm/$CCSMUSER/rundir/$CASE/run</RUNDIR>
-         <EXEROOT>/gscratch/vsm/$CCSMUSER/rundir/$CASE/bld</EXEROOT>
-         <DIN_LOC_ROOT>/gscratch/vsm/wolfet/cesm_inputdata</DIN_LOC_ROOT>
-         <DIN_LOC_ROOT_CLMFORC>/gscratch/vsm/wolfet/cesm_inputdata/atm/datm7</DIN_LOC_ROOT_CLMFORC>
-         <DOUT_S_ROOT>/gscratch/vsm/$CCSMUSER/archive/$CASE</DOUT_S_ROOT>
-         <DOUT_L_MSROOT>UNDEFINED</DOUT_L_MSROOT>
-         <CCSM_BASELINE>UNDEFINED</CCSM_BASELINE>
-         <CCSM_CPRNC>UNDEFINED</CCSM_CPRNC>
-         <BATCHQUERY>squeue</BATCHQUERY>
-         <BATCHSUBMIT>sbatch</BATCHSUBMIT>
-         <SUPPORTED_BY>eric.wolf@colorado.edu</SUPPORTED_BY>
-         <GMAKE_J>12</GMAKE_J>
-         <PIO_BUFFER_SIZE_LIMIT>1</PIO_BUFFER_SIZE_LIMIT>
-         <MAX_TASKS_PER_NODE>16</MAX_TASKS_PER_NODE>
-</machine>
-
-<machine MACH="summit">
-         <DESC>CU supercomputer</DESC>
-         <COMPILERS>intel</COMPILERS>
-         <MPILIBS>openmpi</MPILIBS>
-         <OS>LINUX</OS>
-         <RUNDIR>/scratch/summit/$CCSMUSER/$CASE/run</RUNDIR>
-         <EXEROOT>/scratch/summit/$CCSMUSER/$CASE/bld</EXEROOT>
-         <DIN_LOC_ROOT>/gpfs/summit/datasets/CESM/inputdata</DIN_LOC_ROOT>
-         <DIN_LOC_ROOT_CLMFORC>/gpfs/summit/datasets/CESM/inputdata/atm/datm7</DIN_LOC_ROOT_CLMFORC>
-         <DOUT_S_ROOT>/scratch/summit/$CCSMUSER/archive/$CASE</DOUT_S_ROOT>
-         <DOUT_L_MSROOT>csm/$CASE</DOUT_L_MSROOT>
-         <CCSM_BASELINE>/gpfs/summit/datasets/CESM/baselines</CCSM_BASELINE>
-         <CCSM_CPRNC>/gpfs/summit/datasets/CESM/tools/cprnc/cprnc</CCSM_CPRNC>
-         <BATCHQUERY>squeue</BATCHQUERY>
-         <BATCHSUBMIT>sbatch</BATCHSUBMIT>
-         <SUPPORTED_BY>cseg</SUPPORTED_BY>
-         <GMAKE_J>12</GMAKE_J>
-         <MAX_TASKS_PER_NODE>24</MAX_TASKS_PER_NODE>
-         <PIO_BUFFER_SIZE_LIMIT>1</PIO_BUFFER_SIZE_LIMIT>
-         <PES_PER_NODE>24</PES_PER_NODE>
-</machine>
-
-<machine MACH="discover">
-         <DESC>découvre</DESC>
-         <COMPILERS>intel</COMPILERS>
-         <MPILIBS>openmpi</MPILIBS>
-         <OS>LINUX</OS>
-         <RUNDIR>/discover/nobackup/$CCSMUSER/cesm_scratch/rundir/$CASE/run</RUNDIR>
-         <EXEROOT>/discover/nobackup/$CCSMUSER/cesm_scratch/rundir/$CASE/bld</EXEROOT>
-         <DIN_LOC_ROOT>/discover/nobackup/etwolf/cesm_scratch/inputdata</DIN_LOC_ROOT>
-         <DIN_LOC_ROOT_CLMFORC>/discover/nobackup/etwolf/cesm_scratch/inputdata/atm/datm7</DIN_LOC_ROOT_CLMFORC>
-         <DOUT_S_ROOT>/discover/nobackup/$CCSMUSER/cesm_scratch/archive/$CASE</DOUT_S_ROOT>
-         <DOUT_L_MSROOT>UNDEFINED</DOUT_L_MSROOT>
-         <CCSM_BASELINE>UNDEFINED</CCSM_BASELINE>
-         <CCSM_CPRNC>UNDEFINED</CCSM_CPRNC>
-         <BATCHQUERY>squeue</BATCHQUERY>
-         <BATCHSUBMIT>sbatch</BATCHSUBMIT>
-         <SUPPORTED_BY>eric.wolf@colorado.edu</SUPPORTED_BY>
-         <GMAKE_J>12</GMAKE_J>
-         <MAX_TASKS_PER_NODE>126</MAX_TASKS_PER_NODE>
-         <PIO_BUFFER_SIZE_LIMIT>1</PIO_BUFFER_SIZE_LIMIT>
-         <PES_PER_NODE>126</PES_PER_NODE>
-         <PIO_TYPENAME>pnetcdf</PIO_TYPENAME>
-</machine>
-
-<machine MACH="computecanada">
-        <DESC>Compute Canada clusters - Intel and openmpi with slurm</DESC>                                 <!-- can be anything -->
-        <OS>LINUX</OS>                              <!-- LINUX,Darwin,CNL,AIX,BGL,BGP -->
-        <COMPILERS>intel</COMPILERS>     <!-- intel,ibm,pgi,pathscale,gnu,cray,lahey -->
-        <MPILIBS>openmpi</MPILIBS>                <!-- openmpi, mpich, ibm, mpi-serial -->
-        <!--<CESMSCRATCHROOT>/home/$CCSMUSER/scratch</CESMSCRATCHROOT>                     <!-- complete path to the 'scratch' directory (v1.2.2 setting) -->
-        <RUNDIR>/home/$CCSMUSER/scratch/$CASE</RUNDIR>                       <!-- complete path to the run directory -->
-        <EXEROOT>/home/$CCSMUSER/scratch/ccsm/$CASE</EXEROOT>                     <!-- complete path to the build directory -->
-        <DIN_LOC_ROOT>/home/$CCSMUSER/scratch/ccsm/inputdata</DIN_LOC_ROOT>           <!-- complete path to the inputdata directory -->
-        <DIN_LOC_ROOT_CLMFORC></DIN_LOC_ROOT_CLMFORC> <!-- path to the optional forcing data for CLM (for CRUNCEP forcing) -->
-        <DOUT_S>FALSE</DOUT_S>                                            <!-- logical for short term archiving -->
-        <DOUT_S_ROOT>/home/$CCSMUSER/scratch/ccsm/archive/$CASE</DOUT_S_ROOT>               <!-- complete path to a short term archiving directory ->
-        <DOUT_L_MSROOT>/home/$CCSMUSER/scratch/ccsm/archive/$CASE</DOUT_L_MSROOT>           <!-- complete path to a long term archiving directory -->
-        <CCSM_BASELINE>/home/$CCSMUSER/scratch/ccsm</CCSM_BASELINE>           <!-- where the cesm testing scripts write and read baseline results -->
-        <CCSM_CPRNC>/cvmfs/soft.computecanada.ca/easybuild/software/2017/Core/ccsm/4_0_a02/models/atm/cam/tools/cprnc/cprnc</CCSM_CPRNC>            >
-        <BATCHQUERY>squeue</BATCHQUERY>
-        <BATCHSUBMIT>sbatch</BATCHSUBMIT>
-        <SUPPORTED_BY>USERDEFINED_optional</SUPPORTED_BY>
-        <GMAKE_J>1</GMAKE_J>
-        <MAX_TASKS_PER_NODE>32</MAX_TASKS_PER_NODE>
-</machine>
-
-<machine MACH="discover-mil">
-        <DESC>découvre</DESC>
-        <COMPILERS>intel</COMPILERS>
-        <MPILIBS>openmpi</MPILIBS>
-        <OS>LINUX</OS>
-        <RUNDIR>/discover/nobackup/$CCSMUSER/cesm_scratch/rundir/$CASE/run</RUNDIR>
-        <EXEROOT>/discover/nobackup/$CCSMUSER/cesm_scratch/rundir/$CASE/bld</EXEROOT>
-        <DIN_LOC_ROOT>/discover/nobackup/hchen23/cesm_scratch/inputdata</DIN_LOC_ROOT>
-        <DIN_LOC_ROOT_CLMFORC>/discover/nobackup/hchen23/cesm_scratch/inputdata/atm/datm7</DIN_LOC_ROOT_CLMFORC>
-        <DOUT_S_ROOT>/discover/nobackup/$CCSMUSER/cesm_scratch/archive/$CASE</DOUT_S_ROOT>
-        <DOUT_L_MSROOT>UNDEFINED</DOUT_L_MSROOT>
-        <CCSM_BASELINE>UNDEFINED</CCSM_BASELINE>
-        <CCSM_CPRNC>UNDEFINED</CCSM_CPRNC>
-        <BATCHQUERY>squeue</BATCHQUERY>
-        <BATCHSUBMIT>sbatch</BATCHSUBMIT>
-        <SUPPORTED_BY>eric.wolf@colorado.edu</SUPPORTED_BY>
-        <GMAKE_J>12</GMAKE_J>
-        <MAX_TASKS_PER_NODE>126</MAX_TASKS_PER_NODE>
-        <PIO_BUFFER_SIZE_LIMIT>1</PIO_BUFFER_SIZE_LIMIT>
-        <PES_PER_NODE>126</PES_PER_NODE>
-        <PIO_TYPENAME>pnetcdf</PIO_TYPENAME>
- </machine>
 
 
 
