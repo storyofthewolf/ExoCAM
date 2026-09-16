@@ -652,7 +652,7 @@ subroutine docn_comp_run( EClock, cdata,  x2o, o2x)
                 + x2o%rAttr(ksen  ,n) &  ! sensible
                 + x2o%rAttr(klat  ,n) &  ! latent
                 + x2o%rAttr(kmelth,n) &  ! ice melt
-                !- avstrm%rAttr(kqbot ,n) &  ! flux at bottom
+                - avstrm%rAttr(kqbot ,n) &  ! flux at bottom
                 - (x2o%rAttr(ksnow,n)+x2o%rAttr(kioff,n))*latice & ! latent by prec and roff
                 + shr_const_stebol*t_int**4 ) * &  !extra internal heat flux
                 dt/(cpsw*rhosw*hn)

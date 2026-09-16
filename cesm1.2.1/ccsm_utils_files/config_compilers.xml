@@ -445,6 +445,19 @@ for mct, etc.
   <ADD_SLIBS>-L$(NETCDF_DIR)/lib -lnetcdff -lnetcdf</ADD_SLIBS>
 </compiler>
 
+<compiler MACH="summit" COMPILER="intel">
+  <ADD_SLIBS>$(shell $(NETCDF_PATH)/bin/nc-config --flibs) -mkl=cluster</ADD_SLIBS>
+  <MPICC>mpiicc</MPICC>
+  <MPICXX>mpiicpc </MPICXX>
+  <MPIFC>mpiifort </MPIFC>
+  <SFC>ifort </SFC>
+  <SCXX>icpc </SCXX>
+  <SCC>icc </SCC>
+  <PIO_FILESYSYEM_HINTS>gpfs</PIO_FILESYSYEM_HINTS>
+  <ADD_FFLAGS>-xHost -march=core-avx2</ADD_FFLAGS>
+  <ADD_CFLAGS>-xHost -march=core-avx2</ADD_CFLAGS>
+  <ADD_SLIBS></ADD_SLIBS>
+</compiler>
 
 <compiler MACH="janus">
   <NETCDF_PATH> $(NETCDF)</NETCDF_PATH>
@@ -467,6 +480,13 @@ for mct, etc.
   <ADD_CFLAGS DEBUG="FALSE"> -O2 </ADD_CFLAGS>
   <ADD_FFLAGS DEBUG="FALSE"> -O2 </ADD_FFLAGS>
   <ADD_SLIBS> -llapack -lblas </ADD_SLIBS>
+</compiler>
+
+<compiler MACH="hyak">
+  <NETCDF_PATH> $(NETCDF)</NETCDF_PATH>
+  <ADD_SLIBS> $(shell $(NETCDF_PATH)/bin/nc-config --flibs) </ADD_SLIBS>
+  <SFC> ifort </SFC>
+  <SCC> icc </SCC>
 </compiler>
 
 <compiler COMPILER="ibm" OS="AIX">
@@ -615,7 +635,7 @@ for mct, etc.
 
 <compiler MACH="pleiades-wes">
   <NETCDF_PATH> /nasa/netcdf/4.0-i10.1</NETCDF_PATH>
-  <MPI_PATH>/nasa/sgi/mpt/2.08r7<MPI_PATH>
+  <MPI_PATH>/nasa/sgi/mpt/2.08r7</MPI_PATH>
   <MPI_LIB_NAME>mpi</MPI_LIB_NAME>
   <MPICC>icc</MPICC>
   <ADD_FFLAGS DEBUG="FALSE"> -O2 -axAVX -xSSE4.1 </ADD_FFLAGS>
@@ -707,6 +727,34 @@ for mct, etc.
   <ADD_SLIBS>$(shell $(NETCDF_PATH)/bin/nf-config --flibs)</ADD_SLIBS>
   <ADD_LDFLAGS> -mmic </ADD_LDFLAGS>
   <TRILINOS_PATH>$(TRILINOS_PATH)</TRILINOS_PATH>
+</compiler>
+
+<compiler MACH="discover_old" COMPILER="intel">
+  <MPICC>mpiicc</MPICC>
+  <MPICXX>mpiicpc </MPICXX>
+  <MPIFC>mpiifort </MPIFC>
+  <SFC>ifort </SFC>
+  <SCXX>icpc </SCXX>
+  <SCC>icc </SCC>
+  <PIO_FILESYSYEM_HINTS>gpfs</PIO_FILESYSYEM_HINTS>
+</compiler>
+
+<compiler COMPILER="intel" MACH="computecanada">
+  <NETCDF_PATH> ${EBROOTNETCDF}</NETCDF_PATH>
+  <PNETCDF_PATH>${EBROOTPNETCDF}</PNETCDF_PATH>
+  <SLIBS> -L$(NETCDF_PATH)/lib -lnetcdf -lnetcdff  </SLIBS>
+</compiler>
+
+<!--   milan, formerly titled "discover-mil"  -->
+<compiler MACH="discover" COMPILER="intel">
+  <SLIBS>$(shell $(NETCDF_PATH)/bin/nf-config --flibs)</SLIBS>
+  <MPICC>mpiicc</MPICC>
+  <MPICXX>mpiicpc</MPICXX>
+  <MPIFC>mpiifort</MPIFC>
+  <SFC>ifort</SFC>
+  <SCXX>icpc</SCXX>
+  <SCC>icc</SCC>
+  <PIO_FILESYSTEM_HINTS>gpfs</PIO_FILESYSTEM_HINTS>
 </compiler>
 
 </config_compilers>

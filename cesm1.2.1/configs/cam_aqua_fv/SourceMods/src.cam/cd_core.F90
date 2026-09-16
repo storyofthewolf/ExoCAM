@@ -303,7 +303,6 @@
 
   ! do_am_fixes options
   real(r8) :: oma
-  real(r8) :: xakap
   real(r8), pointer :: cosp(:)
   real(r8), pointer :: cose(:)
 
@@ -325,8 +324,6 @@
   real(r8) :: ptr(grid%im,grid%jfirst-1:grid%jlast+1,grid%kfirst:grid%klast+1)
 
   logical  :: sw_am_corr
-  logical  :: am_press_crrct
-  real(r8) :: wg_hiord
   real(r8) :: tpr, acap
 
 !******************************************************************
@@ -416,8 +413,6 @@
             dpns(grid%jfirst:grid%jlast,grid%kfirst:grid%klast), &
             ddus(grid%jfirst:grid%jlast,grid%kfirst:grid%klast) )
          ddus = 0._r8
-      else
-         xakap = 1._r8
       endif
    
       ! maintain consistent accuracy (uniform PPM order) over domain
@@ -1180,7 +1175,7 @@
             end do
          end if
 
-         ! don't apply correction if order is not 4
+         ! don't apply correction if order is not 4, happens when k<=km/8 so far upper atmosphere
          sw_am_corr = do_am_fixes .and. iord.eq.iord_d .and. jord.eq.jord_d 
 
          call d_sw( grid, u(1,jfirst-ng_d,k),      v(1,jfirst-ng_s,k),  &
@@ -1291,14 +1286,12 @@
          do k = kfirst, klast
             do j = js2g0, jlast
                ddus(j,k) = ddu(1,j,k) &
-                           + (u(1,j,k) + uc(1,j,k)*0.5_r8)*ddpu(1,j,k) &
-                           + wg_hiord*vf(1,j,k)*(dpn(1,j,k) - dpo(1,j,k))*0.5_r8
+                           + (u(1,j,k) + uc(1,j,k)*0.5_r8)*ddpu(1,j,k)
                dpns(j,k) = dpn(1,j,k)
                do i = 2, im
                   ddus(j,k) = ddus(j,k) &
                               + ddu(i,j,k) &
-                              + (u(i,j,k)+uc(i,j,k)*0.5_r8)*ddpu(i,j,k) &
-                              + wg_hiord*vf(i,j,k)*(dpn(i,j,k)-dpo(i,j,k))*0.5_r8
+                              + (u(i,j,k)+uc(i,j,k)*0.5_r8)*ddpu(i,j,k)
                   dpns(j,k) = dpns(j,k) + dpn(i,j,k)
                end do
                ddus(j,k) = ddus(j,k)/dpns(j,k)  
@@ -1811,6 +1804,12 @@
 #endif
 
     end if  !  (iam .lt. npes_yz)
+
+    ! deallocate am_correction arrays allocated above
+    if (do_am_fixes) then
+       deallocate(help, kelp, dpn, dpo, ddpu, ddus, dpns)
+    end if
+
 
       return
 !EOC
