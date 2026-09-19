@@ -16,6 +16,20 @@ Operations, applied in this order:
      the new one (scipy interp1d, linear, extrapolating at the ends).  Skipped
      when the requested nlev equals the template's.
 
+     KNOWN DIVERGENCE FROM THE IDL -- winds.  changevert_cesm.pro does NOT
+     interpolate US/VS: it zeroes them outright (the interpol calls are
+     present but commented out, at lines 183-184 for VS and 207-208 for US).
+     This port interpolates them like any other lev-dependent field, a
+     behavior inherited from mod_cam.i.file.py, which diverged from the IDL
+     the same way and was never checked against it.  Audited and confirmed
+     2026-09-18; E.T. Wolf's decision that day was to KEEP interpolating for
+     now and revisit later, so a level-changed IC made here carries a
+     spun-up wind field where an IDL-made one starts from rest.  That is an
+     O(1) difference in the wind field, not a rounding effect.  Everything
+     else in the level change -- the cut-from-bottom index, linear-in-
+     pressure interpolation, coordinate arrays, unbounded extrapolation and
+     the PS/P0 ordering -- was checked against the IDL and agrees.
+
   2. Change the surface pressure.  This reproduces changepress_cesm.pro exactly:
      the fields are LEFT ALONE in hybrid-sigma space and only PS and P0 are
      rewritten, either
@@ -81,6 +95,11 @@ IC_SUBDIRS = ['cam_aqua_fv', 'cam_aqua_se', 'cam_land_fv', 'cam_mixed_fv',
 
 # Fields interpolated in the level change (everything else is copied). US is
 # on the staggered latitude grid.
+#
+# US/VS are here deliberately: the IDL (changevert_cesm.pro) zeroes both
+# instead of interpolating. Keeping them interpolated is an explicit owner
+# decision (2026-09-18), revisitable -- see the docstring. Removing them from
+# this tuple is all that is needed to match the IDL.
 LEV_FIELDS = ('T', 'Q', 'CLDLIQ', 'CLDICE', 'US', 'VS')
 
 
