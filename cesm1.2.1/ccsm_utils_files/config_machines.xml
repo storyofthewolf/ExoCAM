@@ -50,6 +50,44 @@
         <MAX_TASKS_PER_NODE>USERDEFINED_required_build</MAX_TASKS_PER_NODE>
 </machine>
 
+<machine MACH="ioa">
+        <DESC>Machine to be run on the HPC</DESC>
+        <COMPILERS>gnu</COMPILERS>
+        <COMPILER>gnu</COMPILER>
+        <MPILIBS>openmpi</MPILIBS>
+        <MPILIB>openmpi</MPILIB>
+        <OS>LINUX</OS>
+        <RUNDIR>/home/efxlb2/rds/hpc-work/gcm/runs</RUNDIR>
+        <EXEROOT>/home/efxlb2/rds/hpc-work/gcm/exe</EXEROOT>
+        <DIN_LOC_ROOT>/home/efxlb2/rds/hpc-work/gcm/din_loc</DIN_LOC_ROOT>
+        <DOUT_S>TRUE</DOUT_S>
+        <DOUT_S_ROOT>/home/efxlb2/rds/hpc-work/gcm/archive</DOUT_S_ROOT>
+        <SUPPORTED_BY>Edouard Barrier</SUPPORTED_BY>
+        <GMAKE_J>8</GMAKE_J>
+        <MAX_TASKS_PER_NODE>76</MAX_TASKS_PER_NODE>
+        <BATCHQUERY>squeue -u</BATCHQUERY>
+        <BATCHSUBMIT>sbatch</BATCHSUBMIT>
+</machine>
+
+<machine MACH="ioa_2">
+        <DESC>Machine to be run on the HPC, option to run concurrently with ioa</DESC>
+        <COMPILERS>gnu</COMPILERS>
+        <COMPILER>gnu</COMPILER>
+        <MPILIBS>openmpi</MPILIBS>
+        <MPILIB>openmpi</MPILIB>
+        <OS>LINUX</OS>
+        <RUNDIR>/home/efxlb2/rds/hpc-work/gcm/runs_2</RUNDIR>
+        <EXEROOT>/home/efxlb2/rds/hpc-work/gcm/exe_2</EXEROOT>
+        <DIN_LOC_ROOT>/home/efxlb2/rds/hpc-work/gcm/din_loc</DIN_LOC_ROOT>
+        <DOUT_S>TRUE</DOUT_S>
+        <DOUT_S_ROOT>/home/efxlb2/rds/hpc-work/gcm/archive</DOUT_S_ROOT>
+        <SUPPORTED_BY>Edouard Barrier</SUPPORTED_BY>
+        <GMAKE_J>8</GMAKE_J>
+        <MAX_TASKS_PER_NODE>76</MAX_TASKS_PER_NODE>
+        <BATCHQUERY>squeue -u</BATCHQUERY>
+        <BATCHSUBMIT>sbatch</BATCHSUBMIT>
+</machine>
+
 <machine MACH="bluewaters">
          <DESC>ORNL XE6, os is CNL, 32 pes/node, batch system is PBS</DESC>
 	 <COMPILERS>pgi,cray,gnu</COMPILERS>
@@ -586,7 +624,5 @@
         <PES_PER_NODE>126</PES_PER_NODE>
         <PIO_TYPENAME>pnetcdf</PIO_TYPENAME>
  </machine>
-
-
 
 </config_machines>
