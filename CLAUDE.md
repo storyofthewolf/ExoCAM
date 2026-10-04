@@ -11,7 +11,7 @@ There is no build system, test suite, lint config, or CI in this repo. "Running 
 ## Repository layout
 
 - `cesm1.2.1/configs/<config>/` — one directory per supported model configuration. Each contains a `SourceMods/` tree (copied into `$CASEROOT/SourceMods/`) and a `namelist_files/` directory (copied into `$CASEROOT/`). Configs: `cam_aqua_fv`, `cam_aqua_se`, `cam_land_fv`, `cam_mixed_fv`, `circumbinary`, `carma` (add-on), plus `experimental/` and `extras/` (gitignored, not for general use).
-- `cesm1.2.1/ccsm_utils_files/` — machine/compset/grid XML and batch templates that get copied into `cesm1_2_1/scripts/ccsm_utils/Machines/` and `Case.template/`. Supported machines: `hyak`, `discover`, `summit`, `computecanada`.
+- `cesm1.2.1/ccsm_utils_files/` — machine/compset/grid XML and batch templates that get copied into `cesm1_2_1/scripts/ccsm_utils/Machines/` and `Case.template/`. Supported machines: `hyak`, `discover`, `summit`, `computecanada`, plus contributor-maintained `ioa`/`ioa_2` (Edouard Barrier, gfortran; `mkbatch.ioa`). Machine changes must be additive: put flags in a `MACH="..."` compiler block, never in the generic `COMPILER="intel"`/`"gnu"` blocks every machine inherits (e.g. the generic intel `-mcmodel=medium` is needed on Discover).
 - `cesm1.2.1/initial_files/` — paths to NetCDF initial condition / topography / ozone / gravity-wave files referenced from `user_nl_*` namelists. Per-config subdirectories mirror the configs above.
 - `cesm1.2.1/instructions/` — authoritative how-to docs. Read these before changing build/run procedure: `general_instructions.txt`, `supported_planet_mods.txt`, `adding_oxygen_ozone.txt`, `computecanada_instructions.txt`.
 - `tools/py_progs/`, `tools/idl_progs/` — post-processing utilities; users add these directories to `PYTHONPATH` / `IDL_PATH`. `tools/spectral_albedos/` holds spectral surface albedo files for `broadband_albedo_calculator.py`.
@@ -22,11 +22,12 @@ There is no build system, test suite, lint config, or CI in this repo. "Running 
 `cesm1.2.1/configs/<config>/SourceMods/src.share/exoplanet_mod.F90` is the **single source of truth for planet/atmosphere/run parameters**. Almost all "what kind of planet/star/atmosphere" choices live here as `parameter` constants and are baked in at compile time — they override CESM namelist GHG settings when `do_exo_atmconst = .true.` (the default). Editing this file requires rebuilding the case.
 
 Key parameter groups (see file comments for full docs):
-- Run options: `do_exo_synchronous`, `do_exo_rt`, `do_exo_atmconst`, `do_carma_exort`, `do_exo_gw`, `exo_convect_plim`
+- Run options: `do_exo_synchronous`, `do_exo_rt`, `do_exo_atmconst`, `do_carma_exort`, `do_exo_gw`, `exo_convect_plim`, `do_am_fixes`, `do_am_fix_lbl` (AM flags: `cam_aqua_fv` only, see below)
 - Radiation: `exo_rad_step`, `do_exo_rt_clearsky`, `do_exo_rt_spectral`, `do_exo_rt_optimize_bands`, `Tmax`
 - Planet: `exo_planet_radius`, `exo_surface_gravity`, `exo_ndays`, `exo_porb`, `exo_sday`, `exo_eccen`, `exo_obliq`, `exo_mvelp`
 - Stellar: `exo_scon`, `exo_solar_file` (must match RT spectral resolution)
 - Atmosphere: `exo_n2bar`, `exo_co2bar`, `exo_ch4bar`, `exo_h2bar`, `exo_o2bar`, `exo_c2h6bar`, `exo_nh3bar`, `exo_cobar`. Derived `vmr`/`mmr`/`exo_mwdair`/`exo_cpdair` are computed from these — **do not edit the derived block**. Note: NH₃ and CO default to `0.0` and contribute to `exo_cpdair` via `cpnh3 = 2.175e3` and `cpco = 1.040e3` J/kg/K.
+- Surface (`cam_aqua_fv` only): `t_int` — internal temperature (K); adds σT_int⁴ to the slab ocean in `src.docn/docn_comp_mod.F90`. Default `0.0` (term is exactly zero). 30 K ≈ 46 mW/m².
 
 Critical consistency rules enforced only by convention (the model will not check):
 - `exo_pstd` (sum of partial pressures × 10⁵) must match the total pressure of the `ncdata` initial condition file in `user_nl_cam`.
@@ -55,6 +56,16 @@ Each config's `SourceMods/` mirrors CESM component subdirs and only the listed c
 - `src.drv` — coupler (`ccsm_comp_mod.F90`, `seq_flux_mct.F90`)
 
 When propagating a change to `exoplanet_mod.F90` or other shared SourceMods, **apply it to every config that contains the file** — there is no shared copy. Recent commit `019c2d3` ("propagate changes from cam_mixed_fv to cam_aqua_fv and cam_land_fv") and the 2026-04-29 NH₃/CO additions show the expected pattern. Configs are kept in sync by hand.
+
+### Angular momentum conservation (`cam_aqua_fv` only, PR #14)
+
+Merged 2026-10-04 (`cb8792f`, Edouard Barrier): a CAM4 FV backport of the CAM6 AM correction + fixer (Toniazzo et al. 2020; Barrier & Madhusudhan 2025a). Touches `src.cam/cd_core.F90`, `dyn_comp.F90`, `dynamics_vars.F90`, and adds `sw_core.F90`, `te_map.F90`, `benergy.F90`, `par_vecsum.F90` (now a module, `par_vecsum_mod`) to SourceMods.
+- `do_am_fixes` gates both the transport correction (`cd_core`/`sw_core`/`te_map`) and the residual fixer (`dyn_comp`). `do_am_fix_lbl` picks the fixer mode: global with pressure taper, or level-by-level with no taper (as in CAM6). It has no effect unless `do_am_fixes = .true.`. Both default `.false.`. The plan is to keep the flags rather than delete them, since the fixer trades a little energy conservation for AM conservation.
+- `sw_core`'s half of the correction is skipped where the transport order isn't 4 (top ~km/8 levels); this is expected.
+- **Not bit-for-bit with v1.0.0 even with the flags off:** 4th-order divergence damping `tau4` in `cd_core.F90` was lowered from `0.01` to `0.005/dt` for all runs (deliberately kept; see Christie 2024 on top-of-atmosphere AM loss).
+- Not yet propagated to `cam_land_fv` / `cam_mixed_fv`; `cam_aqua_se` (spectral-element dycore) does not apply. When propagating, carry the `tau4` change, the new SourceMods, and the `exoplanet_mod.F90` flags together.
+
+All three FV configs also carry dycore robustness patches `fill_module.F90` and `mapz_module.F90` (`3dd3678`; `cam_mixed_fv` has only `mapz_module`). `te_map.F90` uses `mapz_module`, so the patched copy is picked up.
 
 Adding a new gas absorber to the ExoRT 3-D interface requires parallel edits in this repo: `mwXXX` in `src.cam/physconst.F90`, and `exo_xxxbar`/`exo_xxxmmr`/`cpXXX`/`exo_cpdair` in `src.share/exoplanet_mod.F90`, applied to every config. See `ExoRT/CLAUDE.md` §"Connecting a New Gas to the 3-D Interface" for the full checklist.
 
