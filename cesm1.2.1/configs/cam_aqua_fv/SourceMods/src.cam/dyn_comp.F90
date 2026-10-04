@@ -14,6 +14,9 @@ use cam_logfile,        only: iulog
 use hycoef,             only: hycoef_init, hyai, hybi
 use pio,                only: file_desc_t
 use shr_const_mod,      only: SHR_CONST_PSTD
+use par_vecsum_mod,     only: par_vecsum
+use te_map_mod,         only: te_map
+
 
 implicit none
 private
@@ -58,6 +61,7 @@ type dyn_export_t
      real(r8), dimension(:,:,:  ), pointer     :: omga   ! Vertical velocity
      real(r8), dimension(:,:,:  ), pointer     :: mfx    ! Mass flux in X
      real(r8), dimension(:,:,:  ), pointer     :: mfy    ! Mass flux in Y
+     real(r8), dimension(:,:,:),   pointer :: duf3s  ! U-wind tend. from fixer (staggered)
 end type dyn_export_t
 
 
@@ -200,6 +204,8 @@ subroutine dyn_init(file, dyn_state, dyn_in, dyn_out, NLFileName )
                                cpair,             &
                                zvir,              &
                                pi
+   use exoplanet_mod,      only: do_am_fixes, do_am_fix_lbl
+
 
    ! ARGUMENTS:
    type(file_desc_t),       intent(in)  :: file       ! PIO file handle for initial or restart file
@@ -486,6 +492,8 @@ subroutine dyn_init(file, dyn_state, dyn_in, dyn_out, NLFileName )
   DYN_STATE%TE_METHOD = TE_METHOD
   DYN_STATE%CONSV     = dyn_conservative
   DYN_STATE%FILTCW    = filtcw
+  DYN_STATE%DO_AM_FIXES = do_am_fixes
+  DYN_STATE%DO_AM_FIX_LBL = do_am_fix_lbl
   if (filtcw .gt. 0) then
      if (masterproc) then
         write (iulog,*) ' '
@@ -532,7 +540,7 @@ subroutine dyn_init(file, dyn_state, dyn_in, dyn_out, NLFileName )
 ! Create the dynamics interface
 !
   call dyn_create_interface( ifirstxy, ilastxy, jfirstxy, jlastxy, &
-                             1, km, ntotq, dyn_in, dyn_out )
+                             1, km, ntotq, dyn_in, dyn_out, dyn_state%do_am_fixes)
 
 !
 ! Now there is sufficient information to perform the dynamics initialization
@@ -583,7 +591,7 @@ contains
 !
 ! !INTERFACE:
 subroutine dyn_create_interface ( I1, IN, J1, JN, K1, KN, LM, &
-                                  dyn_in, dyn_out )
+                                  dyn_in, dyn_out, do_am_fixes)
    use infnan, only : inf, assignment(=)
 !
 ! !USES:
@@ -593,6 +601,7 @@ subroutine dyn_create_interface ( I1, IN, J1, JN, K1, KN, LM, &
    integer, intent(in)                 :: I1, IN, J1, JN, K1, KN, LM
    type (dyn_import_t), intent(out)    :: dyn_in
    type (dyn_export_t), intent(out)    :: dyn_out
+   logical, intent(in)                 :: do_am_fixes
 
 !EOP
 !-----------------------------------------------------------------------
@@ -680,6 +689,12 @@ subroutine dyn_create_interface ( I1, IN, J1, JN, K1, KN, LM, &
    if ( ierror /= 0 ) call endrun('DYN_COMP ALLOC error: array MFX')
    allocate( dyn_out%mfy( I1:IN,J1:JN,K1:KN    ), stat=ierror )
    if ( ierror /= 0 ) call endrun('DYN_COMP ALLOC error: array MFY')
+
+   if (do_am_fixes) then
+      allocate( dyn_out%duf3s(I1:IN,J1:JN,K1:KN), stat=ierror)
+      if ( ierror /= 0 ) call endrun('DYN_COMP ALLOC error: array DUFS3')
+      dyn_out%duf3s= inf
+   end if
 
    dyn_out%peln = inf
    dyn_out%omga = inf
@@ -867,6 +882,8 @@ subroutine dyn_run(ptop, ndt, te0, dyn_state, dyn_in, dyn_out, rc)
    use spmd_utils,   only  : masterproc
 !!   use fv_control_mod, only: ct_overlap, trac_decomp  !! C.Bardeen
    use fv_control_mod, only: ct_overlap, trac_decomp, substep_uv, substep_t  !! C.Bardeen
+   use shr_reprosum_mod, only: shr_reprosum_calc
+
 
 
 #if defined( SPMD )
@@ -1032,6 +1049,7 @@ subroutine dyn_run(ptop, ndt, te0, dyn_state, dyn_in, dyn_out, rc)
    real(r8), pointer :: omgaxy(:,:,:) ! vertical pressure velocity (pa/sec)
    real(r8), pointer :: mfxxy(:,:,:)  ! mass flux in X (Pa m^\2 / s)
    real(r8), pointer :: mfyxy(:,:,:)  ! mass flux in Y (Pa m^\2 / s)
+   real(r8), pointer :: dufix_xy(:,:,:) ! u tend. from AM fixer, staggered grid
 
 ! Other pointers (for convenience)
    type (T_FVDYCORE_GRID)      , pointer :: GRID      ! For convenience
@@ -1104,6 +1122,8 @@ subroutine dyn_run(ptop, ndt, te0, dyn_state, dyn_in, dyn_out, rc)
    integer :: ng_d      ! Ghosting width on D-grid
    integer :: ng_s      ! Ghosting width (staggered, for winds)
    integer :: ns        ! overall split
+   logical :: do_am_fixes !whether to implement Toniazzi 2020 am correction and fixer
+   logical :: do_am_fix_lbl !whether to implement Toniazzi 2020 am correction and fixer level by level
 
    integer :: ifirstxy, ilastxy, jfirstxy, jlastxy  ! xy decomposition
    integer :: npr_z
@@ -1210,6 +1230,39 @@ subroutine dyn_run(ptop, ndt, te0, dyn_state, dyn_in, dyn_out, rc)
     pexy_om(dyn_state%grid%ifirstxy:dyn_state%grid%ilastxy,dyn_state%grid%km+1, &
             dyn_state%grid%jfirstxy:dyn_state%grid%jlastxy)
 
+! AM Conservation variables
+            real(r8) :: tmpsum(1,2)
+            real(r8) :: tmpresult(2)
+            real(r8) :: am0, am1, me0
+         
+            real(r8) :: don(dyn_state%grid%jm,dyn_state%grid%km), & ! out of cd_core
+                        dod(dyn_state%grid%jm,dyn_state%grid%km)    ! out of cd_core
+            real(r8) :: dons(dyn_state%grid%km), &                  ! sums over j
+                        dods(dyn_state%grid%km)
+         
+            real(r8), allocatable :: zpkck(:,:)
+            real(r8) :: avgpk(dyn_state%grid%km)
+            real(r8) :: taper(dyn_state%grid%km)
+            real(r8) :: ptapk, xdlt2
+            real(r8), parameter :: ptap =20._r8 ! default 9000
+            real(r8), parameter :: dptap=2._r8 ! default 1000
+            real(r8), parameter :: tiny=.1e-10_r8
+         
+            ! AM diagnostics
+            integer  :: kmtp                     ! range of levels (1:kmtp) where order is reduced
+            real(r8) :: ame(dyn_state%grid%jm)
+            real(r8) :: zpe(dyn_state%grid%jfirstxy:dyn_state%grid%jlastxy)
+            real(r8) :: tmp
+            real(r8) :: du_fix_g
+            real(r8) :: du_fix(dyn_state%grid%km)
+            real(r8) :: du_fix_s(dyn_state%grid%km)
+            real(r8), allocatable :: du_fix_i(:,:,:)
+            real(r8), allocatable :: du_k    (:,:)
+            real(r8), allocatable :: du_north(:,:)
+            real(r8), allocatable :: uc_s(:,:,:),vc_s(:,:,:)  ! workspace (accumulated uc,vc)
+            real(r8), allocatable :: uc_i(:,:,:),vc_i(:,:,:)  ! workspace (transposed uc_s,vc_s)
+
+
    rc       =  DYN_RUN_FAILURE      ! Set initially to fail
 
    phisxy   => dyn_in%phis
@@ -1231,6 +1284,7 @@ subroutine dyn_run(ptop, ndt, te0, dyn_state, dyn_in, dyn_out, rc)
    omgaxy   => dyn_out%omga
    mfxxy    => dyn_out%mfx
    mfyxy    => dyn_out%mfy
+   dufix_xy => dyn_out%duf3s
 
    grid => dyn_state%grid    ! For convenience
    constants => DYN_STATE%CONSTANTS
@@ -1247,7 +1301,10 @@ subroutine dyn_run(ptop, ndt, te0, dyn_state, dyn_in, dyn_out, rc)
 
    consv     = dyn_state%consv
    te_method = dyn_state%te_method
+   do_am_fixes = dyn_state%do_am_fixes
+   do_am_fix_lbl = dyn_state%do_am_fix_lbl
 
+   !write(iulog,*) "do_am_fixes:", do_am_fixes
    pi   =  constants%pi
    om   =  constants%omega
    ae   =  constants%ae
@@ -1302,6 +1359,12 @@ subroutine dyn_run(ptop, ndt, te0, dyn_state, dyn_in, dyn_out, rc)
    tractag = dp0tag + 5
 ! ntg0 is upper bound on number of needed tags beyond tracer tags for ct_overlap and trac_decomp
    ntg0 = 10
+
+   ! set am_fix tapering parameters
+   if (do_am_fixes .and. .not. do_am_fix_lbl) then
+      ptapk        = ptap**cappa
+      xdlt2        = 2._r8/(log((ptap+.5_r8*dptap)/(ptap-.5_r8*dptap))*cappa)
+   end if
 
 #if ( defined OFFLINE_DYN )
 !
@@ -1438,6 +1501,22 @@ subroutine dyn_run(ptop, ndt, te0, dyn_state, dyn_in, dyn_out, rc)
    allocate (ctstat(MPI_STATUS_SIZE,ntotq+ntg0,trac_decomp))
    allocate (ctstats(MPI_STATUS_SIZE,ntotq+ntg0,trac_decomp))
 #endif
+
+! Allocate AM fix variables
+if (do_am_fixes) then
+   allocate(zpkck(dyn_state%grid%jm,dyn_state%grid%km)) !this one only used in tapering, define it anyway
+   allocate(du_fix_i(ifirstxy:ilastxy,jfirstxy:jlastxy,km))
+   allocate(du_k    (ifirstxy:ilastxy,jfirstxy:jlastxy+1))
+   allocate(du_north(ifirstxy:ilastxy,km))
+   allocate(uc_s(im,jfirst-ng_d:jlast+ng_s,kfirst:klast) )
+   allocate(vc_s(im,jfirst-ng_s:jlast+ng_d,kfirst:klast) )
+   allocate(uc_i(ifirstxy:ilastxy,jfirstxy:jlastxy,km))
+   allocate(vc_i(ifirstxy:ilastxy,jfirstxy:jlastxy,km))
+   du_fix_i(:,:,:) = 0._r8
+   uc_s (:,:,:)  = 0._r8
+   vc_s (:,:,:)  = 0._r8
+end if
+
 ! Compute i.d.'s of remote processes for ct_overlap or trac_decomp
    naux = 0
    if ((ct_overlap .gt. 0 .and. kaux .lt. 2) .or.      &
@@ -1518,6 +1597,17 @@ subroutine dyn_run(ptop, ndt, te0, dyn_state, dyn_in, dyn_out, rc)
 ! On the last iteration, convt_local is set to convt
 !
    convt_local = .false.
+!
+   ! initialise global non-conservation integrals
+   am1=0._r8
+   me0=1._r8
+
+   if (do_am_fixes) then
+      du_fix_g        = 0._r8
+      du_fix(:)       = 0._r8
+      du_fix_s(:)     = 0._r8
+      dufix_xy(:,:,:) = 0._r8
+   end if
 !
 ! Begin vertical re-mapping sub-cycle loop
 !
@@ -1799,6 +1889,12 @@ subroutine dyn_run(ptop, ndt, te0, dyn_state, dyn_in, dyn_out, rc)
 ! C.-C. Chen
      omgaxy(:,:,:) = ZERO
 !
+     if (do_am_fixes) then
+      du_fix_s (:)  = 0._r8
+      uc_s (:,:,:)  = 0._r8
+      vc_s (:,:,:)  = 0._r8
+   endif
+!
 ! Begin tracer sub-cycle loop
 !
 !! C. Bardeen
@@ -1948,7 +2044,9 @@ subroutine dyn_run(ptop, ndt, te0, dyn_state, dyn_in, dyn_out, rc)
                             pkkp, wzkp, cx_om, cy_om, filtcw, s_trac,        &
                             naux, ncx, ncy, nmfx, nmfy, iremotea,            &
                             cxtaga, cytaga, mfxtaga, mfytaga, cdcreqs(1,1),  &
-                            cdcreqs(1,2), cdcreqs(1,3), cdcreqs(1,4))
+                            cdcreqs(1,2), cdcreqs(1,3), cdcreqs(1,4),        &
+                            do_am_fixes, dod, don)
+                            
               ctreqs(2,:) = cdcreqs(:,1)
               ctreqs(3,:) = cdcreqs(:,2)
               ctreqs(4,:) = cdcreqs(:,3)
@@ -1956,6 +2054,126 @@ subroutine dyn_run(ptop, ndt, te0, dyn_state, dyn_in, dyn_out, rc)
            endif  !  (grid%iam .lt. grid%npes_yz)
 
            call t_stopf  ('cd_core')
+
+            ! AM fixer
+           if (do_am_fixes) then
+
+            call t_barrierf('sync_lfix', grid%commdyn)
+            call t_startf ('lfix')
+            if (grid%iam .lt. grid%npes_yz) then
+
+               if (.not. do_am_fix_lbl) then
+                  ! pressure tapering on AM fixer
+                  zpkck(:,:)=0._r8
+   !$omp parallel do private(j, k)
+                  do k=kfirst,klast
+                     do j = jfirst, jlast
+                        zpkck(j,k)=0.25_r8*sum(pkc(:,j,k))*grid%cose(j)
+                     enddo
+                  enddo
+                  do k=kfirst,klast
+                     call par_vecsum(jm, jfirst, jlast, zpkck(1:jm,k), me0, grid%comm_y, grid%npr_y)
+                     avgpk(k)=me0/im/sum(grid%cose)
+                     taper(k)=.5_r8*(1._r8+(1._r8-(ptapk/avgpk(k))**xdlt2)/(1._r8+(ptapk/avgpk(k))**xdlt2))
+                     ! write(iulog,*) " "
+                     ! write(iulog,*) "k:", k, "cappa:", cappa, "ptapk:", ptapk
+                     ! write(iulog,*) "xdlt2:", xdlt2, "me0:", me0, "im:", im
+                     ! write(iulog,*) "avgpk:", avgpk(k), "taper:", taper(k), "kmtp:", kmtp
+
+                  enddo
+               else
+                  do k=kfirst,klast
+                     taper(k)=1._r8
+                  enddo
+               endif
+
+               ! always exclude fixer at top levels if top is not high order
+               taper(1:kmtp)=0._r8
+
+               do k = kfirst, klast
+                  call par_vecsum(jm, jfirst, jlast, don(1:jm,k), am1, grid%comm_y, grid%npr_y)
+                  dons(k) = am1
+               end do
+
+               do k = kfirst, klast
+                  call par_vecsum(jm, jfirst, jlast, dod(1:jm,k), me0, grid%comm_y, grid%npr_y)
+                  dods(k) = me0
+               end do
+
+               if (do_am_fix_lbl) then
+!$omp parallel do private(i, j, k)
+                  do k = kfirst, klast
+                     do j = jfirst, jlast
+                        do i = 1, im
+                           u(i,j,k) = u(i,j,k) - dons(k)/dods(k)*grid%cose(j) * taper(k)
+                        end do
+                     end do
+                  end do
+               endif
+
+               ! diagnose du_fix
+               if (do_am_fix_lbl) then ! output applied increment (tapered)
+!$omp parallel do private(k)
+                  do k = kfirst, klast
+                     du_fix_s(k)=du_fix_s(k)-dons(k)/dods(k)*taper(k)
+                  end do
+                  !have removed an am_diag little section here which I don't *think* is appropriate
+               endif
+
+
+!$omp parallel do private(j, k)
+               do k=kfirst,klast
+                  do j = jfirst, jlast
+                     don(j,k)=don(j,k)*taper(k)
+                     dod(j,k)=dod(j,k)*taper(k)
+                  enddo
+               enddo
+               tmpsum(1,1) = SUM(don)
+               tmpsum(1,2) = SUM(dod)
+               call shr_reprosum_calc(tmpsum, tmpresult, 1, 1, 2, commid=grid%commyz)
+               am1 = tmpresult(1)
+               me0 = max(tmpresult(2),tiny)
+
+               if (do_am_fixes.and.(.not.do_am_fix_lbl)) then
+!$omp parallel do private(i, j, k)
+                  do k = kfirst, klast
+                     do j = jfirst, jlast
+                        do i = 1, im
+                           u(i,j,k) = u(i,j,k) - am1/me0*grid%cose(j) *taper(k)
+                        end do
+                     end do
+                  end do
+
+!$omp parallel do private(k)
+                  do k = kfirst, klast
+                     du_fix_s(k)=du_fix_s(k)-am1/me0*taper(k)
+                  end do
+               end if  ! (do_am_fix_lbl)
+
+               du_fix_g =du_fix_g -am1/me0
+               if (masterproc) then
+                  if ((it == nsplit) .and. (n == n2) .and. (iv == nv)) then
+                     write(iulog,'(1x,a21,1x,1x,e25.17)') "AM GLOBAL FIXER: ", du_fix_g
+                  endif
+               endif
+               ! the following call is blocking, but probably cheaper than 3D transposition for du_fix
+               if ((it == nsplit) .and. (n == n2)) then
+                  call par_vecsum(km, kfirst, klast, du_fix_s, tmp, grid%comm_z, grid%npr_z, return_sum_in=.true.)
+               endif
+            end if     ! (grid%iam .lt. grid%npes_yz)
+            call t_stopf  ('lfix')
+
+!$omp parallel do private(i,j,k)
+            do k=kfirst,klast
+               do j = jfirst, jlast
+                  do i=1,im
+                     uc_s(i,j,k)=uc_s(i,j,k)+uc(i,j,k)
+                     vc_s(i,j,k)=vc_s(i,j,k)+vc(i,j,k)
+                  enddo
+               enddo
+            enddo
+
+         end if    ! (do_am_fixes)
 
 ! C.-C. Chen
            if((it == nsplit).and.(n == n2).and.(iv == nv)) then
@@ -2089,7 +2307,7 @@ subroutine dyn_run(ptop, ndt, te0, dyn_state, dyn_in, dyn_out, rc)
                  do k = kfirst,klast
                     do j = jfirst,jlast
                        do i = 1,im
-                          mfxxy(i,j,k) = mfy(i,j,k)*(grid%dl*ae*grid%cosp(j))*(ae*grid%dp)/(ndt*grid%cose(j)) ! Pa m^2 / s
+                          mfxxy(i,j,k) = mfx(i,j,k)*(grid%dl*ae*grid%cosp(j))*(ae*grid%dp)/(ndt*grid%cose(j)) ! Pa m^2 / s
                           mfyxy(i,j,k) = mfy(i,j,k)*(grid%dl*ae*grid%cosp(j))*(ae*grid%dp)/(ndt*grid%cose(j)) ! Pa m^2 / s
                        enddo
                     enddo
@@ -2378,6 +2596,25 @@ subroutine dyn_run(ptop, ndt, te0, dyn_state, dyn_in, dyn_out, rc)
                             grid%v_to_vxy%RecvDesc, v, vxy,                            &
                             modc=grid%modc_dynrun )
 
+            if (do_am_fixes) then
+
+            ! Transpose uc_s
+            call mp_sendirr( grid%commxy, grid%u_to_uxy%SendDesc,                       &
+                              grid%u_to_uxy%RecvDesc, uc_s, uc_i,                        &
+                              modc=grid%modc_dynrun )
+            call mp_recvirr( grid%commxy, grid%u_to_uxy%SendDesc,                       &
+                              grid%u_to_uxy%RecvDesc, uc_s, uc_i,                        &
+                              modc=grid%modc_dynrun )
+
+            ! Transpose vc_s
+            call mp_sendirr( grid%commxy, grid%v_to_vxy%SendDesc,                       &
+                              grid%v_to_vxy%RecvDesc, vc_s, vc_i,                        &
+                              modc=grid%modc_dynrun )
+            call mp_recvirr( grid%commxy, grid%v_to_vxy%SendDesc,                       &
+                              grid%v_to_vxy%RecvDesc, vc_s, vc_i,                        &
+                              modc=grid%modc_dynrun )
+         end if
+               
            call t_stopf  ('yz_to_xy_psuv')
 
            call t_startf ('yz_to_xy_q')
@@ -2439,6 +2676,18 @@ subroutine dyn_run(ptop, ndt, te0, dyn_state, dyn_in, dyn_out, rc)
               enddo
            enddo
 
+           if (do_am_fixes) then
+            !$omp parallel do private(i,j,k)
+               do k = kfirst, klast
+                  do j = jfirst, jlast
+                     do i = 1, im
+                        uc_i(i,j,k)= uc_s(i,j,k)
+                        vc_i(i,j,k)= vc_s(i,j,k)
+                     end do
+                  end do
+               end do
+            end if
+
            call t_stopf  ('yz_to_xy_psuv')
 
            call t_startf ('yz_to_xy_q')
@@ -2480,13 +2729,29 @@ subroutine dyn_run(ptop, ndt, te0, dyn_state, dyn_in, dyn_out, rc)
         call t_barrierf('sync_te_map', grid%commdyn)
         call t_startf ('te_map')
 
+ 
+
         if (grid%iam .lt. grid%npes_xy) then
+         !write(iulog,*) "vc_i:", vc_i  !"uc_i:", uc_i, "du_fix_s:", du_fix_s, "du_fix_i:", du_fix_i, 
+
            call te_map(grid,     consv,   convt_local, psxy, omgaxy,       &
                        pexy,     delpxy,  pkzxy,  pkxy,   ndt,             &
                        nx,       uxy,     vxy,    ptxy,   dyn_out%tracer,  & 
                        phisxy,   cp,      cappa,  kord,   pelnxy,          &
                        te0,      tempxy,  dp0xy,  mfxxy,  mfyxy,           &
-                       te_method )
+                       te_method, uc_i,     vc_i,  du_fix_s, du_fix_i,     &
+                       do_am_fixes)
+
+!             if (do_am_fixes) then
+! !$omp parallel do private(i,j,k)
+!                   do j=jfirstxy,jlastxy
+!                      do k=1,km
+!                         do i=ifirstxy,ilastxy
+!                            dufix_xy(i,j,k)=dufix_xy(i,j,k)+du_fix_i(i,j,k)*grid%cose(j)
+!                         enddo
+!                      enddo
+!                   enddo
+!                endif
 
            if( .not. convt_local ) then
 !$omp parallel do private(i,j,k)
@@ -2551,6 +2816,17 @@ subroutine dyn_run(ptop, ndt, te0, dyn_state, dyn_in, dyn_out, rc)
   deallocate( u_tmp )
   deallocate( v_tmp )
 #endif
+
+if (do_am_fixes) then
+   deallocate(zpkck)
+   deallocate(du_fix_i)
+   deallocate(du_k)
+   deallocate(du_north)
+   deallocate(uc_s)
+   deallocate(vc_s)
+   deallocate(uc_i)
+   deallocate(vc_i)
+end if
 
   call t_stopf  ('dyn_run_dealloc')
 

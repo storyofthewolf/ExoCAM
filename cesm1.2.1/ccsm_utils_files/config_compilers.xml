@@ -481,6 +481,20 @@ for mct, etc.
 </compiler>
 
 
+<compiler MACH="ioa" COMPILER="gnu">
+  <NETCDF_PATH>$(NETCDF_PATH)</NETCDF_PATH>
+  <ADD_CPPDEFS> -DLINUX -DCPRGNU </ADD_CPPDEFS>
+  <ADD_FFLAGS> -fno-range-check </ADD_FFLAGS>
+  <ADD_SLIBS> $(shell $(NETCDF_PATH)/bin/nc-config --flibs) </ADD_SLIBS>
+</compiler>
+
+<compiler MACH="ioa_2" COMPILER="gnu">
+  <NETCDF_PATH>$(NETCDF_PATH)</NETCDF_PATH>
+  <ADD_CPPDEFS> -DLINUX -DCPRGNU </ADD_CPPDEFS>
+  <ADD_FFLAGS> -fno-range-check </ADD_FFLAGS>
+  <ADD_SLIBS> $(shell $(NETCDF_PATH)/bin/nc-config --flibs) </ADD_SLIBS>
+</compiler>
+
 <compiler MACH="hyak">
   <NETCDF_PATH> $(NETCDF)</NETCDF_PATH>
   <ADD_SLIBS> $(shell $(NETCDF_PATH)/bin/nc-config --flibs) </ADD_SLIBS>

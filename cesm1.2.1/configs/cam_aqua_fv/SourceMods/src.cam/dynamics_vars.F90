@@ -275,6 +275,8 @@ module dynamics_vars
     integer                              :: NSPLTVRM
     integer                              :: NUM_CALLS
     integer                              :: FILTCW      ! filter c-grid winds if positive
+    logical                              :: DO_AM_FIXES    ! implement Toniazzi 2020 correction and fixer
+    logical                              :: DO_AM_FIX_LBL  ! implement Toniazzi 2020 correction and fixer on a level by level basis         
   end type T_FVDYCORE_STATE
 
 !

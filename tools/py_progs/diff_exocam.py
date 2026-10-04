@@ -59,6 +59,8 @@ case_dir           = caseroot + '/' + case
 case_dir           = ''.join(case_dir.split())
 case_cam_dir        = caseroot + "/" + case + "/SourceMods/src.cam"
 case_cam_dir        = ''.join(case_cam_dir.split())
+case_docn_dir        = caseroot + "/" + case + "/SourceMods/src.docn"
+case_docn_dir        = ''.join(case_docn_dir.split())
 case_clm_dir        = caseroot + "/" + case + "/SourceMods/src.clm"
 case_clm_dir        = ''.join(case_clm_dir.split())
 case_cice_dir       = caseroot + "/" + case + "/SourceMods/src.cice"
@@ -74,6 +76,8 @@ if args.case2 is not None:
     case2_dir           = ''.join(case2_dir.split())
     case2_cam_dir        = caseroot + "/" + args.case2 + "/SourceMods/src.cam"
     case2_cam_dir        = ''.join(case2_cam_dir.split())
+    case2_docn_dir        = caseroot + "/" + args.case2 + "/SourceMods/src.docn"
+    case2_docn_dir        = ''.join(case2_docn_dir.split())
     case2_clm_dir        = caseroot + "/" + args.case2 + "/SourceMods/src.clm"
     case2_clm_dir        = ''.join(case2_clm_dir.split())
     case2_cice_dir       = caseroot + "/" + args.case2 + "/SourceMods/src.cice"
@@ -83,9 +87,13 @@ if args.case2 is not None:
     case2_share_dir      = caseroot + "/" + args.case2 + "/SourceMods/src.share"
     case2_share_dir      = ''.join(case2_share_dir.split())
     
-# ExoCAM directories
+# ExoCAM directories - CAM_AQUA_FV
+exo_case_dir    = ec_loc + "/ExoCAM/cesm1.2.1/configs/cam_aqua_fv/namelist_files"
+exo_case_dir     = ''.join(exo_case_dir.split())
 exo_cam_dir     = ec_loc + "/ExoCAM/cesm1.2.1/configs/cam_aqua_fv/SourceMods/src.cam"
 exo_cam_dir     = ''.join(exo_cam_dir.split())
+exo_docn_dir     = ec_loc + "/ExoCAM/cesm1.2.1/configs/cam_aqua_fv/SourceMods/src.docn"
+exo_docn_dir     = ''.join(exo_docn_dir.split())
 exo_clm_dir     = ec_loc + "/ExoCAM/cesm1.2.1/configs/cam_land_fv/SourceMods/src.clm"
 exo_clm_dir     = ''.join(exo_clm_dir.split())
 exo_cice_dir    = ec_loc + "/ExoCAM/cesm1.2.1/configs/cam_aqua_fv/SourceMods/src.cice"
@@ -94,6 +102,22 @@ exo_drv_dir     = ec_loc + "/ExoCAM/cesm1.2.1/configs/cam_aqua_fv/SourceMods/src
 exo_drv_dir     = ''.join(exo_drv_dir.split())
 exo_share_dir   = ec_loc + "/ExoCAM/cesm1.2.1/configs/cam_aqua_fv/SourceMods/src.share"
 exo_share_dir   = ''.join(exo_share_dir.split())
+
+#ExoCAM directories - CAM_AQUA_SE
+#exo_case_dir    = ec_loc + "/ExoCAM/cesm1.2.1/configs/cam_aqua_se/namelist_files/ne16np4"
+#exo_case_dir     = ''.join(exo_case_dir.split())
+#exo_cam_dir     = ec_loc + "/ExoCAM/cesm1.2.1/configs/cam_aqua_se/SourceMods/src.cam"
+#exo_cam_dir     = ''.join(exo_cam_dir.split())
+#exo_docn_dir     = ec_loc + "/ExoCAM/cesm1.2.1/configs/cam_aqua_se/SourceMods/src.docn"
+#exo_docn_dir     = ''.join(exo_docn_dir.split())
+#exo_clm_dir     = ec_loc + "/ExoCAM/cesm1.2.1/configs/cam_land_se/SourceMods/src.clm"
+#exo_clm_dir     = ''.join(exo_clm_dir.split())
+#exo_cice_dir    = ec_loc + "/ExoCAM/cesm1.2.1/configs/cam_aqua_se/SourceMods/src.cice"
+#exo_cice_dir    = ''.join(exo_cice_dir.split())
+#exo_drv_dir     = ec_loc + "/ExoCAM/cesm1.2.1/configs/cam_aqua_se/SourceMods/src.drv"
+#exo_drv_dir     = ''.join(exo_drv_dir.split())
+#exo_share_dir   = ec_loc + "/ExoCAM/cesm1.2.1/configs/cam_aqua_se/SourceMods/src.share"
+#exo_share_dir   = ''.join(exo_share_dir.split())
 
 # ExoCAM subdirectories
 #fv_dir         = exo_cam_dir + "/src.cam.fv"
@@ -123,14 +147,18 @@ exo_share_dir   = ''.join(exo_share_dir.split())
 print("differencing files...")
 if args.case2 is not None:
     print(case, " vs. ", args.case2)
+    comp_case_dir  = case2_dir
     comp_cam_dir   = case2_cam_dir
+    comp_docn_dir  = case2_docn_dir
     comp_share_dir = case2_share_dir
     comp_drv_dir   = case2_drv_dir
     comp_clm_dir   = case2_clm_dir
     comp_cice_dir  = case2_cice_dir
 else:
     print(case, " vs. ExoCAM Source")
+    comp_case_dir  = exo_case_dir
     comp_cam_dir   = exo_cam_dir
+    comp_docn_dir  = exo_docn_dir
     comp_share_dir = exo_share_dir
     comp_drv_dir   = exo_drv_dir
     comp_clm_dir   = exo_clm_dir
@@ -143,7 +171,21 @@ if os.path.exists(case_cam_dir) and os.path.isdir(case_cam_dir):
         if not filename.endswith("~"):
             print(filename)                
             print("======================================================")
+            #if (filename=='zm_conv.F90' or filename=='zm_conv_intr.F90'):
+            #  print("Not differencing this")
+            # print(" ")
+            #else:
             f = ['diff', case_cam_dir + '/' + filename, comp_cam_dir + '/' + filename]
+            subprocess.run(f)
+              
+print(" ")
+print("<<< <<< <<< <<< <<< <<< <<< src.docn >>> >>> >>> >>> >>> >>> >>>")
+if os.path.exists(case_docn_dir) and os.path.isdir(case_docn_dir):
+    for filename in os.listdir(case_docn_dir):
+        if not filename.endswith("~"):
+            print(filename)                
+            print("======================================================")
+            f = ['diff', case_docn_dir + '/' + filename, comp_docn_dir + '/' + filename]
             subprocess.run(f)
 
 print(" ")
@@ -189,10 +231,20 @@ if os.path.exists(case_cice_dir) and os.path.isdir(case_cice_dir):
             subprocess.run(f)
 else:
     print("No ice model in $CASE")
+    
+print(" ")
+print("<<< <<< <<< <<< <<< <<< <<< namelist files >>> >>> >>> >>> >>> >>> >>>")
+if os.path.exists(case_dir) and os.path.isdir(case_dir):
+    for filename in os.listdir(case_dir):
+        if (not filename.endswith("~") and (filename.startswith("user") or ((args.case2 is not None) and (filename.startswith("env") or filename.startswith("preview"))))):
+            print(filename)                
+            print("======================================================")
+            f = ['diff', case_dir + '/' + filename, comp_case_dir + '/' + filename]
+            subprocess.run(f)
+else:
+    print("No nl files in $CASE")
 
 
 print("... finished differencing")
 print(" ")
 sys.exit
-
-
