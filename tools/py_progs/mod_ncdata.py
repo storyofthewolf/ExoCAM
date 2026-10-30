@@ -43,6 +43,20 @@ Operations, applied in this order:
 
   3. Dry: zero Q, CLDLIQ, CLDICE.
 
+  4. Optional re-balance for a new composition (off by default), for
+     bootstrapping a run from another case's restart when the dry-air
+     constants differ (e.g. an N2 state started as pure CO2):
+        adiabat_kappa : energy-conserving dry adjustment of T to the adiabat
+                        of the target R/cp.  Each column is made statically
+                        neutral-or-stable (theta non-decreasing upward) by
+                        mixing unstable layers to a common theta, conserving
+                        sum(T dp), i.e. column enthalpy at constant cp.
+        wind_scale    : multiply US and VS by a constant.  Thermal-wind shear
+                        scales with R, so R_new/R_old (= mw_old/mw_new) keeps
+                        the jet structure while removing most of the
+                        imbalance.
+     Applied after the pressure change, on the output's own hybrid grid.
+
 Library use (what exocam-casemgr's `build.py prep` calls):
 
     from mod_ncdata import modify_ncdata
@@ -270,11 +284,91 @@ def apply_pressure_and_dry(path, pstd_bar=None, dry=False, ps_mode='flat',
 
 
 # ---------------------------------------------------------------------------
+# Re-balance for a new composition (in place)
+# ---------------------------------------------------------------------------
+
+def _adjust_column(T, pmid, dp, kappa):
+    """Energy-conserving dry adjustment of one column (index 0 = model top).
+
+    Pool-adjacent-violators from the surface upward: each block holds one
+    theta; a layer whose theta is below the block beneath it is merged into
+    that block, the merged theta chosen to conserve sum(T dp).  The result has
+    theta non-decreasing upward.  Returns the adjusted T and the number of
+    unstable interfaces in the input.
+    """
+    pi = (pmid / pmid[-1]) ** kappa          # Exner function referenced to the bottom layer
+    theta = T / pi
+    n_unstable = int(np.sum(theta[:-1] < theta[1:]))
+    if n_unstable == 0:
+        return T.copy(), 0
+    # blocks as [sum(T dp), sum(pi dp), first k, last k], built bottom-up
+    blocks = []
+    for k in range(len(T) - 1, -1, -1):
+        h, w, top, bot = T[k] * dp[k], pi[k] * dp[k], k, k
+        while blocks and h / w < blocks[-1][0] / blocks[-1][1]:
+            bh, bw, _, bbot = blocks.pop()
+            h, w, bot = h + bh, w + bw, bbot
+        blocks.append([h, w, top, bot])
+    T_out = np.empty_like(T)
+    for h, w, top, bot in blocks:
+        T_out[top:bot + 1] = (h / w) * pi[top:bot + 1]
+    return T_out, n_unstable
+
+
+def apply_rebalance(path, adiabat_kappa=None, wind_scale=None, verbose=True):
+    """Adjust T to the adiabat of adiabat_kappa and/or scale US/VS, in place."""
+    with nc.Dataset(path, 'r+') as d:
+        if adiabat_kappa is not None:
+            kappa = float(adiabat_kappa)
+            P0 = float(np.array(d['P0'][:]).squeeze())
+            PS = np.array(d['PS'][:])[0]
+            hyam, hybm = np.array(d['hyam'][:]), np.array(d['hybm'][:])
+            hyai, hybi = np.array(d['hyai'][:]), np.array(d['hybi'][:])
+            T = np.array(d['T'][:])[0]                       # (lev, lat, lon)
+            pmid = hyam[:, None, None] * P0 + hybm[:, None, None] * PS[None]
+            pint = hyai[:, None, None] * P0 + hybi[:, None, None] * PS[None]
+            dp = np.diff(pint, axis=0)
+            T_new = np.empty_like(T)
+            n_cols = n_ifaces = 0
+            nlev, nlat, nlon = T.shape
+            for y in range(nlat):
+                for x in range(nlon):
+                    T_new[:, y, x], nu = _adjust_column(
+                        T[:, y, x], pmid[:, y, x], dp[:, y, x], kappa)
+                    n_cols += nu > 0
+                    n_ifaces += nu
+            # residual check: the adjusted state must be stable everywhere
+            theta = T_new / (pmid / pmid[-1:]) ** kappa
+            n_left = int(np.sum(theta[:-1] < theta[1:] * (1.0 - 1.0e-12)))
+            e_in, e_out = (T * dp).sum(axis=0), (T_new * dp).sum(axis=0)
+            rel = np.abs(e_out - e_in).max() / np.abs(e_in).min()
+            d['T'][0] = T_new
+            if verbose:
+                dT = T_new - T
+                print(f"adiabat (kappa={kappa:.5f}): {n_ifaces} unstable interfaces in "
+                      f"{n_cols}/{nlat * nlon} columns -> {n_left} remaining; "
+                      f"dT {dT.min():+.2f}..{dT.max():+.2f} K; "
+                      f"T {T.min():.2f}..{T.max():.2f} -> {T_new.min():.2f}..{T_new.max():.2f} K; "
+                      f"max rel. column-enthalpy change {rel:.1e}")
+        if wind_scale is not None:
+            f = float(wind_scale)
+            for name in ('US', 'VS'):
+                if name in d.variables:
+                    v = np.array(d[name][:])
+                    d[name][:] = v * f
+                    if verbose:
+                        print(f"wind_scale: {name} x {f:.5f} "
+                              f"({v.min():.1f}..{v.max():.1f} -> {f * v.min():.1f}..{f * v.max():.1f} m/s)")
+    return path
+
+
+# ---------------------------------------------------------------------------
 # Driver
 # ---------------------------------------------------------------------------
 
 def modify_ncdata(template, out, nlev=None, pstd_bar=None, dry=False,
                   ps_mode='flat', exocam_root=None, grid_file=None,
+                  adiabat_kappa=None, wind_scale=None,
                   overwrite=False, verbose=True):
     """Produce `out` from `template` with the requested level count, surface
     pressure and dryness. Returns a provenance dict.
@@ -301,6 +395,9 @@ def modify_ncdata(template, out, nlev=None, pstd_bar=None, dry=False,
             print(f"copy: {template} (L{nlev_in}, levels unchanged)")
     apply_pressure_and_dry(tmp, pstd_bar=pstd_bar, dry=dry, ps_mode=ps_mode,
                            verbose=verbose)
+    if adiabat_kappa is not None or wind_scale is not None:
+        apply_rebalance(tmp, adiabat_kappa=adiabat_kappa, wind_scale=wind_scale,
+                        verbose=verbose)
     os.replace(tmp, out)
     if verbose:
         print(f"wrote {out}")
@@ -310,6 +407,7 @@ def modify_ncdata(template, out, nlev=None, pstd_bar=None, dry=False,
         'level_changed': level_changed,
         'pstd_bar': pstd_bar, 'ps_mode': ps_mode if pstd_bar is not None else None,
         'dry': bool(dry),
+        'adiabat_kappa': adiabat_kappa, 'wind_scale': wind_scale,
     }
 
 
@@ -334,6 +432,11 @@ def main(argv=None):
                    help='ExoCAM checkout (default: $EXOCAM or this file\'s checkout)')
     p.add_argument('--grid-file', default=None,
                    help=f'66-level grid template (default: <exocam-root>/{LEVEL_GRID_FILE})')
+    p.add_argument('--adiabat-kappa', type=float, default=None,
+                   help='energy-conserving dry adjustment of T to the adiabat of this '
+                        'R/cp (e.g. 0.2234 for pure CO2 in ExoCAM); default: off')
+    p.add_argument('--wind-scale', type=float, default=None,
+                   help='multiply US and VS by this factor (e.g. R_new/R_old); default: off')
     args = p.parse_args(argv)
 
     print("\n-----------------------------------------------------------------------------")
@@ -342,7 +445,8 @@ def main(argv=None):
         modify_ncdata(args.input_IC_file, args.fname_out, nlev=args.num_lev,
                       pstd_bar=args.surface_pressure, dry=args.dry,
                       ps_mode=args.ps_mode, exocam_root=args.exocam_root,
-                      grid_file=args.grid_file, overwrite=args.overwrite)
+                      grid_file=args.grid_file, adiabat_kappa=args.adiabat_kappa,
+                      wind_scale=args.wind_scale, overwrite=args.overwrite)
     except (FileNotFoundError, FileExistsError, ValueError) as e:
         print(f"ERROR: {e}", file=sys.stderr)
         return 1
