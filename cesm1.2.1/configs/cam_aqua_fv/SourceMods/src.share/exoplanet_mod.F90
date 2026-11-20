@@ -27,9 +27,9 @@ module exoplanet_mod
                                                                 !! and linking aerosol absorption to ExoRT
   logical, public, parameter :: do_exo_gw = .false.             !! flag to turn on gravity waves.  Note, present gw wave parameterization
                                                                 !! does not work for low pressure atmospheres.
-  logical, public, parameter :: do_am_fixes = .false.            !! Implements Toniazzi et al. 2020 angular momentum correction in SW transport
+  logical, public, parameter :: do_am_fixes = .false.            !! Implements Toniazzo et al. 2020 angular momentum correction in SW transport
                                                                 !! and also global angular momentum fixer. Does not include geometric corrections
-  logical, public, parameter :: do_am_fix_lbl = .false.          !! Implements Toniazzi et al. 2020 angular momentum level by level correction
+  logical, public, parameter :: do_am_fix_lbl = .false.          !! Implements Toniazzo et al. 2020 angular momentum level by level correction
                                                                 !! instead of spreading over all levels. Needs do_am_fixes = .true. to be active.  Note, this is a new feature and has not been tested extensively.
 
   real(r8), public, parameter :: exo_convect_plim = 5.0_r8     !! Sets the minimum pressure limit in the convection schemes

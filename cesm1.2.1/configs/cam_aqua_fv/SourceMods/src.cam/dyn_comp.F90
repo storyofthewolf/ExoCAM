@@ -1122,8 +1122,8 @@ subroutine dyn_run(ptop, ndt, te0, dyn_state, dyn_in, dyn_out, rc)
    integer :: ng_d      ! Ghosting width on D-grid
    integer :: ng_s      ! Ghosting width (staggered, for winds)
    integer :: ns        ! overall split
-   logical :: do_am_fixes !whether to implement Toniazzi 2020 am correction and fixer
-   logical :: do_am_fix_lbl !whether to implement Toniazzi 2020 am correction and fixer level by level
+   logical :: do_am_fixes !whether to implement Toniazzo 2020 am correction and fixer
+   logical :: do_am_fix_lbl !whether to implement Toniazzo 2020 am correction and fixer level by level
 
    integer :: ifirstxy, ilastxy, jfirstxy, jlastxy  ! xy decomposition
    integer :: npr_z
