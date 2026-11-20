@@ -22,7 +22,7 @@ There is no build system, test suite, lint config, or CI in this repo. "Running 
 `cesm1.2.1/configs/<config>/SourceMods/src.share/exoplanet_mod.F90` is the **single source of truth for planet/atmosphere/run parameters**. Almost all "what kind of planet/star/atmosphere" choices live here as `parameter` constants and are baked in at compile time — they override CESM namelist GHG settings when `do_exo_atmconst = .true.` (the default). Editing this file requires rebuilding the case.
 
 Key parameter groups (see file comments for full docs):
-- Run options: `do_exo_synchronous`, `do_exo_rt`, `do_exo_atmconst`, `do_carma_exort`, `do_exo_gw`, `exo_convect_plim`, `do_am_fixes`, `do_am_fix_lbl` (AM flags: `cam_aqua_fv` only, see below)
+- Run options: `do_exo_synchronous`, `do_exo_rt`, `do_exo_atmconst`, `do_carma_exort`, `do_exo_gw`, `exo_convect_plim`, `do_am_fixes`, `do_am_fix_lbl` (AM flags: FV configs only, see below)
 - Radiation: `exo_rad_step`, `do_exo_rt_clearsky`, `do_exo_rt_spectral`, `do_exo_rt_optimize_bands`, `Tmax`
 - Planet: `exo_planet_radius`, `exo_surface_gravity`, `exo_ndays`, `exo_porb`, `exo_sday`, `exo_eccen`, `exo_obliq`, `exo_mvelp`
 - Stellar: `exo_scon`, `exo_solar_file` (must match RT spectral resolution)
@@ -57,15 +57,15 @@ Each config's `SourceMods/` mirrors CESM component subdirs and only the listed c
 
 When propagating a change to `exoplanet_mod.F90` or other shared SourceMods, **apply it to every config that contains the file** — there is no shared copy. Recent commit `019c2d3` ("propagate changes from cam_mixed_fv to cam_aqua_fv and cam_land_fv") and the 2026-04-29 NH₃/CO additions show the expected pattern. Configs are kept in sync by hand.
 
-### Angular momentum conservation (`cam_aqua_fv` only, PR #14)
+### Angular momentum conservation (FV configs, PR #14)
 
 Merged 2026-10-04 (`cb8792f`, Edouard Barrier): a CAM4 FV backport of the CAM6 AM correction + fixer (Toniazzo et al. 2020; Barrier & Madhusudhan 2025a). Touches `src.cam/cd_core.F90`, `dyn_comp.F90`, `dynamics_vars.F90`, and adds `sw_core.F90`, `te_map.F90`, `benergy.F90`, `par_vecsum.F90` (now a module, `par_vecsum_mod`) to SourceMods.
 - `do_am_fixes` gates both the transport correction (`cd_core`/`sw_core`/`te_map`) and the residual fixer (`dyn_comp`). `do_am_fix_lbl` picks the fixer mode: global with pressure taper, or level-by-level with no taper (as in CAM6). It has no effect unless `do_am_fixes = .true.`. Both default `.false.`. The plan is to keep the flags rather than delete them, since the fixer trades a little energy conservation for AM conservation.
 - `sw_core`'s half of the correction is skipped where the transport order isn't 4 (top ~km/8 levels); this is expected.
 - **Not bit-for-bit with v1.0.0 even with the flags off:** 4th-order divergence damping `tau4` in `cd_core.F90` was lowered from `0.01` to `0.005/dt` for all runs (deliberately kept; see Christie 2024 on top-of-atmosphere AM loss).
-- Not yet propagated to `cam_land_fv` / `cam_mixed_fv`; `cam_aqua_se` (spectral-element dycore) does not apply. When propagating, carry the `tau4` change, the new SourceMods, and the `exoplanet_mod.F90` flags together.
+- Propagated to `cam_land_fv` and `cam_mixed_fv` on 2026-11-20: the seven `src.cam` files are identical across the three FV configs, and each `exoplanet_mod.F90` carries both flags. `cam_aqua_se` (spectral-element dycore) does not apply. `t_int` was not propagated (it is a slab-ocean `src.docn` change, and `cam_land_fv` has no ocean).
 
-All three FV configs also carry dycore robustness patches `fill_module.F90` and `mapz_module.F90` (`3dd3678`; `cam_mixed_fv` has only `mapz_module`). `te_map.F90` uses `mapz_module`, so the patched copy is picked up.
+All three FV configs also carry dycore robustness patches `fill_module.F90` and `mapz_module.F90` (`3dd3678`; `fill_module` reached `cam_mixed_fv` later, in `c6dfcb6`). `te_map.F90` uses `mapz_module`, so the patched copy is picked up.
 
 Adding a new gas absorber to the ExoRT 3-D interface requires parallel edits in this repo: `mwXXX` in `src.cam/physconst.F90`, and `exo_xxxbar`/`exo_xxxmmr`/`cpXXX`/`exo_cpdair` in `src.share/exoplanet_mod.F90`, applied to every config. See `ExoRT/CLAUDE.md` §"Connecting a New Gas to the 3-D Interface" for the full checklist.
 
