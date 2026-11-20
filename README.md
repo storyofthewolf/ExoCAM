@@ -13,7 +13,7 @@ This software (ExoCAM) contains system files, source code files, initial conditi
 **It is best to think of ExoCAM as a patch to CESM1.2.1!!**
 
 Familiarity with checking out, building, and running CESM 1.2.1 is assumed. Please refer to the publicly available CESM user’s guide for details.
-[http://www.cesm.ucar.edu/models/cesm1.2/cesm/doc/usersguide/ug.pdf](http://www.cesm.ucar.edu/models/cesm1.2/cesm/doc/usersguide/ug.pdf)
+[https://docs.cesm.ucar.edu/models/cesm1/user-guide/1.2/book1.html](https://docs.cesm.ucar.edu/models/cesm1/user-guide/1.2/book1.html)
 
 ExoCAM is intended to be run with ExoRT, a correlated-k radiative transfer package for 3-D climate models available at [https://github.com/storyofthewolf/ExoRT](https://github.com/storyofthewolf/ExoRT). ExoRT was separated from ExoCAM in order to faciliate a standalone 1D off-line version of ExoRT, which could more easily be updated and tested. ExoCAM supports several standard "configs" along with options to change planet parameters, and atmospheric compostions. General instructions and descriptions of supported planet modifications is found here `../ExoCAM/cesm1.2.1/instructions`. Specific instructions for configs are located in individual config directories located at `../ExoCAM/cesm1.2.1/configs/*/README`.
 Also refer to the CESM usersguide listed above.
