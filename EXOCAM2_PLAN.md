@@ -174,6 +174,11 @@ the first radiation step (nstep 3), ExoRT `aerad_driver` at the call to
 `0xfffffffc06e05698`, a hugely negative offset, as from a NaN converted to an
 array index. Logs in `exocam-baselines/reg0/reg0_land_fv_FAILED/`. Needs a
 debug build (`DEBUG=TRUE`) of the land case before land has a baseline.
+**Shelved 2026-11-22 by the author.** Findings so far: the shipped
+`landplanet_dry.clm2.r.nc` is byte-identical to the TRAPPIST-1e Ben1 restart
+`ben1_L51_p6.1.clm2.r.0003-01-01` (commit `29b77bf`); a start from the L51 dry
+IC with soil colour 5 crashes the same way at nstep 6. A `DEBUG=TRUE` trial
+(`sbx_landdbg_debug`, job 59376732) was submitted and left unread.
 
 `exoplanet_mod.F90` stays per config in this phase; Phase 2 replaces it.
 
