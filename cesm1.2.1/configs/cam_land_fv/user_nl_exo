@@ -1,0 +1,9 @@
+! cam_land_fv: the config's settings for exoplanet_mod.F90, applied on top of
+! cesm1.2.1/exoplanet/exoplanet_mod.F90.template (aquaplanet defaults).
+! Put a case's own settings in $CASEROOT/user_nl_exo, not in this file.
+
+! Land surface (CLM): the land-planet choices
+exo_lnd_watmin         = 1.0e-15_r8   ! minimum soil moisture (mm); CLM stock 0.01
+exo_lnd_emis_soil      = 1.0_r8       ! ground emissivity, snow-free soil
+exo_lnd_emis_snow      = 1.0_r8       ! ground emissivity, snow and glacier ice
+do_exo_lnd_q2m_gridbox = .true.       ! 2-m humidity = grid-box humidity

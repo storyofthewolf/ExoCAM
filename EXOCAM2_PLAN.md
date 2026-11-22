@@ -1,6 +1,6 @@
 # ExoCAM 2.0 — plan
 
-**Status:** agreed 2026-11-21. Phase 0 baselines recorded for aqua and mixed; Phase 1 done and BFB for aqua and mixed (2026-11-22). Land blocked by a v1.1.0 crash. This is the working plan; edit it as decisions land.
+**Status:** agreed 2026-11-21. Phase 0 baselines recorded for aqua and mixed; Phase 1 done and BFB for aqua and mixed (2026-11-22). Land blocked by a v1.1.0 crash. Phase 2a done and bitwise-verified (2026-11-22). This is the working plan; edit it as decisions land.
 
 ## Decisions
 
@@ -200,6 +200,29 @@ it. Two steps:
   generator, never by hand.
 - Bit-for-bit against the baselines when `user_nl_exo` reproduces each
   config's current values.
+
+**2a status (2026-11-22): done on `refactor`, bitwise-verified.**
+- `cesm1.2.1/exoplanet/exoplanet_mod.F90.template` (aqua's file, all
+  parameters documented) + `configs/<cfg>/user_nl_exo` (config defaults) +
+  `$CASEROOT/user_nl_exo` → `gen_exoplanet_mod.py` (Python 3, stdlib) →
+  the case's `exoplanet_mod.F90`. `install_sourcemods.sh` runs it; the FV
+  configs ship no Fortran of their own any more.
+- The generator computes `exo_n2bar` with casemgr's rule and number format
+  (`%.12g`, `_r8`); unknown names, wrong types, `exo_pstd` and the derived
+  block are errors. casemgr (newcase) now starts from the generator's output
+  for such configs and applies the matrix on top as before.
+- **Verification:** for aqua, land and mixed, the `reg0` rendering (from
+  `main`) and the 2a rendering were compiled with gfortran and every public
+  parameter compared by bit pattern: 0 differences (60/59/59 shared), and 0
+  of 64 against the Phase 1 rendering that ran BFB on Discover. With the rest
+  of SourceMods unchanged since Phase 1, 2a is BFB without a new run.
+- **Follow-ups:** (1) casemgr should write the matrix's planet as the case's
+  `user_nl_exo` instead of embedding a rendered file, so a case's settings
+  are visible and `build.py patch` stays consistent with the generator (today
+  a later regenerate would drop a `patch` edit). (2) Template defects to fix
+  outside BFB work: the template's own `exo_n2bar` expression omitted H₂, NH₃
+  and CO (now moot: the generator writes the fill), and `exo_pstd` omits NH₃
+  and CO (wrong whenever either is non-zero).
 
 **2b. Move the runtime-safe settings to a true runtime read.** These are the
 ones that never reach `shr_const_mod`:
