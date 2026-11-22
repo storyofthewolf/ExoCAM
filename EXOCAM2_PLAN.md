@@ -1,6 +1,6 @@
 # ExoCAM 2.0 — plan
 
-**Status:** agreed 2026-11-21. Phase 0 baselines running (2026-11-22); Phase 1 code done, BFB check pending. This is the working plan; edit it as decisions land.
+**Status:** agreed 2026-11-21. Phase 0 baselines recorded for aqua and mixed; Phase 1 done and BFB for aqua and mixed (2026-11-22). Land blocked by a v1.1.0 crash. This is the working plan; edit it as decisions land.
 
 ## Decisions
 
@@ -157,9 +157,23 @@ cesm1.2.1/
 **Phase 1 status (2026-11-22):** steps 1–4 committed on `refactor`
 (`98b666f` shared tree, `b71d48e` whitespace merges, `88be16f` docn/`t_int`,
 `bcfc3ce` CLM parameters). Every FV config's own SourceMods is now just
-`exoplanet_mod.F90`, and the three differ only in values. **Outstanding:**
-the BFB check on Discover, casemgr `exp_matrices/sbx_reg0r_phase1.yaml`
-(`exocam_root` = a Discover clone of `refactor`), compared against `reg0_*`.
+`exoplanet_mod.F90`, and the three differ only in values.
+
+**BFB result (2026-11-22, casemgr `exp_matrices/sbx_reg0r_phase1.yaml`,
+built from a Discover clone of `refactor` at `d08510d`):** aqua and mixed
+restarts (`cam.r`, `cam.rs`, `cice.r`, `docn.r`, `cpl.r`, and `clm2.r` for
+mixed) are **identical in every data variable** to `reg0`; only the case-name
+attributes differ. Land cannot be checked: `reg0_land_fv` crashes on stock
+`v1.1.0` (below), and the refactor build crashes identically, with the same
+`nstep, te` values to all digits for steps 0–3, the same 97 fill messages,
+and the same line.
+
+**Open: `cam_land_fv` crashes on stock v1.1.0.** SIGSEGV on 2 of 126 ranks at
+the first radiation step (nstep 3), ExoRT `aerad_driver` at the call to
+`rad_precalc` (`exo_radiation_mod.F90:652`), bad address
+`0xfffffffc06e05698`, a hugely negative offset, as from a NaN converted to an
+array index. Logs in `exocam-baselines/reg0/reg0_land_fv_FAILED/`. Needs a
+debug build (`DEBUG=TRUE`) of the land case before land has a baseline.
 
 `exoplanet_mod.F90` stays per config in this phase; Phase 2 replaces it.
 
