@@ -1,6 +1,6 @@
 # ExoCAM 2.0 — plan
 
-**Status:** agreed 2026-11-21, nothing started. This is the working plan; edit it as decisions land.
+**Status:** agreed 2026-11-21; Phase 0 drafted, Phase 1 diffs classified (2026-11-21). This is the working plan; edit it as decisions land.
 
 ## Decisions
 
@@ -71,6 +71,20 @@ casemgr `regress.py`) far enough to:
 Every later phase must reproduce these baselines bit for bit, except Phase 3,
 which changes the answer on purpose.
 
+**Status (2026-11-21):** matrix drafted as casemgr
+`exp_matrices/reg0_baselines.yaml` (cases `reg0_{aqua,land,mixed}_fv`;
+nlev 40/40/51; 126 tasks; 5 days, restart at day 5). The baselines use
+existing casemgr verbs (`build.py make --send-it`); `regress.py` wraps the
+same steps later. Two things found while drafting:
+- casemgr does not inherit template gases, so the matrix states the shipped
+  composition (400 ppm CO₂, 1.7 ppm CH₄; mixed also O₂ 0.2095 bar and
+  `exo_convect_plim` 4000 Pa).
+- casemgr renders `exo_n2bar` as a rounded literal (`0.9995983_r8`), not the
+  template's expression (`1.0 - exo_co2bar - ...`), which can differ in the
+  last bit. The baseline is therefore defined by the **rendered** file, and
+  the Phase 2a generator must render `exo_n2bar` the same way casemgr does
+  (or both switch to the expression before the baselines are recorded).
+
 **Optional, decide first:** tag current `main` as `v1.1.0` (paired with ExoRT
 `v1.1.0`), so public users get the AM and robustness fixes now rather than at
 2.0.
@@ -97,6 +111,28 @@ cesm1.2.1/
      components, a surface-type flag), never a CPP switch.
 
    Each reconciliation must pass all three baselines.
+
+   **Diff results (2026-11-21, `d2c8720`):**
+
+   | File | Configs | Real difference | Class |
+   |---|---|---|---|
+   | `zm_conv_intr.F90` | aqua=land / mixed | trailing whitespace only | cosmetic |
+   | `convect_shallow.F90` | aqua / land=mixed\* | one space before `)` (\*land and mixed also differ only in trailing whitespace) | cosmetic |
+   | `clm_driver.F90` | land / mixed | spacing inside a comment | cosmetic |
+   | `docn_comp_mod.F90` | aqua / mixed | aqua has `+ shr_const_stebol*t_int**4`; mixed lacks `t_int` | drift: propagate to mixed (adds exactly `+0.0` at `t_int = 0`; BFB under `-fp-model source`, confirm against the baseline) |
+   | `clm_varcon.F90` | land / mixed | `watmin` = 1e-15 (land) vs 1e-10 (mixed) | science choice, needs a decision |
+   | `Biogeophysics1Mod.F90` | land / mixed | ground emissivity 1.0 (land) vs stock 0.96/0.97 (mixed) | science choice, needs a decision |
+   | `BareGroundFluxesMod.F90` | land / mixed | `q_ref2m` = grid-box `forc_q` (land) vs stock formula (mixed) | science choice, needs a decision |
+
+   `exoplanet_mod.F90`: the three parameter sets differ only in `t_int`
+   (aqua only, drift), `exo_o2bar` (mixed 0.2095) and `exo_convect_plim`
+   (mixed 4000 Pa); every other value is identical.
+
+   **Proposal for the three CLM files:** where the two values are both
+   wanted, add a parameter to `exoplanet_mod.F90` set per config (for
+   example `exo_clm_watmin`, `exo_ground_emis`, `do_exo_q2m_gridbox`). This
+   is not a CPP switch, it keeps each config BFB, and the parameters become
+   `user_nl_exo` entries in Phase 2.
 3. **Check that SourceMods for an inactive component is harmless.** Does
    `src.clm` copied into an aqua case compile into anything? Check it against
    the compsets; if not, have casemgr copy per component.
