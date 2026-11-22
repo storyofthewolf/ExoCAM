@@ -85,9 +85,9 @@ same steps later. Two things found while drafting:
   the Phase 2a generator must render `exo_n2bar` the same way casemgr does
   (or both switch to the expression before the baselines are recorded).
 
-**Optional, decide first:** tag current `main` as `v1.1.0` (paired with ExoRT
+**Done 2026-11-21:** `main` tagged `v1.1.0` at `1f81c30` (paired with ExoRT
 `v1.1.0`), so public users get the AM and robustness fixes now rather than at
-2.0.
+2.0. The baselines are recorded against this tag.
 
 ## Phase 1 — One SourceMods set (bit-for-bit per config)
 
@@ -120,18 +120,18 @@ cesm1.2.1/
    | `convect_shallow.F90` | aqua / land=mixed\* | one space before `)` (\*land and mixed also differ only in trailing whitespace) | cosmetic |
    | `clm_driver.F90` | land / mixed | spacing inside a comment | cosmetic |
    | `docn_comp_mod.F90` | aqua / mixed | aqua has `+ shr_const_stebol*t_int**4`; mixed lacks `t_int` | drift: propagate to mixed (adds exactly `+0.0` at `t_int = 0`; BFB under `-fp-model source`, confirm against the baseline) |
-   | `clm_varcon.F90` | land / mixed | `watmin` = 1e-15 (land) vs 1e-10 (mixed) | science choice, needs a decision |
-   | `Biogeophysics1Mod.F90` | land / mixed | ground emissivity 1.0 (land) vs stock 0.96/0.97 (mixed) | science choice, needs a decision |
-   | `BareGroundFluxesMod.F90` | land / mixed | `q_ref2m` = grid-box `forc_q` (land) vs stock formula (mixed) | science choice, needs a decision |
+   | `clm_varcon.F90` | land / mixed | `watmin` = 1e-15 (land) vs 1e-10 (mixed) | science choice: per-config parameter |
+   | `Biogeophysics1Mod.F90` | land / mixed | ground emissivity 1.0 (land) vs stock 0.96/0.97 (mixed) | science choice: per-config parameter |
+   | `BareGroundFluxesMod.F90` | land / mixed | `q_ref2m` = grid-box `forc_q` (land) vs stock formula (mixed) | science choice: per-config parameter |
 
    `exoplanet_mod.F90`: the three parameter sets differ only in `t_int`
    (aqua only, drift), `exo_o2bar` (mixed 0.2095) and `exo_convect_plim`
    (mixed 4000 Pa); every other value is identical.
 
-   **Proposal for the three CLM files:** where the two values are both
-   wanted, add a parameter to `exoplanet_mod.F90` set per config (for
-   example `exo_clm_watmin`, `exo_ground_emis`, `do_exo_q2m_gridbox`). This
-   is not a CPP switch, it keeps each config BFB, and the parameters become
+   **Decided 2026-11-21, the three CLM files:** keep both behaviours as
+   parameters in `exoplanet_mod.F90`, set per config (for example
+   `exo_clm_watmin`, `exo_ground_emis`, `do_exo_q2m_gridbox`). This is not a
+   CPP switch, it keeps each config BFB, and the parameters become
    `user_nl_exo` entries in Phase 2.
 3. **Check that SourceMods for an inactive component is harmless.** Does
    `src.clm` copied into an aqua case compile into anything? Check it against
@@ -236,7 +236,7 @@ override is small.
 
 ## Open decisions
 
-- Tag ExoCAM `v1.1.0` now, or go straight to 2.0?
+- ~~Tag ExoCAM `v1.1.0` now, or go straight to 2.0?~~ Tagged 2026-11-21.
 - CARMA: an add-on directory, or part of the single tree behind a switch?
 - How `user_nl_exo` reaches the rundir.
 - Which constants become runtime in 2b, after the stock-file audit.
