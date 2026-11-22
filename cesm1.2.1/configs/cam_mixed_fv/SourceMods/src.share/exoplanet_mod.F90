@@ -170,6 +170,12 @@ module exoplanet_mod
   real(r8), public, parameter :: exo_lnd_albvis_sat = 0.30    ! land albedo, visible, saturated soil
   real(r8), public, parameter :: exo_lnd_albifr_sat = 0.30    ! land albedo, infrared, saturated soil
 
+  !! ============== LAND SURFACE (CLM; used only where the land model is active) ============== !!
+  real(r8), public, parameter :: exo_lnd_watmin    = 1.0e-10_r8  ! minimum soil moisture (mm); CLM stock 0.01, crashes at 0.0
+  real(r8), public, parameter :: exo_lnd_emis_soil = 0.96_r8  ! ground emissivity, snow-free soil (CLM stock 0.96)
+  real(r8), public, parameter :: exo_lnd_emis_snow = 0.97_r8  ! ground emissivity, snow and glacier ice (CLM stock 0.97)
+  logical,  public, parameter :: do_exo_lnd_q2m_gridbox = .false.  ! .true.: 2-m humidity = grid-box humidity (CLM stock .false.)
+
   !! ============== SURFACE CONDITIONS ============== !!
   real(r8), public, parameter :: t_int = 0.0_r8        ! internal temperature (K) - applied as a temperature forcing to the slab ocean
 

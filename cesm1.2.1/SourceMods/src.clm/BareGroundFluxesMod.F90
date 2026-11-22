@@ -49,6 +49,7 @@ contains
     use shr_const_mod      , only : SHR_CONST_RGAS
     use FrictionVelocityMod, only : FrictionVelocity, MoninObukIni
     use QSatMod            , only : QSat
+    use exoplanet_mod      , only : do_exo_lnd_q2m_gridbox
 
 !
 ! !ARGUMENTS:
@@ -390,8 +391,13 @@ contains
 
        ! 2 m height specific humidity
 
-       !q_ref2m(p) = forc_q(c) + temp2(p)*dqh(p)*(1._r8/temp22m(p) - 1._r8/temp2(p))
-       q_ref2m(p) = forc_q(c) !set 2-m specific humidity equal to grid box specific humidity.
+       ! ExoCAM: do_exo_lnd_q2m_gridbox (exoplanet_mod.F90) sets the 2-m specific
+       ! humidity equal to the grid-box specific humidity instead.
+       if (do_exo_lnd_q2m_gridbox) then
+          q_ref2m(p) = forc_q(c)
+       else
+          q_ref2m(p) = forc_q(c) + temp2(p)*dqh(p)*(1._r8/temp22m(p) - 1._r8/temp2(p))
+       end if
 
        ! 2 m height relative humidity
                                                                                 

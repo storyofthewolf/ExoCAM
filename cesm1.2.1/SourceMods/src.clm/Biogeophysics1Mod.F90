@@ -72,6 +72,7 @@ contains
     use clm_varpar         , only : nlevgrnd, nlevurb, nlevsno, max_pft_per_gcell, nlevsoi
     use QSatMod            , only : QSat
     use shr_const_mod      , only : SHR_CONST_PI
+    use exoplanet_mod      , only : exo_lnd_emis_soil, exo_lnd_emis_snow
 !
 ! !ARGUMENTS:
     implicit none
@@ -409,11 +410,10 @@ contains
 
        if (ityplun(l) /= isturb) then
           if (ityplun(l)==istice .or. ityplun(l)==istice_mec) then
-!             emg(c) = 0.97_r8
-             emg(c) = 1.0_r8  ! Wolf set ground emissivity to 1
+             ! ExoCAM: emissivities set in exoplanet_mod.F90 (CLM stock: 0.97 snow/ice, 0.96 soil)
+             emg(c) = exo_lnd_emis_snow
           else
-!             emg(c) = (1._r8-frac_sno(c))*0.96_r8 + frac_sno(c)*0.97_r8
-             emg(c) = (1._r8-frac_sno(c))*1.0_r8 + frac_sno(c)*1.0_r8
+             emg(c) = (1._r8-frac_sno(c))*exo_lnd_emis_soil + frac_sno(c)*exo_lnd_emis_snow
           end if
        end if
 

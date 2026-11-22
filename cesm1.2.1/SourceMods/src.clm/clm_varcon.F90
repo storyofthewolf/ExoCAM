@@ -18,6 +18,7 @@ module clm_varcon
                            SHR_CONST_PDB, SHR_CONST_PI, SHR_CONST_CDAY,       &
                            SHR_CONST_RGAS, SHR_CONST_ZVIR
   use clm_varpar   , only: numrad, nlevgrnd, nlevlak
+  use exoplanet_mod, only: exo_lnd_watmin
 !
 ! !PUBLIC TYPES:
   implicit none
@@ -67,7 +68,7 @@ module clm_varcon
   real(r8) :: alpha_aero = 1.0_r8   !constant for aerodynamic parameter weighting
   real(r8) :: tlsai_crit = 2.0_r8   !critical value of elai+esai for which aerodynamic parameters are maximum
   !real(r8) :: watmin = 0.01_r8      !minimum soil moisture (mm)
-  real(r8) :: watmin = 1.0e-10_r8      !minimum soil moisture (mm) ! WOLF, exo_mod, model crash if set to 0.0 
+  real(r8) :: watmin = exo_lnd_watmin  !minimum soil moisture (mm), set in exoplanet_mod.F90 ! WOLF: model crashes if set to 0.0 
 
   real(r8) :: re = SHR_CONST_REARTH*0.001_r8 !radius of earth (km)
 
