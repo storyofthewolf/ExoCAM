@@ -110,8 +110,15 @@ STEP 4:  Link ExoRT radiative transfer model and set configure options
 
 STEP 5:  Copy SourceMods and namelist files to your case
 
-  Copy SourceMods directory from ../ExoCAM/cesm1.2.1/configs/$model_config to
-  your case directory ($CASEROOT)
+  For the FV configs (cam_aqua_fv, cam_land_fv, cam_mixed_fv), install the
+  SourceMods with the script, which copies the shared tree
+  ../ExoCAM/cesm1.2.1/SourceMods and then the config's own files:
+
+    ../ExoCAM/cesm1.2.1/install_sourcemods.sh $model_config $CASEROOT/SourceMods
+
+  For the other configs (cam_aqua_se, circumbinary), copy the SourceMods
+  directory from ../ExoCAM/cesm1.2.1/configs/$model_config to your case
+  directory ($CASEROOT), as before.
 
   Copy namelist files from ../ExoCAM/cesm1.2.1/configs/$model_config/namelist_files/* to
   your case directory ($CASEROOT)

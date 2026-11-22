@@ -1,0 +1,16 @@
+SourceMods shared by the FV configs: cam_aqua_fv, cam_land_fv, cam_mixed_fv.
+
+A file lives here when it is identical in every FV config that uses its
+component. A file that differs between configs lives in
+configs/<config>/SourceMods/ instead, never in both places.
+
+Do not copy this directory into a case by hand. Use
+
+    ../install_sourcemods.sh <config> $CASEROOT/SourceMods
+
+which copies only the components in configs/<config>/COMPONENTS, then the
+config's own files. (src.clm is for land/mixed only; src.cice and src.docn
+are for aqua/mixed only.)
+
+Not used by cam_aqua_se or circumbinary, which keep their full SourceMods
+under configs/ (both are outside ExoCAM 2.0).

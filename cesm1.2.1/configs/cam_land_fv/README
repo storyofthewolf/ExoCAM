@@ -26,7 +26,8 @@ xmlchange ROF_GRID=null  ; turns off river routing grid.  alternatively can
                          ; use -res f45_f45_noRTM in creating case
 
 == transfer files ==
-copy SourceMods folder directly into your $Case directory
+install SourceMods into your $Case directory (shared tree + this config's files):
+     $EXOCAM/cesm1.2.1/install_sourcemods.sh cam_land_fv $CASEROOT/SourceMods
 copy namelist files into your $Case directory
      for "MG" clouds, uncomment blocks in user_nl_cam
 

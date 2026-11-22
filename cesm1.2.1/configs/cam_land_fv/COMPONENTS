@@ -1,0 +1,2 @@
+# CESM components whose SourceMods this config installs (install_sourcemods.sh)
+cam share drv clm

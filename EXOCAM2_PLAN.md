@@ -104,6 +104,11 @@ cesm1.2.1/
 **Steps:**
 1. **Move the 51 identical files into the shared tree.** One commit; every
    config's file list must be unchanged.
+   **Done 2026-11-22:** shared tree at `cesm1.2.1/SourceMods/` (config
+   directory names kept, so casemgr's `config_type` values still apply);
+   `configs/<cfg>/COMPONENTS` plus `cesm1.2.1/install_sourcemods.sh`
+   assemble a case. All three assemble byte-identical to `v1.1.0`, so this
+   step is BFB by construction.
 2. **Reconcile the 7 differing files one at a time.** Diff each and classify:
    - **drift** (one config missed an update): take the right version;
    - **a genuine config difference** (land vs ocean surface): a runtime

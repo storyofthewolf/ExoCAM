@@ -55,7 +55,9 @@ Each config's `SourceMods/` mirrors CESM component subdirs and only the listed c
 - `src.clm` — land model (land/mixed configs)
 - `src.drv` — coupler (`ccsm_comp_mod.F90`, `seq_flux_mct.F90`)
 
-When propagating a change to `exoplanet_mod.F90` or other shared SourceMods, **apply it to every config that contains the file** — there is no shared copy. Recent commit `019c2d3` ("propagate changes from cam_mixed_fv to cam_aqua_fv and cam_land_fv") and the 2026-04-29 NH₃/CO additions show the expected pattern. Configs are kept in sync by hand.
+**On the `refactor` branch (ExoCAM 2.0, Phase 1), the FV configs share one tree.** `cesm1.2.1/SourceMods/` holds every file that is identical across the FV configs using its component (51 files). `configs/cam_{aqua,land,mixed}_fv/SourceMods/` hold only that config's own files (`exoplanet_mod.F90` and the files that still differ), and each config's `COMPONENTS` file lists which `src.*` directories it installs. `cesm1.2.1/install_sourcemods.sh <config> $CASEROOT/SourceMods` assembles a case. It refuses a file present in both layers, so each file has exactly one home. Edit a shared file once, in `cesm1.2.1/SourceMods/`. `cam_aqua_se` and `circumbinary` are untouched and keep full per-config SourceMods.
+
+On `main` (1.x) there is no shared copy: apply a change to `exoplanet_mod.F90` or other shared SourceMods **to every config that contains the file**, as commit `019c2d3` and the 2026-04-29 NH₃/CO additions did.
 
 ### Angular momentum conservation (FV configs, PR #14)
 
