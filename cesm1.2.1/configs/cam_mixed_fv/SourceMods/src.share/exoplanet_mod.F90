@@ -108,6 +108,20 @@ module exoplanet_mod
   !real(r8), public, parameter :: exo_porb             = exo_ndays                   !! orbital period
   !real(r8), public, parameter :: exo_sday = 86400.0_r8 * exo_ndays      !! sidereal period, synchronous rotator
 
+  !!K2-18b (Benneke et al. 2019) -- assumed tidally locked
+  !real(r8), public, parameter :: exo_planet_radius = 1.66e7_R8           !! radius ~ m
+  !real(r8), public, parameter :: exo_surface_gravity = 12.4_R8           !! gravity ~ m/s^2
+  !real(r8), public, parameter :: exo_ndays = 32.94                       !! scaler to number of Earth days
+  !real(r8), public, parameter :: exo_porb = 32.94                        !! orbital period
+  !real(r8), public, parameter :: exo_sday = 86400.0_r8 * exo_ndays       !! sidereal period, synchronous rotator
+
+  !!TOI-270d (Van Eylen et al. 2021) -- assumed tidally locked
+  ! real(r8), public, parameter :: exo_planet_radius = 1.36e7_R8           !! radius ~ m
+  ! real(r8), public, parameter :: exo_surface_gravity = 10.34_R8           !! gravity ~ m/s^2
+  ! real(r8), public, parameter :: exo_ndays = 11.38                       !! scaler to number of Earth days
+  ! real(r8), public, parameter :: exo_porb = 11.38                        !! orbital period
+  ! real(r8), public, parameter :: exo_sday = 86400.0_r8 * exo_ndays       !! sidereal period, synchronous rotator
+
   !! ============== ORBITAL OPTIONS ============== !!
   !! if set user_nl_cpl::orb_iyear = -1
   !! if user_nl_cpl::orb_iyear=YEAR, then these values are overriden
@@ -155,6 +169,9 @@ module exoplanet_mod
   real(r8), public, parameter :: exo_lnd_albifr_dry = 0.30    ! land albedo, infrared, dry soil
   real(r8), public, parameter :: exo_lnd_albvis_sat = 0.30    ! land albedo, visible, saturated soil
   real(r8), public, parameter :: exo_lnd_albifr_sat = 0.30    ! land albedo, infrared, saturated soil
+
+  !! ============== SURFACE CONDITIONS ============== !!
+  real(r8), public, parameter :: t_int = 0.0_r8        ! internal temperature (K) - applied as a temperature forcing to the slab ocean
 
 
   !! ===================================================================== !!
@@ -209,5 +226,6 @@ module exoplanet_mod
   real(r8), public, parameter :: &   ! specific heat of dry, air J/kg/K
             exo_cpdair = exo_n2mmr*cpn2 + exo_h2mmr*cph2 + exo_co2mmr*cpco2 + exo_ch4mmr*cpch4 + exo_c2h6mmr*cpc2h6 + exo_o2mmr*cpo2 &
                        + exo_nh3mmr*cpnh3 + exo_commr*cpco
+
 
 end module
