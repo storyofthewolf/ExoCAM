@@ -3581,6 +3581,25 @@ return
 end subroutine parcel_dilute
 
 !-----------------------------------------------------------------------------------------
+real(r8) function vapor_entropy(qv,qsat)
+!-----------------------------------------------------------------------------------------
+!
+! The water-vapour mixing term of the entropy, qv*Rv*ln(qv/qsat).
+! ExoCAM: in a perfectly dry column (qv = 0, as on a dry land planet with
+! qmin = 0) the raw expression is 0*log(0) = NaN, which can reach the parcel
+! temperature and from there the radiation. The term's limit as qv -> 0 is 0.
+!
+     real(r8), intent(in) :: qv, qsat
+
+if (qv > 0._r8) then
+   vapor_entropy = qv*rh2o*log(qv/qsat)
+else
+   vapor_entropy = 0._r8
+end if
+return
+end FUNCTION vapor_entropy
+
+!-----------------------------------------------------------------------------------------
 real(r8) function entropy(TK,p,qtot)
 !-----------------------------------------------------------------------------------------
 !
@@ -3604,7 +3623,7 @@ qv = min(qtot,qsat)                         ! Partition qtot into vapor part onl
 e = qv*p / (eps1 +qv)
 
 entropy = (cpres + qtot*cpliq)*log( TK/tfreez) - rgas*log( (p-e)/pref ) + &
-        L*qv/TK - qv*rh2o*log(qv/qsat)
+        L*qv/TK - vapor_entropy(qv,qsat)
 ! 
 return
 end FUNCTION entropy
@@ -3653,7 +3672,7 @@ t1 = Tfg-10			!low bracket
    qv = min(qt,qsat) 
    e = qv*p / (eps1 +qv)  ! Bolton (eq. 16)
    fs2 = (cpres + qt*cpliq)*log( t2/tfreez ) - rgas*log( (p-e)/pref ) + &
-        L*qv/t2 - qv*rh2o*log(qv/qsat) - s
+        L*qv/t2 - vapor_entropy(qv,qsat) - s
 
    L = rl - (cpliq - cpwv)*(t1-tfreez) 
 
@@ -3662,7 +3681,7 @@ t1 = Tfg-10			!low bracket
    qv = min(qt,qsat) 
    e = qv*p / (eps1 +qv)  ! Bolton (eq. 16)
    fs1 = (cpres + qt*cpliq)*log( t1/tfreez ) - rgas*log( (p-e)/pref ) + &
-        L*qv/t1 - qv*rh2o*log(qv/qsat) - s
+        L*qv/t1 - vapor_entropy(qv,qsat) - s
    
 a=t1
 b=t2
@@ -3730,7 +3749,7 @@ t2=b
    qv = min(qt,qsat) 
    e = qv*p / (eps1 +qv)  ! Bolton (eq. 16)
    fs2 = (cpres + qt*cpliq)*log( t2/tfreez ) - rgas*log( (p-e)/pref ) + &
-        L*qv/t2 - qv*rh2o*log(qv/qsat) - s
+        L*qv/t2 - vapor_entropy(qv,qsat) - s
 fb=fs2
 
    if (i .eq. LOOPMAX - 1) then
