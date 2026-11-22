@@ -84,3 +84,4 @@ See `cesm1.2.1/instructions/adding_oxygen_ozone.txt`. Two-step: set `exo_o2bar` 
 - Do not commit machine-specific paths back to upstream namelists — but the file convention is to keep Discover paths there as templates. Don't "fix" them away.
 - `experimental/` and `extras/` are gitignored intentionally; don't restore them.
 - Companion repo ExoRT must be checked out separately for any actual model run.
+- **ExoCAM 2.0 plan:** `EXOCAM2_PLAN.md`, agreed 2026-11-21. It covers the single FV-only SourceMods set, `user_nl_exo` replacing `exoplanet_mod.F90`, and ExoRT 2.0, released together. circumbinary and `cam_aqua_se` are dropped from 2.0. Until 2.0, the per-config layout above remains in force.
