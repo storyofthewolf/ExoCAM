@@ -1,6 +1,6 @@
 # ExoCAM 2.0 — plan
 
-**Status:** agreed 2026-11-21; Phase 0 drafted, Phase 1 diffs classified (2026-11-21). This is the working plan; edit it as decisions land.
+**Status:** agreed 2026-11-21. Phase 0 baselines running (2026-11-22); Phase 1 code done, BFB check pending. This is the working plan; edit it as decisions land.
 
 ## Decisions
 
@@ -141,7 +141,25 @@ cesm1.2.1/
 3. **Check that SourceMods for an inactive component is harmless.** Does
    `src.clm` copied into an aqua case compile into anything? Check it against
    the compsets; if not, have casemgr copy per component.
+   **Answer (2026-11-22): harmless.** Each component's build reads only
+   `SourceMods/src.<its model>`: a stub reads `src.slnd`/`src.sice`/`src.socn`
+   (`models/*/s*/bld/*.buildexe.csh`), so `src.clm` in an aqua case (SLND) or
+   `src.cice`/`src.docn` in a land case (SICE, SOCN) is never compiled. The
+   `COMPONENTS` lists are kept anyway, so a case's SourceMods file list stays
+   exactly what 1.x installed (handy for casemgr `diff.py`); they could be
+   dropped later.
 4. **Update casemgr and `general_instructions.txt`** for the new layout.
+   **Done 2026-11-22:** `general_instructions.txt`, the config READMEs and
+   `cesm1.2.1/README` (`98b666f`); casemgr `c378430` runs
+   `install_sourcemods.sh` when the config has `COMPONENTS`, otherwise the old
+   `cp -r`, so `main` is unaffected.
+
+**Phase 1 status (2026-11-22):** steps 1–4 committed on `refactor`
+(`98b666f` shared tree, `b71d48e` whitespace merges, `88be16f` docn/`t_int`,
+`bcfc3ce` CLM parameters). Every FV config's own SourceMods is now just
+`exoplanet_mod.F90`, and the three differ only in values. **Outstanding:**
+the BFB check on Discover, casemgr `exp_matrices/sbx_reg0r_phase1.yaml`
+(`exocam_root` = a Discover clone of `refactor`), compared against `reg0_*`.
 
 `exoplanet_mod.F90` stays per config in this phase; Phase 2 replaces it.
 
