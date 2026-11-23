@@ -25,6 +25,9 @@ module exoplanet_mod
                                                                 !! Eventually replace with better orbital computer
   logical, public, parameter :: do_carma_exort = .false.        !! Set to true only if running with the CARMA microphyiscs package
                                                                 !! and linking aerosol absorption to ExoRT
+  logical, public, parameter :: do_exo_clouds = .true.         !! ExoRT v2 (src.cam.exort): H2O cloud RT on.
+                                                                !! .true. reproduces the pre-v2 bundles (always on)
+  logical, public, parameter :: do_exo_haze = do_carma_exort   !! ExoRT v2 (src.cam.exort): haze RT iff CARMA runs
   logical, public, parameter :: do_exo_gw = .false.             !! flag to turn on gravity waves.  Note, present gw wave parameterization
                                                                 !! does not work for low pressure atmospheres.
   logical, public, parameter :: do_am_fixes = .false.            !! Implements Toniazzo et al. 2020 angular momentum correction in SW transport
@@ -140,7 +143,7 @@ module exoplanet_mod
 
   !! Stellar spectral file
   !! Make sure solar file matches spectral intervals for selected RT configuration !!
-  character(len=256), public, parameter :: exo_solar_file = '/discover/nobackup/etwolf/models/ExoRT/data/solar/G2V_SUN_n68.nc'
+  character(len=256), public, parameter :: exo_solar_file = '/discover/nobackup/etwolf/models/ExoRT/data/stellar/G2V_SUN_n84.nc'
 
 
   !! ============== ATMOSPHERIC CONSTITUENT PARAMETERS ============== !!

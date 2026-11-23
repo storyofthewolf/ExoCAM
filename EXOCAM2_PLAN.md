@@ -278,6 +278,14 @@ variables, not parameters.
    `sys_rootdir.F90`, as in `sbx_exort_v2_n1` (both move to the runtime
    `user_nl_exo` when Phase 2 is revisited). The `exo_solar_file` defaults move to
    the n84 grid (`data/stellar/*_n84.nc`).
+   **Done 2026-11-23:** the gates (`do_exo_clouds = .true.`,
+   `do_exo_haze = do_carma_exort`) and the n84 default
+   `data/stellar/G2V_SUN_n84.nc` in all three FV configs. Checked locally with
+   ExoRT's CAM compile gate built against ExoCAM's *real* `exoplanet_mod.F90` (each
+   config) and shared `shr_const_mod.F90` instead of its stubs: the mainline
+   (no-macro) bundle compiles for aqua, land and mixed, and the pre-change file fails
+   on exactly the two missing gates. BFB for n68equiv cases (the flags are unused
+   there; casemgr sets `exo_solar_file` per case).
 2. **casemgr.**
    - an `exort` package with the n84 stem;
    - solar files from `data/stellar/`;
