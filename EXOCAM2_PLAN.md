@@ -1,6 +1,6 @@
 # ExoCAM 2.0 — plan
 
-**Status:** agreed 2026-11-21. Phase 0 baselines recorded for aqua and mixed; Phase 1 done and BFB for aqua and mixed (2026-11-22). Land blocked by a v1.1.0 crash. Phase 2a done and bitwise-verified (2026-11-22). This is the working plan; edit it as decisions land.
+**Status:** agreed 2026-11-21. Phase 0 baselines recorded for aqua and mixed; Phase 1 done and BFB for aqua and mixed (2026-11-22). Phase 2a done and bitwise-verified (2026-11-22). Land baseline (Ben1 hybrid) recorded and BFB (2026-11-23). This is the working plan; edit it as decisions land.
 
 ## Decisions
 
@@ -174,6 +174,17 @@ the first radiation step (nstep 3), ExoRT `aerad_driver` at the call to
 `0xfffffffc06e05698`, a hugely negative offset, as from a NaN converted to an
 array index. Logs in `exocam-baselines/reg0/reg0_land_fv_FAILED/`. Needs a
 debug build (`DEBUG=TRUE`) of the land case before land has a baseline.
+**Land baseline (2026-11-23):** `reg0_land_hyb`, a 5-day hybrid from the spun-up
+`ben1_L51_p6.1` restart (year 156) with Ben1's planet and the shipped land SourceMods;
+archived in `exocam-baselines/reg0/reg0_land_hyb/`. The refactor build
+(`sbx_reg0r_land_hyb`, `400aa22`: Phase 1 + 2a) is **identical in every data variable**
+(`cam.r`, `cam.rs`, `clm2.r`, `cpl.r`). Phases 1 and 2a are now BFB for all three FV configs.
+casemgr `9bbdbee` drops `finidat` from `user_nl_clm` for land/mixed hybrids (CLM takes the
+refcase restart), as the exovolc_* hybrids have it.
+
+**Fresh-start crash, cause found 2026-11-23:** a dry IC with Q = 1e-12 instead of exactly 0
+starts and runs 5 days clean (exocam-operations `dev/dry-start`, trial 9). Fix not chosen.
+
 **Shelved 2026-11-22 by the author.** Findings so far: the shipped
 `landplanet_dry.clm2.r.nc` is byte-identical to the TRAPPIST-1e Ben1 restart
 `ben1_L51_p6.1.clm2.r.0003-01-01` (commit `29b77bf`); a start from the L51 dry
