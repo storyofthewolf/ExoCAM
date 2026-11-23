@@ -303,7 +303,8 @@ variables, not parameters.
    - solar files from `data/stellar/`;
    - an ExoRT `refactor` checkout alongside `main`'s.
 3. **Validation (ExoRT `REFACTOR_PLAN.md` §1.1):**
-   - the clear-sky n68 vs exort comparison;
+   - ~~the clear-sky n68 vs exort comparison~~: dropped 2026-11-23, the RT was
+     validated on ExoRT `refactor` (its `CHANGES.md`, `REGRESSION_STATUS.md`);
    - the optional physics (`-DEXORT_CO2CLD`, `-DEXORT_CARMA`,
      `-DEXORT_SRF_EMISS`) in a real case;
    - the OpenMP checks.
