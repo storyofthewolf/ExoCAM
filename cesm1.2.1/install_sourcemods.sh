@@ -77,19 +77,4 @@ for comp in $comps; do
     done
   done
 done
-
-# exoplanet_mod.F90 is generated, not copied: the template plus the config's
-# user_nl_exo plus the case's own user_nl_exo ($CASEROOT/user_nl_exo, next to
-# DEST), when that exists. Rerun gen_exoplanet_mod.py after editing it.
-if [ -f "$cfgdir/user_nl_exo" ]; then
-  gen=$root/exoplanet/gen_exoplanet_mod.py
-  mkdir -p "$dest/src.share"
-  casenl=$(cd "$dest/.." && pwd)/user_nl_exo
-  if [ -f "$casenl" ]; then
-    python3 "$gen" "$config" --user-nl "$casenl" --out "$dest/src.share/exoplanet_mod.F90"
-  else
-    python3 "$gen" "$config" --out "$dest/src.share/exoplanet_mod.F90"
-  fi
-  n=$((n + 1))
-fi
 echo "install_sourcemods: $config -> $dest ($n files; components: $comps)"

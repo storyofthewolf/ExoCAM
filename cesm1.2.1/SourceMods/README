@@ -9,8 +9,7 @@ Do not copy this directory into a case by hand. Use
     ../install_sourcemods.sh <config> $CASEROOT/SourceMods
 
 which copies only the components in configs/<config>/COMPONENTS, then the
-config's own files, and generates src.share/exoplanet_mod.F90 from
-../exoplanet/ (see ../exoplanet/README). (src.clm is for land/mixed only; src.cice and src.docn
+config's own files. (src.clm is for land/mixed only; src.cice and src.docn
 are for aqua/mixed only.)
 
 Not used by cam_aqua_se or circumbinary, which keep their full SourceMods

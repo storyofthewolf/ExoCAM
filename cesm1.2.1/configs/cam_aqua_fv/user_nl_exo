@@ -1,4 +1,0 @@
-! cam_aqua_fv: the config's settings for exoplanet_mod.F90.
-! The template, cesm1.2.1/exoplanet/exoplanet_mod.F90.template, documents every
-! parameter and carries the aquaplanet defaults, so nothing is set here.
-! Put a case's own settings in $CASEROOT/user_nl_exo, not in this file.

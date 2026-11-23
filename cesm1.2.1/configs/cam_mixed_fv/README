@@ -29,8 +29,6 @@ xmlchange RTM_MODE=NULL
 install SourceMods into your $Case directory (shared tree + this config's files):
      $EXOCAM/cesm1.2.1/install_sourcemods.sh cam_mixed_fv $CASEROOT/SourceMods
 copy namelist files into your $Case directory
-     set the planet in $CASEROOT/user_nl_exo, then regenerate exoplanet_mod.F90
-     (see $EXOCAM/cesm1.2.1/exoplanet/README)
      for "MG" clouds, uncomment blocks in user_nl_cam
 
 == finish ==

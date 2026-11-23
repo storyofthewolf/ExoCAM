@@ -1,7 +1,0 @@
-! cam_mixed_fv: the config's settings for exoplanet_mod.F90, applied on top of
-! cesm1.2.1/exoplanet/exoplanet_mod.F90.template (aquaplanet defaults).
-! Put a case's own settings in $CASEROOT/user_nl_exo, not in this file.
-
-! Modern Earth: O2 present, and with it ozone (user_nl_cam prescribed_ozone_*)
-exo_o2bar        = 0.2095_r8   ! O2 inventory (bar)
-exo_convect_plim = 4.e3_r8     ! convection floor (Pa); 5 Pa is unstable with ozone
