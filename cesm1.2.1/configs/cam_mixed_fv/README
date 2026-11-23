@@ -4,7 +4,7 @@ description:        basic configuration
 physics:            "RK" or "MG"
 surface type:       land and slab ocean mixed
 dynamical core:     finite volume
-radiation scheme:   user selected from ExoRT/3dmodels
+radiation scheme:   ExoRT 2.0, ExoRT/3dmodels/src.cam.exort
 
 Notes: Default settings in user_nl_cam and user_nl_cpl modified to duplicating modern Earth
 
@@ -15,10 +15,10 @@ create_newcase -case $my_aquaplanet_case -res f45_g37 -mach discover -compset E2
 
 == set levels, physics, and the ExoRT radiative transfer package ==
 -- default command below uses "RK" (i.e. cam4) clouds.
-xmlchange CAM_CONFIG_OPTS="-nlev 40 -phys cam4 -usr_src $EXORT_PATH/ExoRT/3dmodels/src.cam.n******"
+xmlchange CAM_CONFIG_OPTS="-nlev 40 -phys cam4 -usr_src $EXORT_PATH/ExoRT/3dmodels/src.cam.exort"
 
 -- command below builds with "MG" (cam5) clouds
-xmlchange CAM_CONFIG_OPTS="-nlev 40 -phys cam4 -usr_src $EXORT_PATH/ExoRT/3dmodels/src.cam.n****** -chem none -microphys mg1"
+xmlchange CAM_CONFIG_OPTS="-nlev 40 -phys cam4 -usr_src $EXORT_PATH/ExoRT/3dmodels/src.cam.exort -chem none -microphys mg1"
 
 
 == turn off river routings ==
@@ -30,6 +30,12 @@ install SourceMods into your $Case directory (shared tree + this config's files)
      $EXOCAM/cesm1.2.1/install_sourcemods.sh cam_mixed_fv $CASEROOT/SourceMods
 copy namelist files into your $Case directory
      for "MG" clouds, uncomment blocks in user_nl_cam
+
+== point ExoRT at its data ==
+set exort_rootdir in $EXORT_PATH/ExoRT/3dmodels/src.cam.exort/sys_rootdir.F90
+set exo_solar_file in $CASEROOT/SourceMods/src.share/exoplanet_mod.F90
+     to an 84-band file, $EXORT_PATH/ExoRT/data/stellar/*_n84.nc
+keep NTHRDS_ATM = 1
 
 == finish ==
 build and run

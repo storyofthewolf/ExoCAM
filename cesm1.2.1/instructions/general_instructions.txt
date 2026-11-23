@@ -85,12 +85,20 @@ STEP 4:  Link ExoRT radiative transfer model and set configure options
   Go to your case directory ($CASEROOT, in NCAR parlance)
   issue command...
 
-  xmlchange CAM_CONFIG_OPTS="-nlev 40 -phys cam4 -usr_src $EXORT_PATH/ExoRT/3dmodels/src.cam.n******"
-  
-  Where $EXORT_PATH is the path to where your ExoRT has been checked out, 
-  and "n******" represents the spectra you want to use (e.g., replace with "n68equiv"). 
-  Radiative transfer models, ready for linking with CESM in 3D are located at
-  ../ExoRT/3dmodels 
+  xmlchange CAM_CONFIG_OPTS="-nlev 40 -phys cam4 -usr_src $EXORT_PATH/ExoRT/3dmodels/src.cam.exort"
+
+  Where $EXORT_PATH is the path to where your ExoRT has been checked out.
+  src.cam.exort is the ExoRT 2.0 radiation bundle (84 bands); the FV configs
+  (cam_aqua_fv, cam_land_fv, cam_mixed_fv) are set up for it.  ExoRT 2.0 must
+  be paired with ExoCAM 2.0.  To use the older bundles (e.g., src.cam.n68equiv),
+  use ExoCAM 1.x (tag v1.1.0) with ExoRT 1.x.  cam_aqua_se and circumbinary
+  are not part of ExoCAM 2.0 and still use the older bundles.
+
+  Before building, open $EXORT_PATH/ExoRT/3dmodels/src.cam.exort/sys_rootdir.F90
+  and set exort_rootdir to your ExoRT checkout (with trailing slash).  ExoRT
+  reads its k-coefficient, cloud and stellar data from there.
+
+  Keep NTHRDS_ATM = 1 with src.cam.exort (OpenMP not yet validated in 3D).
 
   NOTE: If you plan on making changes to the radiation model, I would suggest making
   a duplicate copy somewhere else on your machine.
@@ -126,14 +134,17 @@ STEP 5:  Copy SourceMods and namelist files to your case
   open the namelist files (user_*) and change the paths to initial files to
   match the location of your ExoCAM distribution.
 
-  Also, open SourceMods/src.share/exoplanet_mod.F90 and edit the path of 
-  'exo_solar_file' to match the ExoRT path.
+  Also, open SourceMods/src.share/exoplanet_mod.F90 and edit the path of
+  'exo_solar_file' to match the ExoRT path.  With src.cam.exort it must be an
+  84-band stellar file, $EXORT_PATH/ExoRT/data/stellar/*_n84.nc.  For a cool
+  star that exists only as an _n68 file, ExoRT/tools/stellar_n68_to_n84.py
+  makes the n84 copy.
 
-  Edit or verify the correct path for exort_rootdir in the file 
-  ExoRT/3dmodels/src.cam.n******/sys_rootdir.F90
+  Edit or verify the correct path for exort_rootdir in the file
+  ExoRT/3dmodels/src.cam.exort/sys_rootdir.F90 (see STEP 4)
 
   Optional: if you wish to make modifications to the radiative transfer
-  modules, copy the RT folder $EXORT_PATH/ExoRT/3dmodels/src.cam.n****** into your
+  modules, copy the RT folder $EXORT_PATH/ExoRT/3dmodels/src.cam.exort into your
   $CASEROOT/SourceMods directory, and change -usr_src config opt approriately.
 
 

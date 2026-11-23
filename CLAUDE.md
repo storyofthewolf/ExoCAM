@@ -42,6 +42,8 @@ Critical consistency rules enforced only by convention (the model will not check
 xmlchange CAM_CONFIG_OPTS="-nlev 40 -phys cam4 -usr_src $EXORT_PATH/ExoRT/3dmodels/src.cam.n<spectra>"
 ```
 
+**On `refactor` (2.0) the FV configs are set up for ExoRT 2.0's `src.cam.exort`** (84 bands, `exo_solar_file` = `data/stellar/*_n84.nc`, `do_exo_clouds`/`do_exo_haze` in `exoplanet_mod.F90`); ExoRT's data root stays in its own `src.cam.exort/sys_rootdir.F90`. The list below is the 1.x pairing.
+
 Common spectra: `n68equiv` (default, recommended since 2020), `n84equiv` (extends shortward for F-dwarfs), `n28archean` (high-CO₂ Archean), `n42h2o` (H₂O/N₂/H₂ only). Match `exo_solar_file`, the ozone file, and (for `circumbinary`) the in-tree RT to the chosen package. Per-config quickstart in each `cesm1.2.1/configs/<config>/README`.
 
 For "MG" (CAM5 Morrison-Gettelman) clouds instead of default "RK" (CAM4 Rasch-Kristjansson), append `-chem none -microphys mg1` to `CAM_CONFIG_OPTS` **and** uncomment the MG block (`eddy_scheme`, `macrop_scheme`, `shallow_scheme`, `uwshcu_rpen`) in `user_nl_cam`. The two go together.

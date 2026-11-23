@@ -286,6 +286,18 @@ variables, not parameters.
    (no-macro) bundle compiles for aqua, land and mixed, and the pre-change file fails
    on exactly the two missing gates. BFB for n68equiv cases (the flags are unused
    there; casemgr sets `exo_solar_file` per case).
+
+   **Data root, decided 2026-11-23 (author):** ExoRT owns it, in its
+   `src.cam.exort/sys_rootdir.F90`, as the 1.x instructions already say. ExoCAM
+   does not carry it (an `exo_exort_root` in `exoplanet_mod.F90` was proposed and
+   declined: ExoRT must stay a model that runs on its own). `exo_solar_file` stays a
+   full path in `exoplanet_mod.F90`. casemgr will therefore need the ExoRT checkout's
+   `sys_rootdir.F90` to name that checkout, not a per-case edit. Note: ExoRT
+   `REFACTOR_PLAN.md` §3.11 still says CAM should take the root from `user_nl_exo`;
+   that line conflicts with this decision.
+   **Docs, 2026-11-23:** `general_instructions.txt` STEPs 4–5 and the three FV
+   config READMEs now name `src.cam.exort`, the `sys_rootdir.F90` edit, the n84
+   stellar file and `NTHRDS_ATM = 1`, so the manual path matches the configs.
 2. **casemgr.**
    - an `exort` package with the n84 stem;
    - solar files from `data/stellar/`;
