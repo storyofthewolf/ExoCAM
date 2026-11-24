@@ -1,6 +1,6 @@
 # ExoCAM 2.0 — plan
 
-**Status:** agreed 2026-11-21. Phase 0 baselines recorded for aqua and mixed; Phase 1 done and BFB for aqua and mixed (2026-11-22). Land baseline (Ben1 hybrid) recorded and BFB (2026-11-23). Phase 2 deferred past 2.0 (2026-11-23): `exoplanet_mod.F90` stays compile-time; 2a reverted. This is the working plan; edit it as decisions land.
+**Status:** agreed 2026-11-21. Phase 0 baselines recorded for aqua and mixed; Phase 1 steps 1–4 done and BFB for aqua and mixed (2026-11-22); steps 5–6 (one `exoplanet_mod.F90`, shared namelists) added 2026-11-23. Land baseline (Ben1 hybrid) recorded and BFB (2026-11-23). Phase 2 deferred past 2.0 (2026-11-23): `exoplanet_mod.F90` stays compile-time; 2a reverted. This is the working plan; edit it as decisions land.
 
 ## Decisions
 
@@ -168,6 +168,49 @@ cesm1.2.1/
    `cesm1.2.1/README` (`98b666f`); casemgr `c378430` runs
    `install_sourcemods.sh` when the config has `COMPONENTS`, otherwise the old
    `cp -r`, so `main` is unaffected.
+5. **One shared `exoplanet_mod.F90`** (added 2026-11-23, author). The three
+   copies differ only in values:
+
+   | Parameter | aqua | land | mixed |
+   |---|---|---|---|
+   | `exo_o2bar` | 0.0 | 0.0 | 0.2095 |
+   | `exo_convect_plim` | 5 Pa | 5 Pa | 4000 Pa |
+   | `exo_lnd_watmin` | 1e-10 | 1e-15 | 1e-10 |
+   | `exo_lnd_emis_soil` / `_snow` | 0.96 / 0.97 | 1.0 / 1.0 | 0.96 / 0.97 |
+   | `do_exo_lnd_q2m_gridbox` | .false. | .true. | .false. |
+
+   The land values are read only by CLM, so aqua never sees them. Move one
+   file to `SourceMods/src.share/`, with the aqua values as defaults. Each
+   config's README lists its overrides for a manual setup. casemgr applies them
+   from the registry (`cesm_config.<type>`), under the matrix values, which
+   win. Whether mixed should simply take land's CLM values is a science choice
+   for the author; it is not part of this step, since it changes mixed's answer.
+   **BFB:** all three reg0 baselines, built through casemgr.
+6. **Shared namelists** (added 2026-11-23, author; the 2024 precursor's other
+   half). Today each config ships its own `user_nl_*` files. They differ for
+   real reasons and from drift:
+   - **real, per surface:** `ncdata`, `bnd_topo`, `finidat`, the sea-ice
+     grid/IC files, and the ozone files (mixed has Earth ozone) in `user_nl_cam`;
+     `orb_iyear` in `user_nl_cpl` (mixed 2000, the others -1);
+   - **drift, to classify one by one as in step 2:** `eddy_scheme`'s position,
+     `cldfrc_rhminl = 0.88` in mixed only, small `fincl1` differences, and
+     commented-out spectral-output blocks for the old n68/n28 band counts (update
+     to n84 or drop);
+   - **a defect:** land's `user_nl_cam` has `prescribed_ozone_datapath =
+     /discover/...'` with no opening quote. casemgr overwrites the line, so its
+     cases are unaffected, but a manual land setup cannot parse it.
+
+   Target: `cesm1.2.1/namelist_files/` holds the common files; each config
+   keeps a short overlay of its surface inputs only. The installer combines
+   them and refuses a key set in both layers, as `install_sourcemods.sh` does for
+   files (CESM 1.2.1's build-namelist may reject a duplicate key anyway). casemgr
+   uses the installer in place of its `cp namelist_files/*`.
+   **BFB:** each config's generated `atm_in`, `drv_in`, `docn_in`, `ice_in`,
+   `lnd_in` must match its reg0 case's (ignoring comments, order and the
+   case-name strings), and the reg0 restarts must match bit for bit.
+
+   With steps 5 and 6 done, a config is its `COMPONENTS` line, its namelist
+   overlay and its README.
 
 **Phase 1 status (2026-11-22):** steps 1–4 committed on `refactor`
 (`98b666f` shared tree, `b71d48e` whitespace merges, `88be16f` docn/`t_int`,
