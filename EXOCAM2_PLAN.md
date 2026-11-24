@@ -302,6 +302,21 @@ variables, not parameters.
    - an `exort` package with the n84 stem;
    - solar files from `data/stellar/`;
    - an ExoRT `refactor` checkout alongside `main`'s.
+
+   **Done 2026-11-23 on casemgr branch `v2`** (`139e1f1`; `main` stays the
+   production 1.x tool until 2.0, author's call). Registry `package_roots.exort`
+   names `models/ExoCAM-refactor` and `models/ExoRT-refactor` (fresh Discover
+   clones of `refactor`, made the same day); an `exort` case resolves to them and
+   counts as production, a 1.x case resolves as before (its newcase script is
+   byte-identical to `main`'s). An `exort` newcase gets the n84 sun from
+   `data/stellar/`, `NTHRDS_ATM = 1`, and a guard that refuses an ExoRT checkout
+   whose `sys_rootdir.F90` names any data root but itself; `generate` also refuses
+   a 1.x `exoplanet_mod.F90` (no `do_exo_clouds`/`do_exo_haze`). `a7dfd5f`
+   reverts casemgr's dead Phase 2a path (`deb5be0`). The `n84equiv` and `exort`
+   n84 grids are identical, so `_n84` star products serve both.
+   The Discover clone's `sys_rootdir.F90` names itself (hand edit, uncommitted,
+   2026-11-23). **Still open:** no Discover checkout of casemgr `v2` to run it
+   from yet.
 3. **Validation (ExoRT `REFACTOR_PLAN.md` §1.1):**
    - ~~the clear-sky n68 vs exort comparison~~: dropped 2026-11-23, the RT was
      validated on ExoRT `refactor` (its `CHANGES.md`, `REGRESSION_STATUS.md`);
