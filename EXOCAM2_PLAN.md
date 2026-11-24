@@ -11,6 +11,10 @@
     2026-11-23: see Phase 2);
   - ExoRT 2.0 (`src.cam.exort`) is hooked up;
   - regression baselines guard every step.
+- **2.0 ships as one presentable package** (author, 2026-11-23): ExoCAM
+  `refactor`, ExoRT `refactor` and casemgr `v2` are released together, and a
+  new user must be able to install and run them from the docs, as with the
+  original ExoCAM. Working code alone is not enough. Phase 4 holds the items.
 - **Released together with ExoRT 2.0.** Until that day, ExoCAM 1.x with
   ExoRT 1.x (`v1.1.0`, `n68equiv`) stays the public pair, and ExoRT `main`
   stays v1.
@@ -48,6 +52,16 @@
 - **ExoRT 2.0 has run in ExoCAM** (sandbox `sbx_exort_v2_n1`, 2026-11-21), at
   ~1.9× the original throughput. What a v2 case needs is in ExoRT
   `REFACTOR_PLAN.md` §0.
+- **A 2024 precursor exists:** `/gpfsm/dnb33/etwolf/models/ExoCAM2` on
+  Discover (not a git repo), a hand-rolled first try at the same idea. It has a
+  single `SourceMods/` tree; `config_exocam.py <case> --newcase -config aqua
+  -rad n68equiv`, which reads machine paths from a 5-line `sys.in` and runs
+  create_newcase/clone, the XML changes and the copies (the seed of casemgr);
+  `config_ccsm_utils.py`, a stub to install the machine files into a CESM tree;
+  and `diff_exocam.py` (now casemgr `diff.py`). Two of its notes are still open
+  here: shared namelists as well as shared SourceMods, and copying the ExoRT
+  bundle into each case's SourceMods so ExoRT drift cannot break old cases
+  (`-usr_src` takes a comma-separated list, so subdirectories can stay apart).
 - **nsplit:** the configs ship `nsplit = 32`. Measured on pt04 (126 ranks):
   - 41.7 sim yr/day at 32, 49.0 at 16, 53.7 at 8; 4 crashed.
   - It is a per-campaign science choice, so the default stays at 32.
@@ -340,6 +354,24 @@ variables, not parameters.
    `data/kdist/n68h2o/...`, which no longer exists. Then merge `refactor` →
    `main` and tag `v2.0.0`.
 3. **ExoCAM.** Tag `v2.0.0`.
+4. **casemgr.** Merge `v2` → `main` (once the smoke test passes; 1.x scripts
+   are byte-identical, so it can land before the release), delete
+   `package_roots.exort` at the release, tag `v2.0.0` with the other two.
+5. **The package: what a new user gets** (decision above). Known gaps:
+   - **One front door.** A getting-started page that goes from three clones
+     plus CESM 1.2.1 to a built, running case, with the compatibility table.
+     Today the procedure is split across `general_instructions.txt`, three
+     config READMEs, ExoRT's README and casemgr's README.
+   - **casemgr's registry is the author's.** `config_registry.yaml` carries
+     Discover paths and the author's IC tables in the repo. Ship a template
+     (`config_registry.example.yaml`) and keep the live one out of git, as
+     `sys.in` did in the precursor.
+   - **Machine files.** Installing `ccsm_utils_files` into the CESM tree is
+     still a manual copy (the precursor's `config_ccsm_utils.py` was a stub).
+   - **Install-time edits.** ExoRT's `sys_rootdir.F90` and the Discover paths
+     in the namelist templates: state them in the front door, in one place.
+   - **A worked example** that a new user runs first: one aquaplanet matrix,
+     shipped with casemgr (the `sbx_v2smoke` matrix is the model for it).
 
 ---
 
@@ -359,3 +391,11 @@ variables, not parameters.
 - CARMA: an add-on directory, or part of the single tree behind a switch?
 - The runtime `user_nl_exo` (Phase 2, deferred past 2.0): design, then casemgr in tandem.
 - When the convection PR lands, relative to Phase 1.
+- **The front door for a new user:** casemgr's matrix workflow (generate →
+  make → submit), or a thin single-case command on top of it, like the
+  precursor's `config_exocam.py`?
+- **Backwards compatibility after 2.0** (author unsure, 2026-11-23). casemgr's
+  `package_roots` works in either direction: after the release it can send
+  1.x packages to a v1 checkout. Open: how long 1.x cases stay supported,
+  whether ExoCAM keeps a `v1` branch as ExoRT will, and whether a case should
+  snapshot its ExoRT bundle (precursor note above).
