@@ -397,9 +397,10 @@ variables, not parameters.
    `data/kdist/n68h2o/...`, which no longer exists. Then merge `refactor` →
    `main` and tag `v2.0.0`.
 3. **ExoCAM.** Tag `v2.0.0`.
-4. **casemgr.** Merge `v2` → `main` (once the smoke test passes; 1.x scripts
-   are byte-identical, so it can land before the release), delete
-   `package_roots.exort` at the release, tag `v2.0.0` with the other two.
+4. **casemgr.** `v2` and `main` stay separate until the release (author,
+   2026-11-23: `main` carries ongoing 1.x work). At the release: merge `v2` →
+   `main`, delete `package_roots.exort`, tag `v2.0.0` with the other two. 1.x
+   fixes made on `main` meanwhile are merged into `v2` as they land.
 5. **The package: what a new user gets** (decision above). Known gaps:
    - **One front door.** A getting-started page that goes from three clones
      plus CESM 1.2.1 to a built, running case, with the compatibility table.
